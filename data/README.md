@@ -27,5 +27,11 @@ and text artifacts without modifying generated corpus files.
 Regenerate the fixture from the repository root with:
 
 ```bash
-PYTHONPATH=src python -c "from pathlib import Path; from visdoc_retrieve.synthetic_corpus import generate_default_corpus; generate_default_corpus(Path('data/synthetic-smoke'))"
+PYTHONPATH=src python - <<'PY'
+from pathlib import Path
+
+from visdoc_retrieve.synthetic_corpus import generate_default_corpus
+
+generate_default_corpus(Path("data/synthetic-smoke"))
+PY
 ```
