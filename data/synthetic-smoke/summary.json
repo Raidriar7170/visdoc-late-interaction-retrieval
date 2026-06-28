@@ -1,0 +1,38 @@
+{
+  "content_hash_algorithm": "sha256(image_bytes + nul + text_bytes)",
+  "corpus_id": "synthetic-smoke",
+  "counts": {
+    "families": 3,
+    "pages": 24,
+    "queries": 72
+  },
+  "logical_root": "data/synthetic-smoke",
+  "manifest_digests": {
+    "pages": "4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1",
+    "queries": "bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11"
+  },
+  "manifests": {
+    "pages": "data/synthetic-smoke/pages.jsonl",
+    "queries": "data/synthetic-smoke/queries.jsonl"
+  },
+  "phase_boundary": "data-format-and-artifacts-only",
+  "query_types": [
+    "figure",
+    "layout",
+    "ocr_failure",
+    "table",
+    "text"
+  ],
+  "splits": {
+    "dev": [
+      "manual-b"
+    ],
+    "test": [
+      "manual-c"
+    ],
+    "train": [
+      "manual-a"
+    ]
+  },
+  "version": 1
+}

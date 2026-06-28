@@ -1,0 +1,9 @@
+Pump Controller Field Manual / control panel layout
+Document family: manual-a; split: train.
+Technical domain: pump controller; bilingual signal: 泵站控制.
+Reference code MANUAL-A-06 links the page image to OCR-like text.
+Table signal: operating limit 26 psi and ΔT 9 C.
+Figure signal: callout F6 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 泵站控制 before reset sequence.

@@ -1,0 +1,9 @@
+Pump Controller Field Manual / calibration table
+Document family: manual-a; split: train.
+Technical domain: pump controller; bilingual signal: 泵站控制.
+Reference code MANUAL-A-01 links the page image to OCR-like text.
+Table signal: operating limit 21 psi and ΔT 4 C.
+Figure signal: callout F1 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 泵站控制 before reset sequence.

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VisDoc-Retrieve Phase 0 Bootstrap Brief</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1f2937;
+        --muted: #4b5563;
+        --line: #d1d5db;
+        --panel: #f8fafc;
+        --accent: #2563eb;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #ffffff;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 24px 56px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        margin: 28px 0 10px;
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li {
+        margin: 6px 0;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.95em;
+      }
+
+      .status {
+        display: inline-block;
+        margin: 10px 0 18px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--accent);
+        background: var(--panel);
+        font-weight: 600;
+      }
+
+      .summary {
+        border-left: 4px solid var(--accent);
+        padding: 12px 16px;
+        background: var(--panel);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>VisDoc-Retrieve Phase 0 Bootstrap</h1>
+      <div class="status">状态：BOOTSTRAPPED，OpenSpec 已归档</div>
+
+      <section class="summary">
+        <p>
+          结论：本阶段只完成仓库骨架和本地验证基线，没有引入数据、检索器、训练、
+          指标或最终 benchmark 结果。
+        </p>
+      </section>
+
+      <h2>本阶段改动</h2>
+      <ul>
+        <li>建立轻量 Python <code>src</code> 布局和 import-only smoke test。</li>
+        <li>补充 README、AGENTS、configs/data 占位说明和 reports 进度账本。</li>
+        <li>README 首屏保留视觉文档检索定位，并明确暂无最终 benchmark 结果。</li>
+      </ul>
+
+      <h2>关键来源</h2>
+      <ul>
+        <li><code>openspec/changes/archive/2026-06-27-bootstrap-visdoc-retrieve/proposal.md</code></li>
+        <li><code>openspec/changes/archive/2026-06-27-bootstrap-visdoc-retrieve/design.md</code></li>
+        <li><code>openspec/specs/project-bootstrap/spec.md</code></li>
+        <li><code>openspec/specs/validation-baseline/spec.md</code></li>
+        <li><code>reports/progress-ledger.yaml</code></li>
+      </ul>
+
+      <h2>验证结果</h2>
+      <ul>
+        <li><code>pytest -q</code>：通过，<code>1 passed in 0.00s</code></li>
+        <li><code>ruff check .</code>：通过，<code>All checks passed!</code></li>
+        <li><code>mypy src</code>：通过，<code>Success: no issues found in 1 source file</code></li>
+        <li><code>openspec validate --all --strict</code>：通过，<code>1 passed, 0 failed</code></li>
+      </ul>
+
+      <h2>仍需避免夸大</h2>
+      <ul>
+        <li>不能声称检索提升、模型优越性、冻结测试表现或最终结果。</li>
+        <li>不能把本仓库描述成 chatbot、通用 RAG、Agent 或浏览器自动化项目。</li>
+        <li>后续数据、OCR、检索、训练和评测必须通过新的 OpenSpec 变更进入。</li>
+      </ul>
+
+      <h2>推荐下一步</h2>
+      <p class="muted">
+        当前 Phase 0 已完成并归档。推荐下一步是为 Phase 1 数据格式与 synthetic corpus
+        单独开启新的 OpenSpec change。
+      </p>
+    </main>
+  </body>
+</html>

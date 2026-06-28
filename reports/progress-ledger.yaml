@@ -1,0 +1,58 @@
+current_phase: 1
+status: DATA_FORMAT_SYNTHETIC_CORPUS_READY
+change: add-data-format-and-synthetic-corpus
+openspec_status: archived
+openspec_archive_path: openspec/changes/archive/2026-06-27-add-data-format-and-synthetic-corpus
+updated: 2026-06-28
+data_status:
+  synthetic_smoke: materialized
+  families: 3
+  pages: 24
+  queries: 72
+  splits:
+    train:
+      - manual-a
+    dev:
+      - manual-b
+    test:
+      - manual-c
+  manifests:
+    pages: data/synthetic-smoke/pages.jsonl
+    queries: data/synthetic-smoke/queries.jsonl
+    summary: data/synthetic-smoke/summary.json
+  manifest_digests:
+    pages: 4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1
+    queries: bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11
+visual_retriever_status: not_implemented
+training_status: not_started
+final_test_status: not_run
+validation_baseline:
+  pytest: passed
+  ruff: passed
+  mypy: passed
+  openspec: passed
+validation_commands:
+  - command: pytest -q
+    outcome: 16 passed
+  - command: ruff check .
+    outcome: All checks passed!
+  - command: mypy src
+    outcome: Success, no issues found in 3 source files
+  - command: openspec validate --all --strict
+    outcome: 4 passed, 0 failed
+  - command: git diff --check
+    outcome: passed with no whitespace errors
+notes:
+  - Phase 1 adds only data schema validation and a deterministic synthetic smoke corpus.
+  - Visual retrieval, training, final tests, and result claims remain not started.
+opsx_auto_status:
+  prerequisites: prepared
+  change: prepare-opsx-auto-prerequisites
+  config_dir: .opsx-auto-config
+  validation_wrapper: scripts/validate-local-core.sh
+  runtime_store_initialized: false
+  dedicated_worktree_ready: false
+  initial_commit_ready: false
+  notes:
+    - The repo-local unattended-local-core config and validation policy are prepared for later review.
+    - Runtime store initialization is intentionally not performed in this phase.

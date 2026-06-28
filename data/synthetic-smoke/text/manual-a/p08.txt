@@ -1,0 +1,9 @@
+Pump Controller Field Manual / 中英 mixed checklist
+Document family: manual-a; split: train.
+Technical domain: pump controller; bilingual signal: 泵站控制.
+Reference code MANUAL-A-08 links the page image to OCR-like text.
+Table signal: operating limit 28 psi and ΔT 11 C.
+Figure signal: callout F8 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 泵站控制 before reset sequence.

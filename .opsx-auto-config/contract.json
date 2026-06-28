@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "loop_id": "visdoc-text-baselines-auto",
+  "contract_sha256": "50769aee320ea4a3866dc3275b56567d64f002da392aaa0c22b2d8f05e7674b2",
+  "goal_definitions": [
+    {
+      "goal_id": "visdoc.text.baselines.auto",
+      "role": "core",
+      "text": "Implement the add-text-retrieval-baselines OpenSpec change under the established project boundaries.",
+      "required_dependency_goal_ids": [],
+      "evidence_requirements": [
+        {
+          "requirement_id": "evidence.tests.metrics",
+          "description": "Focused and full local validation pass for text corpus loading, BM25, dense-text, hybrid/RRF, metrics, and diagnostic report behavior.",
+          "mandatory": true
+        },
+        {
+          "requirement_id": "evidence.report.boundary",
+          "description": "Generated reports and documentation remain diagnostic-only and keep final test, visual inference, hard-negative mining, and training out of scope.",
+          "mandatory": true
+        }
+      ]
+    }
+  ],
+  "constraints": [
+    "Use OpenSpec artifacts as the source of truth for the active implementation phase.",
+    "Keep edits inside bounded repo-relative phase allowed paths.",
+    "Do not mutate .opsx-auto, .opsx-auto-config, .git, or paths outside the phase scope."
+  ],
+  "success_thresholds": [
+    "All mandatory evidence requirements are fresh for the active phase.",
+    "The local validation wrapper passes without network, GPU, model download, staging, commit, merge, push, archive, or deployment."
+  ],
+  "completion_criteria": [
+    "The active OpenSpec task list is complete.",
+    "pytest, Ruff, mypy, OpenSpec strict validation, and whitespace checks pass through the pinned validation wrapper.",
+    "A concise Chinese Human Brief records the phase outcome and remaining limitations."
+  ],
+  "privacy_boundaries": [
+    "Do not expose secrets, credentials, tokens, SSH material, private IPs, or unsanitized private logs."
+  ],
+  "release_boundaries": [
+    "No automatic staging, commit, merge, push, pull request, release, deployment, or external account action."
+  ],
+  "non_goal_statements": [
+    "No ColPali or ColQwen inference in the opsx-auto prerequisite phase.",
+    "No Phase 2 retrieval implementation in the opsx-auto prerequisite phase.",
+    "No hard-negative mining, LoRA or QLoRA training, final test evaluation, or benchmark improvement claim.",
+    "No .opsx-auto store initialization during prerequisite preparation."
+  ]
+}

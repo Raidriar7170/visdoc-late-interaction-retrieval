@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "local-core": {
+      "argv": [
+        "scripts/validate-local-core.sh"
+      ],
+      "repo_script_sha256": "b489508ada7858d1d21acb0dea134359312e76daf28f2bfc1f0bcb78eb3dcc97",
+      "shebang_interpreter_path": "/bin/bash",
+      "shebang_interpreter_realpath": "/bin/bash",
+      "shebang_interpreter_sha256": "fde343ee184953c1fa1185abddeaa8be61c6acbebae4eb54db5d6b55b09a5755",
+      "timeout_seconds": 600
+    }
+  }
+}

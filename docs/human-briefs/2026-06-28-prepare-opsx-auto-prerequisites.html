@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>opsx-auto 前置配置 Brief</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #596275;
+        --line: #d6dde8;
+        --panel: #f7f9fc;
+        --accent: #2563eb;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #ffffff;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 24px 56px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        margin: 28px 0 10px;
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li {
+        margin: 6px 0;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.95em;
+      }
+
+      .status {
+        display: inline-block;
+        margin: 10px 0 18px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--accent);
+        background: var(--panel);
+        font-weight: 600;
+      }
+
+      .summary {
+        border-left: 4px solid var(--accent);
+        padding: 12px 16px;
+        background: var(--panel);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>opsx-auto 前置配置</h1>
+      <div class="status">状态：prepared，runtime store 未初始化</div>
+
+      <section class="summary">
+        <p>
+          结论：本阶段只准备了后续 unattended-local-core 所需的 repo-local
+          配置、hash-bound validation policy 和说明文档；没有启动
+          <code>$opsx-auto</code>，也没有创建 <code>.opsx-auto/</code> runtime store。
+        </p>
+      </section>
+
+      <h2>本阶段改动</h2>
+      <ul>
+        <li>新增 <code>.opsx-auto-config/unattended-local.json</code>，限定后续自动阶段可编辑路径。</li>
+        <li>新增 <code>.opsx-auto-config/contract.json</code>，绑定下一阶段 text-baseline loop 的 core goal 和 mandatory evidence。</li>
+        <li>新增 <code>.opsx-auto-config/validation-policy.json</code>，绑定验证脚本和 <code>/bin/bash</code> hash。</li>
+        <li>新增 <code>scripts/validate-local-core.sh</code>，固定本地验证顺序。</li>
+        <li>新增 focused pytest，校验配置、hash、自举边界和不创建 store。</li>
+      </ul>
+
+      <h2>关键文件</h2>
+      <ul>
+        <li><code>.opsx-auto-config/</code></li>
+        <li><code>scripts/validate-local-core.sh</code></li>
+        <li><code>tests/test_opsx_auto_prerequisites.py</code></li>
+        <li><code>docs/opsx-auto-prerequisites.md</code></li>
+        <li><code>openspec/changes/prepare-opsx-auto-prerequisites/</code></li>
+      </ul>
+
+      <h2>验证状态</h2>
+      <ul>
+        <li><code>pytest -q tests/test_opsx_auto_prerequisites.py</code>：通过，4 passed。</li>
+        <li><code>bash scripts/validate-local-core.sh</code>：通过，包含 pytest、Ruff、mypy、OpenSpec strict 和 whitespace check。</li>
+        <li><code>opsx-auto-runtime.py inspect</code>：不再报告 missing_config_dir；仍因当前不是 dedicated linked worktree 而不能初始化 store。</li>
+      </ul>
+
+      <h2>剩余限制</h2>
+      <ul>
+        <li>当前 repo 仍是无初始 commit 的主 worktree，不能直接成功 <code>init-store</code>。</li>
+        <li>下一步需要人工创建初始 commit 和 dedicated linked worktree 后再初始化 runtime store。</li>
+        <li>本阶段没有实现 BM25、dense、hybrid/RRF、metrics 或报告生成。</li>
+        <li>不能声称 ColPali/ColQwen 结果、训练结果、final test 表现或 benchmark improvement。</li>
+      </ul>
+
+      <h2>推荐下一步</h2>
+      <p class="muted">
+        先完成一次人工 Git 基线整理；之后在 dedicated linked worktree 中运行
+        <code>init-store</code>，再用 bounded phase manifest 进入自动循环。
+      </p>
+    </main>
+  </body>
+</html>

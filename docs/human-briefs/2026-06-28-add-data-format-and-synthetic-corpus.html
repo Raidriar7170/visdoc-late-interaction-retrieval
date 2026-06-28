@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Phase 1 Data Format And Synthetic Corpus Brief</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #596275;
+        --line: #d6dde8;
+        --panel: #f7f9fc;
+        --accent: #0f766e;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #ffffff;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 24px 56px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        margin: 28px 0 10px;
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li {
+        margin: 6px 0;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.95em;
+      }
+
+      .status {
+        display: inline-block;
+        margin: 10px 0 18px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--accent);
+        background: var(--panel);
+        font-weight: 600;
+      }
+
+      .summary {
+        border-left: 4px solid var(--accent);
+        padding: 12px 16px;
+        background: var(--panel);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Phase 1 Data Format And Synthetic Corpus</h1>
+      <div class="status">状态：applying，本地验证已通过</div>
+
+      <section class="summary">
+        <p>
+          结论：本阶段建立了 page/query manifest、family split 校验、final-test
+          leakage guard，以及一个 3 个文档族、24 页、72 条 query 的 synthetic
+          smoke corpus；没有引入检索模型、训练或结果指标。
+        </p>
+      </section>
+
+      <h2>本阶段改动</h2>
+      <ul>
+        <li>新增 <code>data_schema.py</code>，校验 page/query JSONL、split 和 test leakage。</li>
+        <li>新增 <code>synthetic_corpus.py</code>，用 ReportLab + PyMuPDF 生成 PDF、PNG 和 OCR-like text。</li>
+        <li>物化 <code>data/synthetic-smoke/</code>：3 个 PDF、24 张 PNG、24 个 text、2 个 manifest 和 summary。</li>
+        <li>README、data README 和 progress ledger 更新到 Phase 1 数据可用状态。</li>
+      </ul>
+
+      <h2>关键文件</h2>
+      <ul>
+        <li><code>openspec/changes/archive/2026-06-27-add-data-format-and-synthetic-corpus/</code></li>
+        <li><code>src/visdoc_retrieve/data_schema.py</code></li>
+        <li><code>src/visdoc_retrieve/synthetic_corpus.py</code></li>
+        <li><code>tests/test_data_schema.py</code></li>
+        <li><code>tests/test_synthetic_corpus.py</code></li>
+        <li><code>tests/test_split_leakage.py</code></li>
+        <li><code>data/synthetic-smoke/summary.json</code></li>
+      </ul>
+
+      <h2>验证状态</h2>
+      <ul>
+        <li><code>pytest -q</code>：通过，<code>16 passed</code>。</li>
+        <li><code>ruff check .</code>：通过，<code>All checks passed!</code></li>
+        <li><code>mypy src</code>：通过，<code>Success: no issues found in 3 source files</code></li>
+        <li><code>openspec validate --all --strict</code>：通过，4 passed, 0 failed。</li>
+        <li><code>git diff --check</code>：通过，无 whitespace error。</li>
+      </ul>
+
+      <h2>不要夸大</h2>
+      <ul>
+        <li>不能声称 Recall/MRR/NDCG、检索提升、模型优越性或 frozen-test 表现。</li>
+        <li>leakage guard 只是校验，不生成 hard negatives 或训练样本。</li>
+        <li>synthetic corpus 是 smoke fixture，不是最终评测集或 benchmark 结果。</li>
+      </ul>
+
+      <h2>推荐下一步</h2>
+      <p class="muted">
+        当前 Phase 1 已完成并归档。推荐下一步是单独开启文本检索 baseline 的 OpenSpec change。
+      </p>
+    </main>
+  </body>
+</html>

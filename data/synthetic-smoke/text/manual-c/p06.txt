@@ -1,0 +1,9 @@
+Robotic Arm Calibration Manual / control panel layout
+Document family: manual-c; split: test.
+Technical domain: robotic arm; bilingual signal: 机械臂校准.
+Reference code MANUAL-C-06 links the page image to OCR-like text.
+Table signal: operating limit 26 psi and ΔT 9 C.
+Figure signal: callout F6 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 机械臂校准 before reset sequence.

@@ -1,0 +1,9 @@
+Optical Switch Service Manual / faint scanned label
+Document family: manual-b; split: dev.
+Technical domain: optical switch; bilingual signal: 光交换机.
+Reference code MANUAL-B-07 links the page image to OCR-like text.
+Table signal: operating limit 27 psi and ΔT 10 C.
+Figure signal: callout F7 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 光交换机 before reset sequence.

@@ -1,0 +1,9 @@
+Pump Controller Field Manual / torque specification
+Document family: manual-a; split: train.
+Technical domain: pump controller; bilingual signal: 泵站控制.
+Reference code MANUAL-A-04 links the page image to OCR-like text.
+Table signal: operating limit 24 psi and ΔT 7 C.
+Figure signal: callout F4 labels sensor, valve, and service port.
+Layout signal: top-left panel, center warning band, and footer revision box.
+OCR-failure-style signal: S0L-1 may be confused with SOL-I in scans.
+中文/English mixed note: 检查 泵站控制 before reset sequence.

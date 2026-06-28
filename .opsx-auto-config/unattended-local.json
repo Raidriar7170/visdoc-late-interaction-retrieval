@@ -1,0 +1,26 @@
+{
+  "mode": "unattended-local-core",
+  "allowed_paths": [
+    "README.md",
+    "configs/**",
+    "data/README.md",
+    "docs/**",
+    "openspec/changes/add-text-retrieval-baselines/**",
+    "reports/**",
+    "scripts/validate-local-core.sh",
+    "src/visdoc_retrieve/**",
+    "tests/**"
+  ],
+  "phase_file_globs": [
+    ".opsx-auto-inbox/*.json"
+  ],
+  "validation_profile": "local-core",
+  "completion_validation_profile": "local-core",
+  "max_phases_per_run": 5,
+  "max_runtime_minutes": 120,
+  "max_repair_rounds_per_failure": 3,
+  "max_no_progress_phases": 3,
+  "max_consecutive_replans": 2,
+  "max_changed_files_per_phase": 40,
+  "max_changed_lines_per_phase": 4000
+}
