@@ -1,7 +1,7 @@
 current_phase: 2
-status: TEXT_BASELINE_DIAGNOSTICS_READY
+status: TEXT_BASELINE_DIAGNOSTICS_ARCHIVED
 change: add-text-retrieval-baselines
-openspec_status: applying
+openspec_status: archived
 updated: 2026-06-28
 data_status:
   synthetic_smoke: materialized
@@ -50,7 +50,7 @@ validation_commands:
   - command: mypy src
     outcome: Success, no issues found in 6 source files
   - command: openspec validate --all --strict
-    outcome: 6 passed, 0 failed
+    outcome: 7 passed, 0 failed
   - command: git diff --check
     outcome: passed with no whitespace errors
   - command: rg forbidden Phase 2 expansion and claim terms

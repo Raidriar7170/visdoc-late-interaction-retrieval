@@ -80,7 +80,7 @@
 <main>
   <h1>Phase 2：文本检索基线诊断</h1>
   <p><strong>结论：</strong>本阶段已建立 BM25、本地确定性 dense-text、Hybrid/RRF 三个文本-only 诊断基线，并默认只评估 synthetic-smoke 的 dev split。</p>
-  <p class="status">状态：needs review，本地验证已通过，尚未归档</p>
+  <p class="status">状态：archived，本地验证已通过，OpenSpec 已归档</p>
 
   <h2>本阶段变更</h2>
   <table>
@@ -102,7 +102,7 @@
     <tr><td><code>pytest -q</code></td><td>29 passed</td></tr>
     <tr><td><code>ruff check .</code></td><td>All checks passed!</td></tr>
     <tr><td><code>mypy src</code></td><td>Success, no issues found in 6 source files</td></tr>
-    <tr><td><code>openspec validate --all --strict</code></td><td>6 passed, 0 failed</td></tr>
+    <tr><td><code>openspec validate --all --strict</code></td><td>归档后重新验证通过：7 passed, 0 failed</td></tr>
     <tr><td><code>git diff --check</code></td><td>无 whitespace error</td></tr>
     <tr><td><code>scope scan</code></td><td>仅发现边界说明、spec/test 引用，以及 false / not_run 状态字段</td></tr>
   </table>
@@ -112,7 +112,7 @@
   <p>本阶段没有图像检索、视觉 late-interaction、hard-negative mining 输出、训练、adapter、GPU/A100 依赖、网络下载或 final test 评估。</p>
 
   <h2>建议下一步</h2>
-  <p>完成本阶段验证与 diff review；若通过，再考虑 OpenSpec archive。后续视觉检索或最终测试必须另开变更。</p>
+  <p>本阶段已归档。后续视觉检索、hard-negative mining、训练或最终测试必须另开 OpenSpec 变更。</p>
 </main>
 </body>
 </html>
