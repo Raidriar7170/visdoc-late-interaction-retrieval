@@ -21,7 +21,8 @@ Default split contract:
 
 Boundary: this directory contains no embeddings, retrieval scores, ranking
 metrics, hard-negative triples, checkpoints, adapters, benchmark reports, or
-final result tables.
+final result tables. Phase 2 text-baseline diagnostics consume these manifests
+and text artifacts without modifying generated corpus files.
 
 Regenerate the fixture from the repository root with:
 

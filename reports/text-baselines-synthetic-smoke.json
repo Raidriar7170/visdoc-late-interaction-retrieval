@@ -1,0 +1,120 @@
+{
+  "boundary": {
+    "benchmark_claim": "none",
+    "external_embedding_paths_enabled_by_default": false,
+    "gpu_required": false,
+    "hard_negative_triples_emitted": false,
+    "network_required": false,
+    "text_only": true,
+    "training_run": false,
+    "visual_retrieval_run": false
+  },
+  "corpus": {
+    "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+    "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+  },
+  "evaluated_splits": [
+    "dev"
+  ],
+  "excluded_splits": [
+    "test"
+  ],
+  "final_test_status": "not_run",
+  "methods": {
+    "bm25": {
+      "diagnostics": {
+        "index_size_pages": {
+          "label": "diagnostic",
+          "value": 8
+        },
+        "latency_per_query_ms": {
+          "label": "diagnostic",
+          "status": "not_measured_deterministic_report",
+          "value": null
+        },
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "external_embeddings_enabled": false,
+      "hard_negative_hit_rate": {
+        "status": "not_available",
+        "support": 0
+      },
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7687499999999999,
+        "ndcg_at_10": 0.8238302057361316,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.9166666666666666
+      }
+    },
+    "dense_text": {
+      "diagnostics": {
+        "index_size_pages": {
+          "label": "diagnostic",
+          "value": 8
+        },
+        "latency_per_query_ms": {
+          "label": "diagnostic",
+          "status": "not_measured_deterministic_report",
+          "value": null
+        },
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "external_embeddings_enabled": false,
+      "hard_negative_hit_rate": {
+        "status": "not_available",
+        "support": 0
+      },
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7723214285714285,
+        "ndcg_at_10": 0.8269308196901023,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.875
+      }
+    },
+    "hybrid_rrf": {
+      "diagnostics": {
+        "index_size_pages": {
+          "label": "diagnostic",
+          "value": 8
+        },
+        "latency_per_query_ms": {
+          "label": "diagnostic",
+          "status": "not_measured_deterministic_report",
+          "value": null
+        },
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "external_embeddings_enabled": false,
+      "hard_negative_hit_rate": {
+        "status": "not_available",
+        "support": 0
+      },
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7673611111111112,
+        "ndcg_at_10": 0.8225533048975268,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.875
+      }
+    }
+  },
+  "name": "synthetic-smoke-text-baselines",
+  "status": "diagnostic_only"
+}

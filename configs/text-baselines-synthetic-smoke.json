@@ -1,0 +1,26 @@
+{
+  "evaluated_splits": [
+    "dev"
+  ],
+  "final_test_split": "test",
+  "methods": {
+    "bm25": {
+      "enabled": true
+    },
+    "dense_text": {
+      "enabled": true,
+      "external_embeddings": {
+        "enabled": false,
+        "path": null
+      }
+    },
+    "hybrid_rrf": {
+      "enabled": true,
+      "rrf_k": 60
+    }
+  },
+  "name": "synthetic-smoke-text-baselines",
+  "output_path": "reports/text-baselines-synthetic-smoke.json",
+  "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+  "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+}

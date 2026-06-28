@@ -1,8 +1,7 @@
-current_phase: 1
-status: DATA_FORMAT_SYNTHETIC_CORPUS_READY
-change: add-data-format-and-synthetic-corpus
-openspec_status: archived
-openspec_archive_path: openspec/changes/archive/2026-06-27-add-data-format-and-synthetic-corpus
+current_phase: 2
+status: TEXT_BASELINE_DIAGNOSTICS_READY
+change: add-text-retrieval-baselines
+openspec_status: applying
 updated: 2026-06-28
 data_status:
   synthetic_smoke: materialized
@@ -24,6 +23,18 @@ data_status:
     pages: 4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1
     queries: bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11
 visual_retriever_status: not_implemented
+text_baseline_status:
+  status: diagnostic_report_generated
+  config: configs/text-baselines-synthetic-smoke.json
+  report: reports/text-baselines-synthetic-smoke.json
+  evaluated_splits:
+    - dev
+  enabled_methods:
+    - bm25
+    - dense_text
+    - hybrid_rrf
+  external_embeddings_enabled_by_default: false
+  hard_negative_hit_rate: not_available
 training_status: not_started
 final_test_status: not_run
 validation_baseline:
@@ -33,18 +44,20 @@ validation_baseline:
   openspec: passed
 validation_commands:
   - command: pytest -q
-    outcome: 16 passed
+    outcome: 29 passed
   - command: ruff check .
     outcome: All checks passed!
   - command: mypy src
-    outcome: Success, no issues found in 3 source files
+    outcome: Success, no issues found in 6 source files
   - command: openspec validate --all --strict
-    outcome: 4 passed, 0 failed
+    outcome: 6 passed, 0 failed
   - command: git diff --check
     outcome: passed with no whitespace errors
+  - command: rg forbidden Phase 2 expansion and claim terms
+    outcome: only boundary/spec/test references and false or not_run status flags
 notes:
-  - Phase 1 adds only data schema validation and a deterministic synthetic smoke corpus.
-  - Visual retrieval, training, final tests, and result claims remain not started.
+  - Phase 2 adds only text-only diagnostic baselines over existing Phase 1 text artifacts.
+  - Visual retrieval, training, final tests, hard-negative mining output, and result claims remain not started.
 opsx_auto_status:
   prerequisites: prepared
   change: prepare-opsx-auto-prerequisites

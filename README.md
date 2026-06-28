@@ -6,16 +6,18 @@ path is to compare OCR/text baselines with visual late-interaction retrieval,
 then evaluate hard-negative mining and future LoRA adaptation under a frozen
 benchmark contract.
 
-**Current status:** Phase 1 data format and deterministic synthetic smoke corpus
-are available. No final benchmark results exist yet, and this repository does
-not claim retrieval improvement, model superiority, or frozen-test performance.
+**Current status:** Phase 2 text-only diagnostic baselines are available for the
+synthetic smoke development split. No final benchmark results exist yet, and
+this repository does not claim retrieval improvement, model superiority, or
+frozen-test performance.
 
 This repository currently contains the project skeleton, local validation
 configuration, Phase 1 page/query manifest validation, and a small generated
-synthetic technical page corpus under `data/synthetic-smoke/`. It does not yet
-contain retrieval implementations, ranking metrics, ColPali/ColQwen inference,
-embedding caches, training scripts, adapters, checkpoints, benchmark reports, or
-final result tables.
+synthetic technical page corpus under `data/synthetic-smoke/`. It also contains
+deterministic BM25, local dense-text, and hybrid/RRF text baselines plus a
+diagnostic report runner. It does not contain ColPali/ColQwen inference,
+embedding caches, training scripts, adapters, checkpoints, final benchmark
+reports, or final result tables.
 
 ## Project Boundary
 
@@ -39,3 +41,12 @@ openspec validate --all --strict
 
 The tests import the package and validate the synthetic corpus without network
 access, GPU hardware, model downloads, or external services.
+
+Generate the text-only diagnostic report from the repository root with:
+
+```bash
+PYTHONPATH=src python -m visdoc_retrieve.text_baseline_report configs/text-baselines-synthetic-smoke.json
+```
+
+The default config evaluates only the synthetic smoke `dev` split and records
+the final `test` split as `not_run`.
