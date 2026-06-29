@@ -1,4 +1,5 @@
 {
+  "candidate_universe": "evaluated_split_pages",
   "evaluated_splits": [
     "dev"
   ],
@@ -7,14 +8,28 @@
     "bm25": {
       "enabled": true
     },
-    "dense_text": {
+    "lexical_cosine": {
       "enabled": true,
       "external_embeddings": {
         "enabled": false,
         "path": null
       }
     },
-    "hybrid_rrf": {
+    "neural_text": {
+      "enabled": true,
+      "external_embeddings": {
+        "enabled": false,
+        "path": null
+      },
+      "provider": {
+        "type": "local_stub"
+      }
+    },
+    "bm25_lexical_rrf": {
+      "enabled": true,
+      "rrf_k": 60
+    },
+    "bm25_neural_rrf": {
       "enabled": true,
       "rrf_k": 60
     }

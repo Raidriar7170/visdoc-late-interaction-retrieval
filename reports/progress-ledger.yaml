@@ -1,7 +1,8 @@
 current_phase: 3A
-status: VISUAL_SMOKE_DIAGNOSTICS_ARCHIVED
-change: add-visual-late-interaction-smoke-baseline
+status: PHASE_2_5_TEXT_CANDIDATE_UNIVERSE_ARCHIVED
+change: add-neural-text-baseline-and-candidate-universe
 openspec_status: archived
+archive: openspec/changes/archive/2026-06-29-add-neural-text-baseline-and-candidate-universe
 updated: 2026-06-29
 data_status:
   synthetic_smoke: materialized
@@ -39,15 +40,38 @@ visual_baseline_status:
   hard_negative_hit_rate: not_available
 text_baseline_status:
   status: diagnostic_report_generated
+  phase: "2.5"
   config: configs/text-baselines-synthetic-smoke.json
   report: reports/text-baselines-synthetic-smoke.json
   evaluated_splits:
     - dev
+  candidate_universe: evaluated_split_pages
+  candidate_page_count: 8
+  candidate_split_counts:
+    dev: 8
+  evaluated_query_count: 24
+  ranked_pages_per_query: 8
+  candidate_universe_options:
+    - evaluated_split_pages
+    - non_train_pages
+    - all_pages
   enabled_methods:
     - bm25
-    - dense_text
-    - hybrid_rrf
+    - lexical_cosine
+    - neural_text
+    - bm25_lexical_rrf
+    - bm25_neural_rrf
+  neural_text_provider:
+    provider: local_stub
+    status: mock_or_local_stub
+    external_embeddings_enabled: false
+    network_required: false
+    gpu_required: false
+    model_download_required: false
+    embedding_cache_required: false
   external_embeddings_enabled_by_default: false
+  model_download_required: false
+  embedding_cache_required: false
   hard_negative_hit_rate: not_available
 training_status: not_started
 final_test_status: not_run
@@ -57,26 +81,29 @@ validation_baseline:
   mypy: passed
   openspec: passed
 validation_commands:
-  - command: pytest -q tests/test_visual_retrieval_baselines.py
-    outcome: 4 passed
+  - command: python -m py_compile src/visdoc_retrieve/*.py
+    outcome: passed
+  - command: python - <<'PY' ... tomllib.loads(Path('pyproject.toml').read_text()) ... PY
+    outcome: pyproject parse ok
+  - command: pytest -q tests/test_text_retrieval_baselines.py tests/test_retrieval_metrics_and_report.py
+    outcome: 16 passed
   - command: pytest -q
-    outcome: 33 passed
+    outcome: 40 passed
   - command: ruff check .
     outcome: All checks passed!
   - command: mypy src
     outcome: Success, no issues found in 8 source files
   - command: openspec validate --all --strict
-    outcome: 8 passed, 0 failed
+    outcome: 9 passed, 0 failed
   - command: git diff --check
     outcome: passed with no whitespace errors
-  - command: changed-file whitespace scan including untracked Phase 3A files
-    outcome: passed with no trailing whitespace matches
-  - command: rg forbidden Phase 3A expansion and claim terms
-    outcome: only boundary/spec/test references and false or not_run status flags
+  - command: scope scan for forbidden Phase 2.5 expansion and claim terms
+    outcome: no data changes; external/GPU/model/cache flags false; final test not_run; no forbidden implementation dependencies
 notes:
   - Phase 2 adds only text-only diagnostic baselines over existing Phase 1 text artifacts.
+  - Phase 2.5 renames the local lexical cosine baseline, records candidate-universe support, and adds only a deterministic local-stub neural text path.
   - Phase 3A adds only deterministic local visual-smoke diagnostics over existing Phase 1 image artifacts.
-  - Real visual model inference, training, final tests, hard-negative mining output, and result claims remain not started.
+  - Real visual model inference, external embeddings, training, final tests, hard-negative mining output, and result claims remain not started.
 opsx_auto_status:
   prerequisites: prepared
   change: prepare-opsx-auto-prerequisites

@@ -8,10 +8,11 @@ with visual late-interaction retrieval,
 then evaluate hard-negative mining
 and future LoRA adaptation under a frozen benchmark contract.
 
-**Current status:** Phase 3A diagnostic baselines are available
-for the synthetic smoke development split:
-Phase 2 text-only baselines plus a deterministic
-local visual-smoke report.
+**Current status:** Phase 3A diagnostic baselines remain available,
+with a Phase 2.5 text/candidate-universe clarification applied
+to the synthetic smoke development split:
+Phase 2 text-only baselines, explicit candidate-universe metadata,
+and a deterministic local visual-smoke report.
 No final benchmark results exist yet,
 and this repository does not claim retrieval improvement,
 model superiority, or frozen-test performance.
@@ -21,12 +22,14 @@ local validation configuration,
 Phase 1 page/query manifest validation,
 and a small generated synthetic technical page corpus
 under `data/synthetic-smoke/`.
-It also contains deterministic BM25, local dense-text,
-and hybrid/RRF text baselines plus a diagnostic report runner.
+It also contains deterministic BM25, local lexical cosine,
+a config-gated local-stub neural text baseline,
+BM25+lexical RRF, and BM25+neural RRF text diagnostics
+plus a diagnostic report runner.
 It also contains a deterministic local visual-smoke runner
 over existing page image artifacts.
 It does not contain ColPali/ColQwen inference,
-embedding caches, training scripts,
+external embedding caches, training scripts,
 adapters, checkpoints,
 final benchmark reports, or final result tables.
 
@@ -66,7 +69,12 @@ PYTHONPATH=src python -m visdoc_retrieve.text_baseline_report configs/text-basel
 ```
 
 The default config evaluates only the synthetic smoke `dev` split
-and records the final `test` split as `not_run`.
+against the `evaluated_split_pages` candidate universe:
+24 dev queries ranked over 8 dev pages.
+It records the final `test` split as `not_run`.
+The `neural_text` method uses a deterministic local stub provider
+with external embeddings, network, GPU, model downloads,
+and embedding caches disabled.
 
 Generate the deterministic local visual-smoke diagnostic report with:
 

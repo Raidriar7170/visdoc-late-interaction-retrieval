@@ -1,50 +1,4 @@
-# text-retrieval-baselines Specification
-
-## Purpose
-Define the text-only retrieval baseline layer that loads Phase 1 page/query
-manifests and produces deterministic BM25, dense-text, and hybrid/RRF rankings
-without visual inference, model downloads, GPU requirements, training, or final
-test evaluation.
-## Requirements
-### Requirement: Manifest-backed text retrieval corpus
-The system SHALL load text retrieval corpora from Phase 1 page and query
-manifests, validate the records, resolve repo-relative page text artifacts, and
-keep page/query split metadata available to retrievers and reports.
-
-#### Scenario: Valid text corpus loads from manifests
-- **WHEN** the text baseline loader is given existing Phase 1 page and query manifests
-           plus existing text artifacts
-- **THEN** it returns page and query records keyed by stable IDs with their split,
-           family, query type, positive page IDs, and page text available for retrieval
-
-#### Scenario: Missing page text fails loading
-- **WHEN** a page manifest record points to a missing text artifact
-- **THEN** the text baseline loader fails with a validation error instead of silently
-           indexing an empty page
-
-### Requirement: Deterministic BM25 retriever
-The system SHALL provide a BM25 retriever over page text with deterministic
-tokenization, scoring, ranking, and stable tie-breaking by page ID.
-
-#### Scenario: BM25 ranks exact lexical matches first
-- **WHEN** a toy corpus contains one page that shares the query's distinctive tokens and
-           another page that does not
-- **THEN** the BM25 retriever ranks the lexical match ahead of the non-match
-
-#### Scenario: BM25 tie-breaking is stable
-- **WHEN** two pages receive the same BM25 score for a query
-- **THEN** their relative order is deterministic and sorted by stable page ID
-
-### Requirement: Text-only baseline boundary
-The text retrieval baseline layer SHALL NOT read page images, run visual
-late-interaction models, emit hard-negative triples, train adapters, or evaluate
-the final test split by default.
-
-#### Scenario: Baseline execution remains text-only
-- **WHEN** the default text baseline report is generated
-- **THEN** it consumes page text artifacts and manifests without invoking ColPali,
-           ColQwen, image embeddings, hard-negative mining, LoRA/QLoRA training, GPU
-           hardware, or final test evaluation
+## ADDED Requirements
 
 ### Requirement: Deterministic lexical cosine baseline
 The system SHALL provide a local deterministic lexical cosine or local TF-IDF
@@ -132,3 +86,23 @@ embedding caches, or evaluate the final test split by default.
 - **THEN** it consumes text artifacts and manifests without invoking ColPali,
            ColQwen, image embeddings, hard-negative mining, LoRA/QLoRA
            training, GPU hardware, or final-test query evaluation
+
+## REMOVED Requirements
+
+### Requirement: Deterministic dense-text baseline
+**Reason**: The existing local implementation is lexical cosine over local text
+tokens, not a neural dense embedding model. Keeping the `dense_text` name makes
+diagnostic evidence look stronger than it is.
+
+**Migration**: Rename the local method to `lexical_cosine` or
+`local_tfidf_cosine`, update configs, reports, tests, docs, and ledgers, and
+use the new config-gated neural text baseline for any future BGE-M3 or
+sentence-transformers-style dense method.
+
+### Requirement: Hybrid reciprocal-rank fusion retriever
+**Reason**: The current hybrid requirement does not identify whether the dense
+side is lexical cosine or a neural text baseline.
+
+**Migration**: Replace it with explicit BM25+lexical RRF and BM25+neural RRF
+method contracts so reports disclose which dense-side retrieval method was
+used.

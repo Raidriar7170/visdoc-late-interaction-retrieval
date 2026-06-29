@@ -6,13 +6,21 @@ design, specs, and tasks before implementing non-trivial changes.
 
 ## Current Phase Boundary
 
-The repository is currently through Phase 3A:
+The repository is currently through Phase 3A, with Phase 2.5
+text/candidate-universe clarification applied:
 
 - Phase 1 synthetic corpus and manifest validation exist under
   `data/synthetic-smoke/` and `src/visdoc_retrieve/data_schema.py`.
 - Phase 2 text-only diagnostic baselines exist for the synthetic smoke `dev`
-  split, including deterministic BM25, local dense-text, hybrid/RRF, metrics,
-  and diagnostic report generation.
+  split, including deterministic BM25, local lexical cosine, retrieval
+  metrics, and diagnostic report generation.
+- Phase 2.5 clarifies text candidate universes and method naming. The default
+  text diagnostic config uses `evaluated_split_pages`, ranks 24 dev queries
+  over 8 dev pages, records candidate split counts and ranked-page support,
+  and includes a deterministic local-stub `neural_text` method plus
+  `bm25_lexical_rrf` and `bm25_neural_rrf` method IDs. External embeddings,
+  network access, GPU execution, model downloads, and embedding caches remain
+  disabled.
 - Phase 3A deterministic local visual-smoke diagnostics exist for the
   synthetic smoke `dev` split, including manifest-backed page-image loading, a
   hashed patch-token late-interaction-style smoke scorer, and diagnostic report

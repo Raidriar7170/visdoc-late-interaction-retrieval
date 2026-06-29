@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 2.5 Text Candidate Universe Brief</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #52606d;
+      --line: #d7dde5;
+      --panel: #ffffff;
+      --bg: #f7f9fb;
+      --accent: #0f766e;
+      --warn: #9a3412;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 26px 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 8px 0;
+    }
+    code {
+      background: #f0f3f6;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.92em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border: 1px solid #9bd3c7;
+      background: #e7f7f3;
+      color: var(--accent);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .warn {
+      border-left: 4px solid var(--warn);
+      background: #fff7ed;
+      padding: 10px 12px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 2.5：Text Baseline 与 Candidate Universe 澄清</h1>
+  <p><span class="status">状态：archived，本地验证通过，OpenSpec canonical specs 已同步</span></p>
+  <p><strong>一句话结论：</strong>本阶段只澄清文本基线命名和候选页集合：旧的 <code>dense_text</code> 已替换为 <code>lexical_cosine</code>，默认报告显式记录 <code>evaluated_split_pages</code> 候选集合，并加入只使用本地 deterministic stub 的 <code>neural_text</code> 诊断路径。</p>
+
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>新增 candidate universe 配置：<code>evaluated_split_pages</code>、<code>non_train_pages</code>、<code>all_pages</code>。</li>
+    <li>默认报告仍只评估 synthetic-smoke <code>dev</code> queries：24 个查询 rank 8 个 dev pages。</li>
+    <li>文本方法 ID 现在是 <code>bm25</code>、<code>lexical_cosine</code>、<code>neural_text</code>、<code>bm25_lexical_rrf</code>、<code>bm25_neural_rrf</code>。</li>
+    <li><code>neural_text</code> 使用 <code>local_stub</code> provider；外部 embedding、网络、GPU、model download、embedding cache 均为 false。</li>
+    <li><code>bm25_neural_rrf</code> 只有在 <code>neural_text</code> 启用时才出现在报告中，避免把 lexical 和 neural hybrid 混在一起。</li>
+  </ul>
+
+  <h2>关键文件</h2>
+  <table>
+    <tr><th>类别</th><th>文件</th></tr>
+    <tr><td>实现</td><td><code>src/visdoc_retrieve/text_retrieval.py</code>、<code>src/visdoc_retrieve/text_baseline_report.py</code></td></tr>
+    <tr><td>测试</td><td><code>tests/test_text_retrieval_baselines.py</code>、<code>tests/test_retrieval_metrics_and_report.py</code></td></tr>
+    <tr><td>配置/报告</td><td><code>configs/text-baselines-synthetic-smoke.json</code>、<code>reports/text-baselines-synthetic-smoke.json</code>、<code>reports/progress-ledger.yaml</code></td></tr>
+    <tr><td>OpenSpec</td><td><code>openspec/changes/archive/2026-06-29-add-neural-text-baseline-and-candidate-universe/</code></td></tr>
+  </table>
+
+  <h2>验证结果</h2>
+  <table>
+    <tr><th>命令</th><th>结果</th></tr>
+    <tr><td><code>pytest -q tests/test_text_retrieval_baselines.py tests/test_retrieval_metrics_and_report.py</code></td><td>RED：11 failed / 5 passed；GREEN：16 passed</td></tr>
+    <tr><td><code>python -m py_compile src/visdoc_retrieve/*.py</code></td><td>passed</td></tr>
+    <tr><td><code>pyproject.toml</code> tomllib parse</td><td><code>pyproject parse ok</code></td></tr>
+    <tr><td><code>pytest -q</code></td><td>40 passed</td></tr>
+    <tr><td><code>ruff check .</code></td><td>All checks passed!</td></tr>
+    <tr><td><code>mypy src</code></td><td>Success, no issues found in 8 source files</td></tr>
+    <tr><td><code>openspec validate --all --strict</code></td><td>9 passed, 0 failed</td></tr>
+    <tr><td><code>git diff --check</code></td><td>passed</td></tr>
+    <tr><td>scope scan</td><td>无新增 data；external/GPU/model/cache flags 为 false；final test 仍为 <code>not_run</code>；实现未引入 forbidden dependencies。</td></tr>
+  </table>
+
+  <h2>边界与风险</h2>
+  <div class="warn">
+    这是 Phase 2.5 文本诊断与候选集合澄清，不是真实 neural embedding 证据，也不是视觉模型结果。不要声称 ColPali/ColQwen、hard-negative mining、training、adapter、final test、benchmark improvement、retrieval improvement 或 model superiority。
+  </div>
+  <p>Phase 3A 的 deterministic visual-smoke baseline 仍然存在；本阶段没有修改 visual retrieval/report code，也没有新增数据。</p>
+
+  <h2>推荐下一步</h2>
+  <p>当前 change 已归档；任何真实外部 embedding、视觉模型、hard-negative mining、训练或 final test 都应另开后续 OpenSpec change。</p>
+</main>
+</body>
+</html>

@@ -7,7 +7,9 @@ import re
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from hashlib import blake2b
 from pathlib import Path
+from typing import Protocol
 
 from visdoc_retrieve.data_schema import (
     QueryRecord,
@@ -62,6 +64,17 @@ class RankingItem:
 
     page_id: str
     score: float
+
+
+class EmbeddingProvider(Protocol):
+    """Minimal embedding-provider contract for config-gated neural text smoke."""
+
+    @property
+    def status(self) -> dict[str, object]:
+        """Return provider provenance and local/external execution flags."""
+
+    def embed(self, text: str) -> tuple[float, ...]:
+        """Embed text deterministically for ranking."""
 
 
 def load_text_corpus(
@@ -184,9 +197,10 @@ class BM25Retriever:
         return score
 
 
-class DenseTextRetriever:
-    """Deterministic local lexical-vector dense-text baseline."""
+class LexicalCosineRetriever:
+    """Deterministic local lexical-vector cosine baseline."""
 
+    method_id = "lexical_cosine"
     uses_external_embeddings = False
 
     def __init__(self, pages: Sequence[TextPage]) -> None:
@@ -213,8 +227,93 @@ class DenseTextRetriever:
         return tuple(sorted(scored, key=lambda item: (-item.score, item.page_id)))
 
 
-class HybridRetriever:
-    """RRF hybrid over BM25 and dense-text rankings."""
+class LocalStubEmbeddingProvider:
+    """Deterministic local embedding provider for neural-text validation."""
+
+    def __init__(self, *, dimensions: int = 32) -> None:
+        if dimensions <= 0:
+            raise ValueError("dimensions must be positive")
+        self._dimensions = dimensions
+
+    @property
+    def status(self) -> dict[str, object]:
+        """Return explicit non-external provider status for reports."""
+
+        return {
+            "provider": "local_stub",
+            "status": "mock_or_local_stub",
+            "external_embeddings_enabled": False,
+            "network_required": False,
+            "gpu_required": False,
+            "model_download_required": False,
+            "embedding_cache_required": False,
+        }
+
+    def embed(self, text: str) -> tuple[float, ...]:
+        """Hash tokens into a deterministic normalized vector."""
+
+        vector = [0.0] * self._dimensions
+        for token in tokenize(text):
+            digest = blake2b(token.encode("utf-8"), digest_size=8).digest()
+            bucket = int.from_bytes(digest[:4], "big") % self._dimensions
+            sign = 1.0 if digest[4] % 2 == 0 else -1.0
+            vector[bucket] += sign
+        return _normalized_vector(vector)
+
+
+class NeuralTextRetriever:
+    """Config-gated neural text retriever backed by an embedding provider."""
+
+    method_id = "neural_text"
+
+    def __init__(
+        self,
+        pages: Sequence[TextPage],
+        *,
+        provider: EmbeddingProvider | None = None,
+    ) -> None:
+        self._pages = tuple(sorted(pages, key=lambda page: page.page_id))
+        self._provider = provider or LocalStubEmbeddingProvider()
+        self._vectors = {
+            page.page_id: self._provider.embed(page.text) for page in self._pages
+        }
+
+    @property
+    def index_size_pages(self) -> int:
+        """Return the number of indexed pages."""
+
+        return len(self._pages)
+
+    @property
+    def uses_external_embeddings(self) -> bool:
+        """Return whether the configured provider uses external embeddings."""
+
+        return bool(self._provider.status["external_embeddings_enabled"])
+
+    @property
+    def provider_status(self) -> dict[str, object]:
+        """Return provider provenance and execution flags."""
+
+        return self._provider.status
+
+    def rank(self, query: str) -> tuple[RankingItem, ...]:
+        """Rank all indexed pages with provider embeddings."""
+
+        query_vector = self._provider.embed(query)
+        scored = [
+            RankingItem(
+                page.page_id,
+                _vector_dot(query_vector, self._vectors[page.page_id]),
+            )
+            for page in self._pages
+        ]
+        return tuple(sorted(scored, key=lambda item: (-item.score, item.page_id)))
+
+
+class BM25LexicalRrfRetriever:
+    """BM25 plus lexical-cosine reciprocal-rank fusion."""
+
+    method_id = "bm25_lexical_rrf"
 
     def __init__(
         self,
@@ -222,16 +321,16 @@ class HybridRetriever:
         *,
         rrf_k: int = 60,
         bm25_rankings: Mapping[str, Sequence[str]] | None = None,
-        dense_rankings: Mapping[str, Sequence[str]] | None = None,
+        lexical_rankings: Mapping[str, Sequence[str]] | None = None,
     ) -> None:
         self._pages = tuple(sorted(pages, key=lambda page: page.page_id))
         self._page_ids = tuple(page.page_id for page in self._pages)
         self._rrf_k = rrf_k
         self._bm25_rankings = bm25_rankings
-        self._dense_rankings = dense_rankings
+        self._lexical_rankings = lexical_rankings
         self._bm25 = BM25Retriever(self._pages) if bm25_rankings is None else None
-        self._dense = (
-            DenseTextRetriever(self._pages) if dense_rankings is None else None
+        self._lexical = (
+            LexicalCosineRetriever(self._pages) if lexical_rankings is None else None
         )
 
     @property
@@ -244,26 +343,80 @@ class HybridRetriever:
         """Rank pages by reciprocal rank fusion."""
 
         sparse = self._ranking_for(query, self._bm25_rankings, self._bm25)
-        dense = self._ranking_for(query, self._dense_rankings, self._dense)
-        scores = {page_id: 0.0 for page_id in self._page_ids}
-        for ranking in (sparse, dense):
-            for rank_index, page_id in enumerate(ranking, start=1):
-                scores[page_id] = scores.get(page_id, 0.0) + 1 / (
-                    self._rrf_k + rank_index
-                )
-        return tuple(
-            RankingItem(page_id, score)
-            for page_id, score in sorted(
-                scores.items(),
-                key=lambda item: (-item[1], item[0]),
-            )
-        )
+        lexical = self._ranking_for(query, self._lexical_rankings, self._lexical)
+        return _rrf_rank(self._page_ids, (sparse, lexical), self._rrf_k)
 
     @staticmethod
     def _ranking_for(
         query: str,
         injected_rankings: Mapping[str, Sequence[str]] | None,
-        retriever: BM25Retriever | DenseTextRetriever | None,
+        retriever: BM25Retriever | LexicalCosineRetriever | None,
+    ) -> tuple[str, ...]:
+        if injected_rankings is not None:
+            return tuple(injected_rankings[query])
+        if retriever is None:
+            return ()
+        return tuple(item.page_id for item in retriever.rank(query))
+
+
+class BM25NeuralRrfRetriever:
+    """BM25 plus neural-text reciprocal-rank fusion."""
+
+    method_id = "bm25_neural_rrf"
+
+    def __init__(
+        self,
+        pages: Sequence[TextPage],
+        *,
+        provider: EmbeddingProvider | None = None,
+        rrf_k: int = 60,
+        bm25_rankings: Mapping[str, Sequence[str]] | None = None,
+        neural_rankings: Mapping[str, Sequence[str]] | None = None,
+    ) -> None:
+        self._pages = tuple(sorted(pages, key=lambda page: page.page_id))
+        self._page_ids = tuple(page.page_id for page in self._pages)
+        self._rrf_k = rrf_k
+        self._bm25_rankings = bm25_rankings
+        self._neural_rankings = neural_rankings
+        self._bm25 = BM25Retriever(self._pages) if bm25_rankings is None else None
+        self._neural = (
+            NeuralTextRetriever(self._pages, provider=provider)
+            if neural_rankings is None
+            else None
+        )
+
+    @property
+    def index_size_pages(self) -> int:
+        """Return the number of indexed pages."""
+
+        return len(self._pages)
+
+    @property
+    def provider_status(self) -> dict[str, object]:
+        """Return neural provider status when rankings are computed locally."""
+
+        if self._neural is None:
+            return LocalStubEmbeddingProvider().status
+        return self._neural.provider_status
+
+    @property
+    def uses_external_embeddings(self) -> bool:
+        """Return whether the neural side uses external embeddings."""
+
+        return bool(self.provider_status["external_embeddings_enabled"])
+
+    def rank(self, query: str) -> tuple[RankingItem, ...]:
+        """Rank pages by reciprocal rank fusion."""
+
+        sparse = self._ranking_for(query, self._bm25_rankings, self._bm25)
+        neural = self._ranking_for(query, self._neural_rankings, self._neural)
+        return _rrf_rank(self._page_ids, (sparse, neural), self._rrf_k)
+
+    @staticmethod
+    def _ranking_for(
+        query: str,
+        injected_rankings: Mapping[str, Sequence[str]] | None,
+        retriever: BM25Retriever | NeuralTextRetriever | None,
     ) -> tuple[str, ...]:
         if injected_rankings is not None:
             return tuple(injected_rankings[query])
@@ -308,3 +461,35 @@ def _dot(left: Mapping[str, float], right: Mapping[str, float]) -> float:
     if len(left) > len(right):
         left, right = right, left
     return sum(value * right.get(token, 0.0) for token, value in left.items())
+
+
+def _normalized_vector(values: Sequence[float]) -> tuple[float, ...]:
+    norm = math.sqrt(sum(value * value for value in values))
+    if norm == 0:
+        return tuple(0.0 for _ in values)
+    return tuple(value / norm for value in values)
+
+
+def _vector_dot(left: Sequence[float], right: Sequence[float]) -> float:
+    return sum(
+        left_value * right_value
+        for left_value, right_value in zip(left, right, strict=True)
+    )
+
+
+def _rrf_rank(
+    page_ids: Sequence[str],
+    rankings: Sequence[Sequence[str]],
+    rrf_k: int,
+) -> tuple[RankingItem, ...]:
+    scores = {page_id: 0.0 for page_id in page_ids}
+    for ranking in rankings:
+        for rank_index, page_id in enumerate(ranking, start=1):
+            scores[page_id] = scores.get(page_id, 0.0) + 1 / (rrf_k + rank_index)
+    return tuple(
+        RankingItem(page_id, score)
+        for page_id, score in sorted(
+            scores.items(),
+            key=lambda item: (-item[1], item[0]),
+        )
+    )
