@@ -1,0 +1,15 @@
+{
+  "evaluated_splits": [
+    "dev"
+  ],
+  "final_test_split": "test",
+  "methods": {
+    "visual_smoke": {
+      "enabled": true
+    }
+  },
+  "name": "synthetic-smoke-visual-baselines",
+  "output_path": "reports/visual-baselines-synthetic-smoke.json",
+  "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+  "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+}

@@ -1,8 +1,8 @@
-current_phase: 2
-status: TEXT_BASELINE_DIAGNOSTICS_ARCHIVED
-change: add-text-retrieval-baselines
+current_phase: 3A
+status: VISUAL_SMOKE_DIAGNOSTICS_ARCHIVED
+change: add-visual-late-interaction-smoke-baseline
 openspec_status: archived
-updated: 2026-06-28
+updated: 2026-06-29
 data_status:
   synthetic_smoke: materialized
   families: 3
@@ -22,7 +22,21 @@ data_status:
   manifest_digests:
     pages: 4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1
     queries: bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11
-visual_retriever_status: not_implemented
+visual_retriever_status: deterministic_local_smoke
+visual_baseline_status:
+  status: diagnostic_report_generated
+  config: configs/visual-baselines-synthetic-smoke.json
+  report: reports/visual-baselines-synthetic-smoke.json
+  evaluated_splits:
+    - dev
+  enabled_methods:
+    - visual_smoke
+  local_smoke_only: true
+  page_image_artifacts_read: true
+  page_text_artifacts_read: false
+  external_model_download_required: false
+  gpu_required: false
+  hard_negative_hit_rate: not_available
 text_baseline_status:
   status: diagnostic_report_generated
   config: configs/text-baselines-synthetic-smoke.json
@@ -43,21 +57,26 @@ validation_baseline:
   mypy: passed
   openspec: passed
 validation_commands:
+  - command: pytest -q tests/test_visual_retrieval_baselines.py
+    outcome: 4 passed
   - command: pytest -q
-    outcome: 29 passed
+    outcome: 33 passed
   - command: ruff check .
     outcome: All checks passed!
   - command: mypy src
-    outcome: Success, no issues found in 6 source files
+    outcome: Success, no issues found in 8 source files
   - command: openspec validate --all --strict
-    outcome: 7 passed, 0 failed
+    outcome: 8 passed, 0 failed
   - command: git diff --check
     outcome: passed with no whitespace errors
-  - command: rg forbidden Phase 2 expansion and claim terms
+  - command: changed-file whitespace scan including untracked Phase 3A files
+    outcome: passed with no trailing whitespace matches
+  - command: rg forbidden Phase 3A expansion and claim terms
     outcome: only boundary/spec/test references and false or not_run status flags
 notes:
   - Phase 2 adds only text-only diagnostic baselines over existing Phase 1 text artifacts.
-  - Visual retrieval, training, final tests, hard-negative mining output, and result claims remain not started.
+  - Phase 3A adds only deterministic local visual-smoke diagnostics over existing Phase 1 image artifacts.
+  - Real visual model inference, training, final tests, hard-negative mining output, and result claims remain not started.
 opsx_auto_status:
   prerequisites: prepared
   change: prepare-opsx-auto-prerequisites

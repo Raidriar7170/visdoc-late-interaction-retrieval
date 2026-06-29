@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 3A Visual Smoke Baseline Brief</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 32px; color: #17202a; line-height: 1.55; }
+    main { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #d7dde5; padding-bottom: 4px; }
+    .status { display: inline-block; padding: 4px 8px; background: #e8f1ff; border: 1px solid #b8cff8; border-radius: 6px; font-size: 13px; }
+    code { background: #f4f6f8; padding: 1px 4px; border-radius: 4px; }
+    ul { padding-left: 20px; }
+    .warn { background: #fff7e6; border-left: 4px solid #d99000; padding: 10px 12px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 3A：Visual Smoke Baseline</h1>
+  <p><span class="status">状态：archived via normal OpenSpec closeout</span></p>
+  <p><strong>一句话结论：</strong>本阶段只加入可本地验证的 deterministic visual-smoke baseline，用来打通视觉检索报告形状；它不是 ColPali/ColQwen 结果，也不是 benchmark 改进声明。</p>
+
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>新增 <code>visual-retrieval-baselines</code> OpenSpec change。</li>
+    <li>新增 manifest-backed visual corpus loader，只读取 <code>image_path</code> bytes，不读取 OCR/text artifacts。</li>
+    <li>新增 deterministic hashed patch-token late-interaction smoke retriever。</li>
+    <li>新增 config-driven visual report：<code>reports/visual-baselines-synthetic-smoke.json</code>。</li>
+  </ul>
+
+  <h2>关键文件</h2>
+  <ul>
+    <li><code>openspec/specs/visual-retrieval-baselines/spec.md</code></li>
+    <li><code>openspec/changes/archive/2026-06-29-add-visual-late-interaction-smoke-baseline/</code></li>
+    <li><code>src/visdoc_retrieve/visual_retrieval.py</code></li>
+    <li><code>src/visdoc_retrieve/visual_baseline_report.py</code></li>
+    <li><code>tests/test_visual_retrieval_baselines.py</code></li>
+    <li><code>configs/visual-baselines-synthetic-smoke.json</code></li>
+    <li><code>reports/visual-baselines-synthetic-smoke.json</code></li>
+    <li><code>reports/progress-ledger.yaml</code></li>
+  </ul>
+
+  <h2>当前证据</h2>
+  <ul>
+    <li>visual report 只评估 <code>dev</code> split，<code>final_test_status</code> 是 <code>not_run</code>。</li>
+    <li>report boundary 显式记录 no network、no GPU、no external model download、no training、no hard-negative triples、no benchmark claim。</li>
+    <li>focused visual tests 已覆盖 corpus loader、missing image failure、deterministic ranking、report boundary。</li>
+  </ul>
+
+  <h2>不要过度声称</h2>
+  <div class="warn">
+    这是 visual-smoke plumbing 证据，不是模型质量证据。不要声称真实 ColPali/ColQwen 推理、adapter improvement、final-test result、hard-negative quality 或 benchmark improvement。
+  </div>
+
+  <h2>推荐下一步</h2>
+  <p>本 change 已按普通 OpenSpec 流程归档。下一阶段仍不要扩大到真实视觉模型、训练、hard-negative mining 或 benchmark claim；如需推进，应先提出新的 OpenSpec change。</p>
+</main>
+</body>
+</html>

@@ -6,21 +6,25 @@ design, specs, and tasks before implementing non-trivial changes.
 
 ## Current Phase Boundary
 
-The repository is currently through Phase 2:
+The repository is currently through Phase 3A:
 
 - Phase 1 synthetic corpus and manifest validation exist under
   `data/synthetic-smoke/` and `src/visdoc_retrieve/data_schema.py`.
 - Phase 2 text-only diagnostic baselines exist for the synthetic smoke `dev`
   split, including deterministic BM25, local dense-text, hybrid/RRF, metrics,
   and diagnostic report generation.
+- Phase 3A deterministic local visual-smoke diagnostics exist for the
+  synthetic smoke `dev` split, including manifest-backed page-image loading, a
+  hashed patch-token late-interaction-style smoke scorer, and diagnostic report
+  generation.
 
-Do not add visual retrieval, ColPali/ColQwen inference, image embeddings,
-embedding caches, hard-negative mining outputs, LoRA/QLoRA, training scripts,
-adapters, checkpoints, final test evaluation, benchmark result tables,
-retrieval improvement claims, model superiority claims, frozen-test performance
-claims, chatbot UI, generic RAG app behavior, Agent/browser automation
-positioning, citation safety systems, production RAG deployment, or QA
-generation without a future accepted OpenSpec change.
+Do not add real visual-model retrieval, ColPali/ColQwen inference, external
+image embeddings, embedding caches, hard-negative mining outputs, LoRA/QLoRA,
+training scripts, adapters, checkpoints, final test evaluation, benchmark
+result tables, retrieval improvement claims, model superiority claims,
+frozen-test performance claims, chatbot UI, generic RAG app behavior,
+Agent/browser automation positioning, citation safety systems, production RAG
+deployment, or QA generation without a future accepted OpenSpec change.
 
 ## Validation Baseline
 

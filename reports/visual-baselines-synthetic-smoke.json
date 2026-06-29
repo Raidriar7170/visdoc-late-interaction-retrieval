@@ -1,0 +1,63 @@
+{
+  "boundary": {
+    "benchmark_claim": "none",
+    "colpali_or_colqwen_inference": false,
+    "external_model_download_required": false,
+    "final_test_evaluated": false,
+    "gpu_required": false,
+    "hard_negative_triples_emitted": false,
+    "network_required": false,
+    "page_image_artifacts_read": true,
+    "page_text_artifacts_read": false,
+    "training_run": false,
+    "visual_smoke_only": true
+  },
+  "corpus": {
+    "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+    "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+  },
+  "evaluated_splits": [
+    "dev"
+  ],
+  "excluded_splits": [
+    "test"
+  ],
+  "final_test_status": "not_run",
+  "methods": {
+    "visual_smoke": {
+      "diagnostics": {
+        "index_size_pages": {
+          "label": "diagnostic",
+          "value": 8
+        },
+        "latency_per_query_ms": {
+          "label": "diagnostic",
+          "status": "not_measured_deterministic_report",
+          "value": null
+        },
+        "patch_tokens_per_page": {
+          "max": 14102,
+          "min": 12637,
+          "pages": 8
+        }
+      },
+      "external_model_enabled": false,
+      "gpu_required": false,
+      "hard_negative_hit_rate": {
+        "status": "not_available",
+        "support": 0
+      },
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.32242063492063505,
+        "ndcg_at_10": 0.47929286989189074,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.125,
+        "recall_at_5": 0.5416666666666666
+      }
+    }
+  },
+  "name": "synthetic-smoke-visual-baselines",
+  "status": "diagnostic_only",
+  "visual_retriever_status": "deterministic_local_smoke"
+}
