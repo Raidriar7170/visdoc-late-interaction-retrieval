@@ -1,0 +1,41 @@
+{
+  "candidate_universe": "evaluated_split_pages",
+  "evaluated_splits": [
+    "dev"
+  ],
+  "final_test_split": "test",
+  "name": "synthetic-smoke-mvp",
+  "outputs": {
+    "human_brief": "docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html",
+    "metrics": "reports/mvp/metrics.json",
+    "mock_visual_cache": "reports/mvp/mock-visual-embeddings.json",
+    "rankings": "reports/mvp/rankings.csv",
+    "run_card": "reports/mvp/run-card.md"
+  },
+  "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+  "queries_manifest": "data/synthetic-smoke/queries.jsonl",
+  "text_methods": {
+    "bm25": {
+      "enabled": true
+    },
+    "lexical_cosine": {
+      "enabled": true
+    },
+    "bm25_lexical_rrf": {
+      "enabled": true,
+      "rrf_k": 60
+    },
+    "neural_text": {
+      "enabled": false,
+      "provider": {
+        "type": "local_stub"
+      }
+    }
+  },
+  "visual_methods": {
+    "mock_visual": {
+      "enabled": true,
+      "provider": "deterministic_mock"
+    }
+  }
+}

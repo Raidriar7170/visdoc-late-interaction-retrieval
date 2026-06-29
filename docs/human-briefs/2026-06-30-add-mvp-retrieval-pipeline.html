@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>VisDoc MVP Diagnostic Brief</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #1f2933;
+    }
+    main { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin-top: 24px; }
+    code { background: #eef2f7; padding: 2px 5px; border-radius: 4px; }
+    ul { padding-left: 22px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>VisDoc-Retrieve MVP diagnostic smoke brief</h1>
+  <p><strong>结论：</strong>本阶段增加了一键运行的最小端到端检索 MVP，
+  用固定 synthetic smoke corpus 对比 text baselines 与 deterministic mock
+  visual late-interaction scaffold。</p>
+
+  <h2>Current status / 当前状态</h2>
+  <p>applying; evidence is diagnostic smoke only and not final benchmark evidence.</p>
+
+  <h2>Inputs and candidate universe / 输入与候选集合</h2>
+  <ul>
+    <li>Pages: <code>data/synthetic-smoke/pages.jsonl</code></li>
+    <li>Queries/qrels: <code>data/synthetic-smoke/queries.jsonl</code></li>
+    <li>Evaluated split: <code>dev</code></li>
+    <li>Candidate universe: <code>evaluated_split_pages</code></li>
+    <li>Candidate pages: 8; evaluated
+    queries: 24</li>
+  </ul>
+
+  <h2>Baselines / 方法</h2>
+  <ul>
+    <li><code>bm25</code>: deterministic text baseline.</li>
+    <li><code>lexical_cosine</code>: deterministic local lexical cosine
+    baseline, not external dense embedding.</li>
+    <li><code>bm25_lexical_rrf</code>: deterministic BM25 + lexical cosine RRF.</li>
+    <li><code>mock_visual</code>: deterministic mock scaffold with MaxSim; not real ColPali or ColQwen execution.</li>
+  </ul>
+
+  <h2>Evidence / 证据路径</h2>
+  <ul>
+    <li><code>reports/mvp/metrics.json</code></li>
+    <li><code>reports/mvp/rankings.csv</code></li>
+    <li><code>reports/mvp/run-card.md</code></li>
+    <li><code>reports/mvp/mock-visual-embeddings.json</code></li>
+  </ul>
+
+  <h2>Limits / 不夸大的边界</h2>
+  <p>Metrics are diagnostic smoke only. Real ColPali / ColQwen execution,
+  external embeddings, hard-negative mining, LoRA / QLoRA training, and final
+  test evaluation have not started.</p>
+
+  <h2>Reproduce / 复现</h2>
+  <p><code>PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json</code></p>
+</main>
+</body>
+</html>

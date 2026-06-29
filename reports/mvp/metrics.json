@@ -1,0 +1,471 @@
+{
+  "boundary": {
+    "benchmark_claim": "none",
+    "diagnostic_smoke_only": true,
+    "external_embeddings_used": false,
+    "final_test_evaluated": false,
+    "gpu_required": false,
+    "hard_negative_mining": false,
+    "model_download_required": false,
+    "network_required": false,
+    "real_colpali_or_colqwen_execution": false,
+    "training_run": false
+  },
+  "candidate_universe": {
+    "candidate_page_count": 8,
+    "candidate_split_counts": {
+      "dev": 8
+    },
+    "evaluated_query_count": 24,
+    "evaluated_splits": [
+      "dev"
+    ],
+    "name": "evaluated_split_pages"
+  },
+  "corpus": {
+    "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+    "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+  },
+  "evaluated_splits": [
+    "dev"
+  ],
+  "excluded_splits": [
+    "test"
+  ],
+  "final_test_status": "not_run",
+  "methods": {
+    "bm25": {
+      "boundary": {
+        "benchmark_claim": "none",
+        "diagnostic_only": true,
+        "external_embeddings_used": false,
+        "final_test_evaluated": false,
+        "gpu_required": false,
+        "hard_negative_mining": false,
+        "model_download_required": false,
+        "network_required": false,
+        "real_colpali_or_colqwen_execution": false,
+        "training_run": false
+      },
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.39375,
+            "ndcg_at_10": 0.5332485605234158,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.46875,
+            "ndcg_at_10": 0.5942677971076449,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "diagnostics": {
+        "candidate_universe": {
+          "candidate_page_count": 8,
+          "candidate_split_counts": {
+            "dev": 8
+          },
+          "evaluated_query_count": 24,
+          "evaluated_splits": [
+            "dev"
+          ],
+          "name": "evaluated_split_pages"
+        },
+        "external_embeddings_enabled": false,
+        "index_size_pages": 8,
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "method_id": "bm25",
+      "method_kind": "text",
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7687499999999999,
+          "ndcg_at_10": 0.8238302057361316,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.9166666666666666
+        },
+        "support": 24
+      },
+      "status": "diagnostic_smoke_only"
+    },
+    "bm25_lexical_rrf": {
+      "boundary": {
+        "benchmark_claim": "none",
+        "diagnostic_only": true,
+        "external_embeddings_used": false,
+        "final_test_evaluated": false,
+        "gpu_required": false,
+        "hard_negative_mining": false,
+        "model_download_required": false,
+        "network_required": false,
+        "real_colpali_or_colqwen_execution": false,
+        "training_run": false
+      },
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.38541666666666663,
+            "ndcg_at_10": 0.525587155491786,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.5
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.46875,
+            "ndcg_at_10": 0.5942677971076449,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "diagnostics": {
+        "candidate_universe": {
+          "candidate_page_count": 8,
+          "candidate_split_counts": {
+            "dev": 8
+          },
+          "evaluated_query_count": 24,
+          "evaluated_splits": [
+            "dev"
+          ],
+          "name": "evaluated_split_pages"
+        },
+        "external_embeddings_enabled": false,
+        "index_size_pages": 8,
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "method_id": "bm25_lexical_rrf",
+      "method_kind": "text",
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7673611111111112,
+          "ndcg_at_10": 0.8225533048975268,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.875
+        },
+        "support": 24
+      },
+      "status": "diagnostic_smoke_only"
+    },
+    "lexical_cosine": {
+      "boundary": {
+        "benchmark_claim": "none",
+        "diagnostic_only": true,
+        "external_embeddings_used": false,
+        "final_test_evaluated": false,
+        "gpu_required": false,
+        "hard_negative_mining": false,
+        "model_download_required": false,
+        "network_required": false,
+        "real_colpali_or_colqwen_execution": false,
+        "training_run": false
+      },
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.4107142857142857,
+            "ndcg_at_10": 0.5473851301103388,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.5
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.4732142857142857,
+            "ndcg_at_10": 0.598734911244546,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "diagnostics": {
+        "candidate_universe": {
+          "candidate_page_count": 8,
+          "candidate_split_counts": {
+            "dev": 8
+          },
+          "evaluated_query_count": 24,
+          "evaluated_splits": [
+            "dev"
+          ],
+          "name": "evaluated_split_pages"
+        },
+        "external_embeddings_enabled": false,
+        "index_size_pages": 8,
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        }
+      },
+      "method_id": "lexical_cosine",
+      "method_kind": "text",
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7723214285714285,
+          "ndcg_at_10": 0.8269308196901023,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.875
+        },
+        "support": 24
+      },
+      "status": "diagnostic_smoke_only"
+    },
+    "mock_visual": {
+      "boundary": {
+        "benchmark_claim": "none",
+        "diagnostic_only": true,
+        "external_embeddings_used": false,
+        "final_test_evaluated": false,
+        "gpu_required": false,
+        "hard_negative_mining": false,
+        "model_download_required": false,
+        "network_required": false,
+        "real_colpali_or_colqwen_execution": false,
+        "training_run": false
+      },
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.1976190476190476,
+            "ndcg_at_10": 0.38362089954708933,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.0,
+            "recall_at_5": 0.6666666666666666
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 0.42857142857142855,
+            "ndcg_at_10": 0.5640940548025626,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.2,
+            "recall_at_5": 0.6
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.4419642857142857,
+            "ndcg_at_10": 0.5699319909226299,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.5
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.3839285714285714,
+            "ndcg_at_10": 0.524335806185015,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.5
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 0.35535714285714287,
+            "ndcg_at_10": 0.5085845246742676,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.125,
+            "recall_at_5": 0.75
+          },
+          "support": 8
+        }
+      },
+      "diagnostics": {
+        "cache_path": "reports/mvp/mock-visual-embeddings.json",
+        "candidate_universe": {
+          "candidate_page_count": 8,
+          "candidate_split_counts": {
+            "dev": 8
+          },
+          "evaluated_query_count": 24,
+          "evaluated_splits": [
+            "dev"
+          ],
+          "name": "evaluated_split_pages"
+        },
+        "external_model_enabled": false,
+        "gpu_required": false,
+        "index_size_pages": 8,
+        "provider": "deterministic_mock",
+        "ranked_page_support": {
+          "max_pages": 8,
+          "min_pages": 8,
+          "queries": 24
+        },
+        "retriever_id": "mock_visual"
+      },
+      "method_id": "mock_visual",
+      "method_kind": "visual_mock",
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.37008928571428573,
+          "ndcg_at_10": 0.5173783482699501,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.16666666666666666,
+          "recall_at_5": 0.625
+        },
+        "support": 24
+      },
+      "status": "diagnostic_smoke_only"
+    }
+  },
+  "name": "synthetic-smoke-mvp",
+  "outputs": {
+    "human_brief": "docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html",
+    "metrics": "reports/mvp/metrics.json",
+    "mock_visual_cache": "reports/mvp/mock-visual-embeddings.json",
+    "rankings": "reports/mvp/rankings.csv",
+    "run_card": "reports/mvp/run-card.md"
+  },
+  "status": "diagnostic_smoke_only"
+}

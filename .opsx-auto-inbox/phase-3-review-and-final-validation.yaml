@@ -1,0 +1,40 @@
+phase_id: phase-3-review-and-final-validation
+change: add-mvp-retrieval-pipeline
+status: complete
+scope:
+  - Reviewer pass over the diff
+  - Must Fix repair loop only
+  - full required validation and smoke artifact checks
+files_touched:
+  actual:
+    - .opsx-auto-inbox/phase-3-review-and-final-validation.yaml
+validation_commands:
+  actual:
+    - python -m py_compile src/visdoc_retrieve/*.py
+    - pyproject tomllib parse
+    - pytest -q
+    - ruff check .
+    - mypy src
+    - openspec validate --all --strict
+    - git diff --check
+    - MVP pipeline command
+    - metrics/run-card/human-brief existence checks
+    - progress-ledger YAML parse check
+evidence:
+  actual:
+    - MVP command exited 0
+    - python -m py_compile src/visdoc_retrieve/*.py exited 0
+    - pyproject tomllib parse printed "pyproject parse ok"
+    - pytest -q returned 44 passed
+    - ruff check . returned "All checks passed!"
+    - mypy src returned "Success: no issues found in 10 source files"
+    - openspec validate --all --strict returned 10 passed, 0 failed
+    - git diff --check exited 0
+    - metrics/run-card/human-brief existence checks passed
+    - progress-ledger YAML parse check passed
+    - Reviewer Must Fix: none
+    - Reviewer Final Verdict: pass with one Should Fix, then ledger parse test strengthened
+phase_complete: true
+phase_blocked: false
+goal_impossible: false
+goal_complete_checkpoint: true

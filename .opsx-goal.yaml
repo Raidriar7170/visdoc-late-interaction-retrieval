@@ -1,0 +1,49 @@
+goal_id: visdoc.mvp.practical
+created: 2026-06-30
+change: add-mvp-retrieval-pipeline
+status: applying
+worktree:
+  path: .worktrees/visdoc-mvp-practical
+  branch: codex/visdoc-mvp-practical
+  base_ref: origin/main
+execution_policy:
+  profile: practical
+  commit: forbidden
+  push: forbidden
+  merge: forbidden
+  archive_openspec: forbidden
+  deploy: forbidden
+  gpu: forbidden
+  network_required: false
+goal:
+  summary: >
+    Build a minimal end-to-end diagnostic MVP pipeline for fixed synthetic
+    page-level retrieval, comparing text baselines with a deterministic visual
+    late-interaction mock scaffold and writing reproducible evidence artifacts.
+  default_command: PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+acceptance:
+  required_artifacts:
+    - reports/mvp/metrics.json
+    - reports/mvp/rankings.csv
+    - reports/mvp/run-card.md
+    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+    - reports/progress-ledger.yaml
+  required_validation:
+    - python -m py_compile src/visdoc_retrieve/*.py
+    - pyproject tomllib parse
+    - pytest -q
+    - ruff check .
+    - mypy src
+    - openspec validate --all --strict
+    - git diff --check
+hard_stops:
+  - real ColPali or ColQwen execution
+  - external embedding downloads or services
+  - GPU or A100 execution
+  - hard-negative mining
+  - LoRA or QLoRA training
+  - final test evaluation
+  - benchmark improvement or model superiority claims
+phase_state:
+  active_phase: phase-3-review-and-final-validation
+  goal_complete_checkpoint: true

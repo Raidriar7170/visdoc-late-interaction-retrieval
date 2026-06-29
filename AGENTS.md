@@ -25,9 +25,17 @@ text/candidate-universe clarification applied:
   synthetic smoke `dev` split, including manifest-backed page-image loading, a
   hashed patch-token late-interaction-style smoke scorer, and diagnostic report
   generation.
+- The active `add-mvp-retrieval-pipeline` worktree adds a diagnostic MVP
+  command,
+  `PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json`, that
+  composes fixed synthetic smoke manifests, explicit `evaluated_split_pages`
+  candidate-universe metadata, text baselines, and a deterministic CPU-only
+  `mock_visual` late-interaction scaffold with MaxSim and mock cache evidence.
+  This MVP is diagnostic/smoke evidence only and is not archived unless a future
+  closeout explicitly archives the OpenSpec change.
 
 Do not add real visual-model retrieval, ColPali/ColQwen inference, external
-image embeddings, embedding caches, hard-negative mining outputs, LoRA/QLoRA,
+image embeddings, real model embedding caches, hard-negative mining outputs, LoRA/QLoRA,
 training scripts, adapters, checkpoints, final test evaluation, benchmark
 result tables, retrieval improvement claims, model superiority claims,
 frozen-test performance claims, chatbot UI, generic RAG app behavior,

@@ -73,6 +73,45 @@ text_baseline_status:
   model_download_required: false
   embedding_cache_required: false
   hard_negative_hit_rate: not_available
+mvp_retrieval_pipeline_status:
+  status: diagnostic_smoke_generated
+  change: add-mvp-retrieval-pipeline
+  command: PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+  config: configs/mvp.json
+  evaluated_splits:
+    - dev
+  candidate_universe: evaluated_split_pages
+  candidate_page_count: 8
+  candidate_split_counts:
+    dev: 8
+  evaluated_query_count: 24
+  ranked_pages_per_query: 8
+  enabled_methods:
+    - bm25
+    - lexical_cosine
+    - bm25_lexical_rrf
+    - mock_visual
+  visual_retriever_interface: present
+  visual_retriever_status: deterministic_mock_scaffold
+  visual_cache:
+    schema: mock_visual_embedding_cache/v1
+    path: reports/mvp/mock-visual-embeddings.json
+    provider: deterministic_mock
+    external_embeddings_enabled: false
+    network_required: false
+    gpu_required: false
+    model_download_required: false
+  evidence:
+    metrics: reports/mvp/metrics.json
+    rankings: reports/mvp/rankings.csv
+    run_card: reports/mvp/run-card.md
+    human_brief: docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+  real_visual_model_execution: not_started
+  external_embeddings: not_started
+  hard_negative_mining: not_started
+  training: not_started
+  final_test_evaluation: not_run
+  benchmark_claim: none
 training_status: not_started
 final_test_status: not_run
 validation_baseline:

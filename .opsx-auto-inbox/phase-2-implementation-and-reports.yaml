@@ -1,0 +1,33 @@
+phase_id: phase-2-implementation-and-reports
+change: add-mvp-retrieval-pipeline
+status: complete
+scope:
+  - VisualRetriever protocol, MockVisualRetriever, MaxSim, and cache schema
+  - MVP config and one-command pipeline
+  - metrics, rankings, run-card, human brief, and progress ledger evidence
+files_touched:
+  actual:
+    - configs/mvp.json
+    - src/visdoc_retrieve/visual_retrieval.py
+    - src/visdoc_retrieve/mvp_pipeline.py
+    - src/visdoc_retrieve/run_mvp.py
+    - reports/mvp/**
+    - reports/progress-ledger.yaml
+    - README.md
+    - configs/README.md
+    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+validation_commands:
+  actual:
+    - python -m py_compile src/visdoc_retrieve/*.py
+    - PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+    - pytest -q tests/test_mvp_retrieval_pipeline.py
+evidence:
+  actual:
+    - reports/mvp/metrics.json
+    - reports/mvp/rankings.csv
+    - reports/mvp/mock-visual-embeddings.json
+    - reports/mvp/run-card.md
+    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+phase_complete: true
+phase_blocked: false
+goal_impossible: false
