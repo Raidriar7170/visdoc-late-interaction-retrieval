@@ -1,0 +1,39 @@
+{
+  "checks": {
+    "deterministic_dedupe_and_ordering": {
+      "passed": true,
+      "violations": 0
+    },
+    "dev_has_no_test_query_ids": {
+      "passed": true,
+      "violations": 0
+    },
+    "evaluated_split_pages_same_split_negatives": {
+      "negative_split_counts_by_query_split": {
+        "dev": {
+          "dev": 429
+        },
+        "train": {
+          "train": 429
+        }
+      },
+      "passed": true,
+      "violations": 0
+    },
+    "negative_not_positive": {
+      "passed": true,
+      "violations": 0
+    },
+    "test_split_absent_from_artifacts": {
+      "passed": true,
+      "violations": 0
+    },
+    "train_has_no_dev_or_test_query_ids": {
+      "passed": true,
+      "violations": 0
+    }
+  },
+  "final_test_status": "not_run",
+  "record_count": 858,
+  "status": "passed"
+}

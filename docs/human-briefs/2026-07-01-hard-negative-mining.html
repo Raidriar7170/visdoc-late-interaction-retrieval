@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>VisDoc Hard-Negative Mining Brief</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 32px;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 17px; margin-top: 22px; }
+    code { background: #eef2f7; padding: 2px 5px; border-radius: 4px; }
+    .status {
+      border-left: 4px solid #2563eb;
+      padding: 10px 14px;
+      background: #eff6ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Phase 4 hard-negative mining checkpoint</h1>
+  <div class="status"><strong>结论：</strong>已生成 train/dev hard-negative
+  triples 和 leakage report；这是确定性 CPU-only 训练准备证据，不训练、
+  不跑 final test、不声明 benchmark improvement。</div>
+  <h2>当前状态</h2>
+  <p>状态：generated。OpenSpec change：<code>add-hard-negative-mining</code>。</p>
+  <h2>本阶段变化</h2>
+  <p>新增 hard-negative mining CLI、配置、train/dev JSONL、summary、
+  leakage check、run card 和 progress ledger entry。</p>
+  <h2>关键产物</h2>
+  <ul>
+    <li>Train triples: <code>data/derived/hard_negatives/train.jsonl</code></li>
+    <li>Dev triples: <code>data/derived/hard_negatives/dev.jsonl</code></li>
+    <li>Summary: <code>reports/hard-negatives/mining-summary.json</code></li>
+    <li>Leakage: <code>reports/hard-negatives/leakage-check.json</code></li>
+  </ul>
+  <h2>记录数量</h2>
+  <p>Total: 858; train: 429; dev: 429。</p>
+  <h2>边界</h2>
+  <p>不训练；不下载 ColPali/ColQwen/BGE/sentence-transformers 权重；
+  不需要 GPU；不跑 final test evaluation；不把 mock visual 写成 real
+  visual result；不把项目改成 RAG chatbot。</p>
+  <h2>建议下一步</h2>
+  <p>先 review 本 PR 的 split/leakage/source-support evidence。LoRA /
+  QLoRA adaptation 需要后续单独 OpenSpec change。</p>
+</body>
+</html>
