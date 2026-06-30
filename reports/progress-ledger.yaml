@@ -112,6 +112,31 @@ mvp_retrieval_pipeline_status:
   training: not_started
   final_test_evaluation: not_run
   benchmark_claim: none
+visual_zero_shot_backend_status:
+  status: scaffold_started
+  change: add-visual-zero-shot-backend
+  config: configs/visual_zero_shot.local.example.json
+  command: PYTHONPATH=src python -m visdoc_retrieve.run_visual_zero_shot --config configs/visual_zero_shot.local.example.json
+  ci_required: false
+  backend:
+    name: local_visual_model
+    adapter: src/visdoc_retrieve/visual_zero_shot_backend.py
+    import_safe: true
+    runtime_imports_lazy: true
+    local_files_only: true
+  cache_schema:
+    schema: visual_token_embedding_cache/v1
+    compatible_with: maxsim_score
+    validates_embedding_dimensions: true
+  real_visual_model_execution: optional_local_only
+  default_mvp_backend: mock_visual
+  mock_fallback_for_real_backend_errors: false
+  external_embeddings: optional_local_only_not_run
+  hard_negative_mining: not_started
+  training: not_started
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  human_brief: docs/human-briefs/2026-06-30-visual-zero-shot-backend.html
 training_status: not_started
 final_test_status: not_run
 validation_baseline:

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Visual Zero-Shot Backend Checkpoint</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 40px; line-height: 1.55; color: #1f2933; }
+    main { max-width: 880px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin-top: 28px; }
+    code { background: #eef2f7; padding: 2px 5px; border-radius: 4px; }
+    .status { border-left: 4px solid #2878bd; padding: 10px 14px; background: #f5f8fb; }
+    ul { padding-left: 22px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Visual Zero-Shot Backend Checkpoint</h1>
+  <p class="status">结论：本阶段只启动了可选本地真实视觉后端的安全脚手架；默认 MVP 仍是确定性的 <code>mock_visual</code>，没有真实 ColPali/ColQwen 运行或指标提升声明。</p>
+
+  <h2>当前状态</h2>
+  <p>状态：applying。真实后端 adapter 已开始搭建，真实模型执行仅限用户显式提供本地模型与运行时后的本地可选 smoke。</p>
+
+  <h2>本阶段变更</h2>
+  <ul>
+    <li>新增 <code>visual_zero_shot</code> 配置加载与路径预检。</li>
+    <li>新增 import-safe 的 <code>LocalVisualModelBackend</code> 脚手架；导入不会加载 torch、transformers 或 colpali_engine。</li>
+    <li>新增通用 token embedding cache 读写与维度校验，可供 MaxSim 评分使用。</li>
+    <li>新增 <code>run_visual_zero_shot</code> CLI，支持 <code>--check-config</code> 与 <code>--dry-run</code>。</li>
+  </ul>
+
+  <h2>关键文件</h2>
+  <ul>
+    <li><code>src/visdoc_retrieve/visual_zero_shot.py</code></li>
+    <li><code>src/visdoc_retrieve/visual_zero_shot_backend.py</code></li>
+    <li><code>src/visdoc_retrieve/run_visual_zero_shot.py</code></li>
+    <li><code>configs/visual_zero_shot.local.example.json</code></li>
+    <li><code>openspec/changes/add-visual-zero-shot-backend/</code></li>
+  </ul>
+
+  <h2>验证命令</h2>
+  <ul>
+    <li><code>pytest -q tests/test_visual_zero_shot_backend.py</code>：13 passed。</li>
+    <li><code>pytest -q</code>：58 passed。</li>
+    <li><code>PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json</code>：exit 0。</li>
+    <li><code>ruff check .</code>、<code>mypy src</code>、<code>openspec validate --all --strict</code>、<code>git diff --check</code>：均通过。</li>
+  </ul>
+
+  <h2>边界与风险</h2>
+  <ul>
+    <li>未开始 hard-negative mining、训练、LoRA/QLoRA、final benchmark 或 test split 评估。</li>
+    <li>没有 benchmark improvement claim。</li>
+    <li>真实模型路径缺失或本地运行时缺失时必须失败，不能 fallback 到 mock。</li>
+    <li>本 brief 只作人工审阅，OpenSpec、测试和验证输出仍是权威证据。</li>
+  </ul>
+
+  <h2>建议下一步</h2>
+  <p>完成本地验证与 Reviewer 之后，只修 Must Fix；真实模型执行支持应作为后续更小阶段继续定义。</p>
+</main>
+</body>
+</html>

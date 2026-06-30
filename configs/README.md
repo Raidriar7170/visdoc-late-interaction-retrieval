@@ -46,3 +46,20 @@ This directory contains OpenSpec-managed local configuration.
   mock cache round-trip evidence. It is not real ColPali/ColQwen inference and
   does not require external embeddings, network access, GPU execution, model
   downloads, hard-negative mining, final test evaluation, or training.
+
+## Optional Visual Zero-Shot Local Smoke
+
+- `visual_zero_shot.local.example.json` is an opt-in local-only example for
+  users who already have local ColPali/ColQwen-style model weights and an
+  optional local runtime installed outside the default project contract.
+- It is not required by CI and has `ci_required: false`.
+- It declares backend name `local_visual_model`, local model fields, device,
+  batch size, cache path, corpus/query/qrels paths, and output paths.
+- Config checking validates corpus/query/qrels paths and fails clearly when a
+  provided local model path does not exist:
+  `PYTHONPATH=src python -m visdoc_retrieve.run_visual_zero_shot --config configs/visual_zero_shot.local.example.json --check-config`.
+- `--dry-run` performs config and path preflight only. Real execution is never
+  started by default, never downloads model weights, and does not fall back to
+  `mock_visual`.
+- This checkpoint does not start hard-negative mining, training, final-test
+  evaluation, benchmark tables, or benchmark improvement claims.
