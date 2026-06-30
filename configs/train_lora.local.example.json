@@ -1,0 +1,31 @@
+{
+  "adapter_output_dir": ".local/training-readiness/adapters",
+  "allow_final_test": false,
+  "base_model_name_or_path": "local-colpali-or-colqwen-placeholder",
+  "batch_size": 8,
+  "candidate_universe_id": "evaluated_split_pages",
+  "corpus_path": "data/synthetic-smoke/pages.jsonl",
+  "dev_hard_negatives_path": "data/derived/hard_negatives/dev.jsonl",
+  "device": "cpu",
+  "dry_run": true,
+  "dry_run_sample_limit": 8,
+  "gradient_accumulation_steps": 1,
+  "learning_rate": 0.0001,
+  "local_model_path": "local-models/colpali-or-colqwen",
+  "loss_type": "mock_pairwise_margin",
+  "max_steps": 1,
+  "model_revision": "local-files-only-placeholder",
+  "outputs": {
+    "artifact_freeze": "reports/training-readiness/artifact-freeze.json",
+    "dataset_summary": "reports/training-readiness/dataset-summary.json",
+    "dry_run_card": "reports/training-readiness/dry-run-card.md",
+    "human_brief": "docs/human-briefs/2026-07-01-training-readiness.md",
+    "progress_ledger": "reports/progress-ledger.yaml",
+    "safety_check": "reports/training-readiness/safety-check.json"
+  },
+  "qrels_path": "data/synthetic-smoke/queries.jsonl",
+  "queries_path": "data/synthetic-smoke/queries.jsonl",
+  "report_timestamp_utc": "2026-07-01T00:00:00Z",
+  "seed": 17,
+  "train_hard_negatives_path": "data/derived/hard_negatives/train.jsonl"
+}

@@ -1,0 +1,16 @@
+{
+  "adapter_checkpoint_committed": false,
+  "benchmark_claim_added": false,
+  "embedding_cache_committed": false,
+  "final_test_not_used": true,
+  "forbidden_artifact_scan": {
+    "adapter_checkpoint_paths": [],
+    "embedding_cache_paths": [],
+    "model_weight_paths": []
+  },
+  "gpu_not_required": true,
+  "mock_dry_run_results_are_model_performance": false,
+  "model_download_not_executed": true,
+  "model_weights_committed": false,
+  "training_not_executed": true
+}
