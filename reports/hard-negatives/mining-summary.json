@@ -1,0 +1,113 @@
+{
+  "boundary": {
+    "benchmark_claim": "none",
+    "cpu_only": true,
+    "external_embeddings_used": false,
+    "final_test_evaluated": false,
+    "gpu_required": false,
+    "model_download_required": false,
+    "network_required": false,
+    "rag_or_chatbot_behavior": false,
+    "real_colpali_or_colqwen_execution": false,
+    "training_run": false
+  },
+  "candidate_universe": {
+    "final_test_split": "test",
+    "id": "evaluated_split_pages"
+  },
+  "command": "PYTHONPATH=src python -m visdoc_retrieve.mine_hard_negatives --config configs/hard_negatives.json",
+  "config": "configs/hard_negatives.json",
+  "evaluated_splits": [
+    "train",
+    "dev"
+  ],
+  "final_test_status": "not_run",
+  "inputs": {
+    "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+    "queries_manifest": "data/synthetic-smoke/queries.jsonl"
+  },
+  "name": "synthetic-smoke-hard-negatives",
+  "outputs": {
+    "dev_jsonl": "data/derived/hard_negatives/dev.jsonl",
+    "human_brief": "docs/human-briefs/2026-07-01-hard-negative-mining.html",
+    "leakage_check": "reports/hard-negatives/leakage-check.json",
+    "progress_ledger": "reports/progress-ledger.yaml",
+    "run_card": "reports/hard-negatives/run-card.md",
+    "summary": "reports/hard-negatives/mining-summary.json",
+    "train_jsonl": "data/derived/hard_negatives/train.jsonl"
+  },
+  "record_counts": {
+    "by_split": {
+      "dev": 429,
+      "train": 429
+    },
+    "dev": 429,
+    "negative_split_counts_by_query_split": {
+      "dev": {
+        "dev": 429
+      },
+      "train": {
+        "train": 429
+      }
+    },
+    "total": 858,
+    "train": 429
+  },
+  "source_support": {
+    "bm25": {
+      "source": "bm25",
+      "splits": {
+        "dev": 72,
+        "train": 72
+      },
+      "status": "generated",
+      "support": 144
+    },
+    "bm25_lexical_rrf": {
+      "source": "bm25_lexical_rrf",
+      "splits": {
+        "dev": 72,
+        "train": 72
+      },
+      "status": "generated",
+      "support": 144
+    },
+    "lexical_cosine": {
+      "source": "lexical_cosine",
+      "splits": {
+        "dev": 72,
+        "train": 72
+      },
+      "status": "generated",
+      "support": 144
+    },
+    "mock_visual": {
+      "source": "mock_visual",
+      "splits": {
+        "dev": 72,
+        "train": 72
+      },
+      "status": "generated",
+      "support": 144
+    },
+    "same_document": {
+      "source": "same_document",
+      "splits": {
+        "dev": 72,
+        "train": 72
+      },
+      "status": "generated",
+      "support": 144
+    },
+    "tag_aware": {
+      "source": "tag_aware",
+      "splits": {
+        "dev": 69,
+        "train": 69
+      },
+      "status": "generated",
+      "support": 138
+    }
+  },
+  "status": "hard_negative_mining_generated"
+}

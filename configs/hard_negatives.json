@@ -1,0 +1,48 @@
+{
+  "candidate_universe": "evaluated_split_pages",
+  "evaluated_splits": [
+    "train",
+    "dev"
+  ],
+  "final_test_split": "test",
+  "name": "synthetic-smoke-hard-negatives",
+  "outputs": {
+    "dev_jsonl": "data/derived/hard_negatives/dev.jsonl",
+    "human_brief": "docs/human-briefs/2026-07-01-hard-negative-mining.html",
+    "leakage_check": "reports/hard-negatives/leakage-check.json",
+    "progress_ledger": "reports/progress-ledger.yaml",
+    "run_card": "reports/hard-negatives/run-card.md",
+    "summary": "reports/hard-negatives/mining-summary.json",
+    "train_jsonl": "data/derived/hard_negatives/train.jsonl"
+  },
+  "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+  "queries_manifest": "data/synthetic-smoke/queries.jsonl",
+  "sources": {
+    "bm25": {
+      "enabled": true,
+      "top_k": 3
+    },
+    "bm25_lexical_rrf": {
+      "enabled": true,
+      "top_k": 3
+    },
+    "lexical_cosine": {
+      "enabled": true,
+      "top_k": 3
+    },
+    "mock_visual": {
+      "enabled": true,
+      "provider": "deterministic_mock",
+      "top_k": 3
+    },
+    "same_document": {
+      "enabled": true,
+      "top_k": 3
+    },
+    "tag_aware": {
+      "enabled": true,
+      "top_k": 3
+    }
+  },
+  "top_k_per_source": 3
+}

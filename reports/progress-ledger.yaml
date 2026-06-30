@@ -179,3 +179,28 @@ opsx_auto_status:
   notes:
     - The repo-local unattended-local-core config and validation policy are prepared for later review.
     - Runtime store initialization is intentionally not performed in this phase.
+
+hard_negative_mining_status:
+  status: generated
+  change: add-hard-negative-mining
+  command: PYTHONPATH=src python -m visdoc_retrieve.mine_hard_negatives --config configs/hard_negatives.json
+  config: configs/hard_negatives.json
+  evaluated_splits:
+    - train
+    - dev
+  candidate_universe: evaluated_split_pages
+  train_records: 429
+  dev_records: 429
+  total_records: 858
+  evidence:
+    train_jsonl: data/derived/hard_negatives/train.jsonl
+    dev_jsonl: data/derived/hard_negatives/dev.jsonl
+    summary: reports/hard-negatives/mining-summary.json
+    leakage_check: reports/hard-negatives/leakage-check.json
+    run_card: reports/hard-negatives/run-card.md
+    human_brief: docs/human-briefs/2026-07-01-hard-negative-mining.html
+  real_visual_model_execution: not_run
+  external_embeddings: not_started
+  training: not_started
+  final_test_evaluation: not_run
+  benchmark_claim: none
