@@ -41,7 +41,7 @@ This directory contains OpenSpec-managed local configuration.
   `bm25_lexical_rrf`, and deterministic `mock_visual`.
 - Outputs: `reports/mvp/metrics.json`, `reports/mvp/rankings.csv`,
   `reports/mvp/mock-visual-embeddings.json`, `reports/mvp/run-card.md`, and
-  `docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html`.
+  `docs/human-briefs/2026-06-30-visdoc-mvp.html`.
 - The `mock_visual` path is a CPU-only deterministic scaffold with MaxSim and
   mock cache round-trip evidence. It is not real ColPali/ColQwen inference and
   does not require external embeddings, network access, GPU execution, model

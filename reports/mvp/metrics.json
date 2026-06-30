@@ -461,7 +461,7 @@
   },
   "name": "synthetic-smoke-mvp",
   "outputs": {
-    "human_brief": "docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html",
+    "human_brief": "docs/human-briefs/2026-06-30-visdoc-mvp.html",
     "metrics": "reports/mvp/metrics.json",
     "mock_visual_cache": "reports/mvp/mock-visual-embeddings.json",
     "rankings": "reports/mvp/rankings.csv",

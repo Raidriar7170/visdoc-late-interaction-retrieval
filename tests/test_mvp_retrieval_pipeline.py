@@ -106,7 +106,7 @@ def test_mvp_pipeline_writes_default_smoke_artifacts_and_boundaries() -> None:
     run_card_path = Path("reports/mvp/run-card.md")
     cache_path = Path("reports/mvp/mock-visual-embeddings.json")
     human_brief_path = Path(
-        "docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html"
+        "docs/human-briefs/2026-06-30-visdoc-mvp.html"
     )
 
     assert metrics_path.is_file()
@@ -196,7 +196,7 @@ def test_mvp_pipeline_writes_default_smoke_artifacts_and_boundaries() -> None:
         "rankings": "reports/mvp/rankings.csv",
         "run_card": "reports/mvp/run-card.md",
         "human_brief": (
-            "docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html"
+            "docs/human-briefs/2026-06-30-visdoc-mvp.html"
         ),
     }
     assert mvp_status["real_visual_model_execution"] == "not_started"

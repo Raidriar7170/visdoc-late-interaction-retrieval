@@ -105,7 +105,7 @@ The MVP uses `data/synthetic-smoke/pages.jsonl` and
 - `reports/mvp/rankings.csv`
 - `reports/mvp/mock-visual-embeddings.json`
 - `reports/mvp/run-card.md`
-- `docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html`
+- `docs/human-briefs/2026-06-30-visdoc-mvp.html`
 
 Default MVP methods are `bm25`, `lexical_cosine`, `bm25_lexical_rrf`, and
 `mock_visual`. The `mock_visual` path is a deterministic CPU-only scaffold with

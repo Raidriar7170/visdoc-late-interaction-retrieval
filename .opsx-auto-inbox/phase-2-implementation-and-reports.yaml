@@ -15,7 +15,7 @@ files_touched:
     - reports/progress-ledger.yaml
     - README.md
     - configs/README.md
-    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+    - docs/human-briefs/2026-06-30-visdoc-mvp.html
 validation_commands:
   actual:
     - python -m py_compile src/visdoc_retrieve/*.py
@@ -27,7 +27,7 @@ evidence:
     - reports/mvp/rankings.csv
     - reports/mvp/mock-visual-embeddings.json
     - reports/mvp/run-card.md
-    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+    - docs/human-briefs/2026-06-30-visdoc-mvp.html
 phase_complete: true
 phase_blocked: false
 goal_impossible: false

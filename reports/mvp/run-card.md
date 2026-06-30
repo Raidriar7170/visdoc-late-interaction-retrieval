@@ -42,4 +42,4 @@ Evidence:
 - Metrics: reports/mvp/metrics.json
 - Rankings: reports/mvp/rankings.csv
 - Mock visual cache: reports/mvp/mock-visual-embeddings.json
-- Human brief: docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+- Human brief: docs/human-briefs/2026-06-30-visdoc-mvp.html

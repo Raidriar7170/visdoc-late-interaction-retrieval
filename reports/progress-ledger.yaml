@@ -105,7 +105,7 @@ mvp_retrieval_pipeline_status:
     metrics: reports/mvp/metrics.json
     rankings: reports/mvp/rankings.csv
     run_card: reports/mvp/run-card.md
-    human_brief: docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+    human_brief: docs/human-briefs/2026-06-30-visdoc-mvp.html
   real_visual_model_execution: not_started
   external_embeddings: not_started
   hard_negative_mining: not_started

@@ -26,7 +26,7 @@ acceptance:
     - reports/mvp/metrics.json
     - reports/mvp/rankings.csv
     - reports/mvp/run-card.md
-    - docs/human-briefs/2026-06-30-add-mvp-retrieval-pipeline.html
+    - docs/human-briefs/2026-06-30-visdoc-mvp.html
     - reports/progress-ledger.yaml
   required_validation:
     - python -m py_compile src/visdoc_retrieve/*.py
