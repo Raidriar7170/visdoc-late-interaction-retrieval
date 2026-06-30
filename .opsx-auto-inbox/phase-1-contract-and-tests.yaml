@@ -1,0 +1,25 @@
+phase_id: phase-1-contract-and-tests
+change: add-mvp-retrieval-pipeline
+status: complete
+scope:
+  - OpenSpec MVP proposal/design/spec/tasks
+  - opsx goal and phase manifests
+  - RED tests for visual mock scaffold and MVP pipeline behavior
+files_touched:
+  actual:
+    - openspec/changes/add-mvp-retrieval-pipeline/**
+    - .opsx-goal.yaml
+    - .opsx-auto-inbox/phase-1-contract-and-tests.yaml
+    - tests/test_mvp_retrieval_pipeline.py
+validation_commands:
+  actual:
+    - openspec validate add-mvp-retrieval-pipeline --strict
+    - pytest -q tests/test_mvp_retrieval_pipeline.py
+evidence:
+  actual:
+    - OpenSpec strict output: Change 'add-mvp-retrieval-pipeline' is valid
+    - RED output: missing visdoc_retrieve.mvp_pipeline before implementation
+    - GREEN output: 4 passed in tests/test_mvp_retrieval_pipeline.py
+phase_complete: true
+phase_blocked: false
+goal_impossible: false

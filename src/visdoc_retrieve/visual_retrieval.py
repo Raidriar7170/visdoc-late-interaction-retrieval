@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol, cast
 
 from visdoc_retrieve.data_schema import (
     QueryRecord,
@@ -65,6 +67,29 @@ class RankingItem:
 
     page_id: str
     score: float
+
+
+@dataclass(frozen=True, slots=True)
+class MockEmbeddingCache:
+    """Serializable deterministic mock embedding cache evidence."""
+
+    metadata: Mapping[str, object]
+    query_embeddings: Mapping[str, tuple[tuple[float, ...], ...]]
+    page_embeddings: Mapping[str, tuple[tuple[float, ...], ...]]
+
+
+class VisualRetriever(Protocol):
+    """Minimal visual retriever interface for MVP late-interaction scaffolds."""
+
+    uses_external_model: bool
+    gpu_required: bool
+
+    @property
+    def index_size_pages(self) -> int:
+        """Return the number of indexed pages."""
+
+    def rank(self, query: VisualQuery) -> tuple[RankingItem, ...]:
+        """Rank candidate pages for one visual query."""
 
 
 def load_visual_corpus(
@@ -159,6 +184,154 @@ class VisualSmokeRetriever:
         return tuple(sorted(scored, key=lambda item: (-item.score, item.page_id)))
 
 
+class MockVisualRetriever:
+    """Deterministic CPU-only visual late-interaction mock retriever."""
+
+    retriever_id = "mock_visual"
+    uses_external_model = False
+    gpu_required = False
+
+    def __init__(self, pages: Sequence[VisualPage]) -> None:
+        self._pages = tuple(sorted(pages, key=lambda page: page.page_id))
+        self._page_embeddings = {
+            page.page_id: self.embed_page(page) for page in self._pages
+        }
+
+    @property
+    def index_size_pages(self) -> int:
+        """Return the number of indexed pages."""
+
+        return len(self._pages)
+
+    @property
+    def page_embeddings(self) -> Mapping[str, tuple[tuple[float, ...], ...]]:
+        """Return deterministic page token embeddings keyed by page ID."""
+
+        return self._page_embeddings
+
+    def embed_query(self, query: VisualQuery) -> tuple[tuple[float, ...], ...]:
+        """Embed query tokens deterministically for mock MaxSim scoring."""
+
+        return tuple(_vector_for_token(token) for token in _query_tokens(query.query))
+
+    def embed_page(self, page: VisualPage) -> tuple[tuple[float, ...], ...]:
+        """Embed page patch tokens deterministically for mock MaxSim scoring."""
+
+        return tuple(
+            _vector_for_token(token) for token in _mock_page_tokens(page.image_bytes)
+        )
+
+    def rank(self, query: VisualQuery) -> tuple[RankingItem, ...]:
+        """Rank pages with deterministic MaxSim and stable page-ID tie-breaking."""
+
+        query_embeddings = self.embed_query(query)
+        scored = [
+            RankingItem(
+                page.page_id,
+                maxsim_score(
+                    query_token_embeddings=query_embeddings,
+                    page_token_embeddings=self._page_embeddings[page.page_id],
+                ),
+            )
+            for page in self._pages
+        ]
+        return tuple(sorted(scored, key=lambda item: (-item.score, item.page_id)))
+
+
+def maxsim_score(
+    *,
+    query_token_embeddings: Sequence[Sequence[float]],
+    page_token_embeddings: Sequence[Sequence[float]],
+) -> float:
+    """Compute mean query-token MaxSim over page-token embeddings."""
+
+    if not query_token_embeddings or not page_token_embeddings:
+        return 0.0
+
+    query_matrix = _validate_embedding_matrix(query_token_embeddings)
+    page_matrix = _validate_embedding_matrix(page_token_embeddings)
+    query_dimensions = len(query_matrix[0])
+    page_dimensions = len(page_matrix[0])
+    if query_dimensions != page_dimensions:
+        raise ValidationError(
+            "query and page token embeddings must use same dimensions"
+        )
+
+    token_scores = []
+    for query_vector in query_matrix:
+        token_scores.append(
+            max(
+                0.0,
+                max(_dot(query_vector, page_vector) for page_vector in page_matrix),
+            )
+        )
+    return sum(token_scores) / len(token_scores)
+
+
+def build_mock_embedding_cache(
+    retriever: MockVisualRetriever,
+    queries: Sequence[VisualQuery],
+) -> MockEmbeddingCache:
+    """Build a deterministic mock visual embedding cache artifact."""
+
+    query_embeddings = {
+        query.query_id: retriever.embed_query(query)
+        for query in sorted(queries, key=lambda item: item.query_id)
+    }
+    page_embeddings = {
+        page_id: retriever.page_embeddings[page_id]
+        for page_id in sorted(retriever.page_embeddings)
+    }
+    return MockEmbeddingCache(
+        metadata={
+            "schema_version": "mock_visual_embedding_cache/v1",
+            "retriever_id": retriever.retriever_id,
+            "provider": "deterministic_mock",
+            "network_required": False,
+            "gpu_required": False,
+            "model_download_required": False,
+            "external_embeddings_enabled": False,
+            "embedding_dimensions": VECTOR_DIMENSIONS,
+            "page_count": len(page_embeddings),
+            "query_count": len(query_embeddings),
+            "scoring": "maxsim_mean_query_token_best_page_token",
+        },
+        query_embeddings=query_embeddings,
+        page_embeddings=page_embeddings,
+    )
+
+
+def write_mock_embedding_cache(path: Path, cache: MockEmbeddingCache) -> None:
+    """Write mock visual embedding cache evidence as deterministic JSON."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = {
+        "metadata": dict(cache.metadata),
+        "query_embeddings": cache.query_embeddings,
+        "page_embeddings": cache.page_embeddings,
+    }
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def load_mock_embedding_cache(path: Path) -> MockEmbeddingCache:
+    """Load and validate deterministic mock visual embedding cache evidence."""
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValidationError("mock embedding cache must be a JSON object")
+    metadata = data.get("metadata")
+    if not isinstance(metadata, dict):
+        raise ValidationError("mock embedding cache metadata must be an object")
+    return MockEmbeddingCache(
+        metadata=cast(dict[str, object], metadata),
+        query_embeddings=_embedding_map(data.get("query_embeddings"), "query"),
+        page_embeddings=_embedding_map(data.get("page_embeddings"), "page"),
+    )
+
+
 def _visual_query(query: QueryRecord) -> VisualQuery:
     return VisualQuery(
         query_id=query.query_id,
@@ -202,6 +375,22 @@ def _image_patch_tokens(image_bytes: bytes) -> tuple[str, ...]:
     return tuple(text_tokens + chunk_tokens + [byte_length_token])
 
 
+def _mock_page_tokens(image_bytes: bytes) -> tuple[str, ...]:
+    text = image_bytes.decode("latin-1", errors="ignore")
+    text_tokens = [
+        f"text:{match.group(0).lower()}"
+        for match in TOKEN_PATTERN.finditer(text)
+        if match.group(0).strip()
+    ][:64]
+    chunk_tokens = [
+        f"chunk:{hashlib.sha256(chunk).hexdigest()[:16]}"
+        for chunk in _chunks(image_bytes, 4096)[:16]
+    ]
+    content_digest_token = f"digest:{hashlib.sha256(image_bytes).hexdigest()[:16]}"
+    byte_length_token = f"bytes:{len(image_bytes)}"
+    return tuple(text_tokens + chunk_tokens + [content_digest_token, byte_length_token])
+
+
 def _chunks(data: bytes, size: int) -> tuple[bytes, ...]:
     if not data:
         return (b"",)
@@ -223,14 +412,10 @@ def _late_interaction_score(
     query_vectors: Sequence[Sequence[float]],
     patch_vectors: Sequence[Sequence[float]],
 ) -> float:
-    if not query_vectors or not patch_vectors:
-        return 0.0
-    token_scores = []
-    for query_vector in query_vectors:
-        token_scores.append(
-            max(0.0, max(_dot(query_vector, patch) for patch in patch_vectors))
-        )
-    return sum(token_scores) / len(token_scores)
+    return maxsim_score(
+        query_token_embeddings=query_vectors,
+        page_token_embeddings=patch_vectors,
+    )
 
 
 def _dot(left: Sequence[float], right: Sequence[float]) -> float:
@@ -238,3 +423,54 @@ def _dot(left: Sequence[float], right: Sequence[float]) -> float:
         left_value * right_value
         for left_value, right_value in zip(left, right, strict=True)
     )
+
+
+def _validate_embedding_matrix(
+    embeddings: Sequence[Sequence[float]],
+) -> tuple[tuple[float, ...], ...]:
+    dimension: int | None = None
+    matrix: list[tuple[float, ...]] = []
+    for vector in embeddings:
+        row = tuple(float(value) for value in vector)
+        if not row:
+            raise ValidationError("token embeddings must use same dimensions")
+        if dimension is None:
+            dimension = len(row)
+        elif len(row) != dimension:
+            raise ValidationError("token embeddings must use same dimensions")
+        matrix.append(row)
+    return tuple(matrix)
+
+
+def _embedding_map(
+    value: object,
+    label: str,
+) -> dict[str, tuple[tuple[float, ...], ...]]:
+    if not isinstance(value, dict):
+        raise ValidationError(f"mock embedding cache {label} embeddings must be object")
+    embeddings: dict[str, tuple[tuple[float, ...], ...]] = {}
+    for item_id, matrix in value.items():
+        if not isinstance(item_id, str) or not item_id:
+            raise ValidationError(f"mock embedding cache {label} IDs must be strings")
+        if not isinstance(matrix, list):
+            raise ValidationError(
+                f"mock embedding cache {label} embedding must be a list"
+            )
+        embeddings[item_id] = _matrix_from_json(matrix, label)
+    return embeddings
+
+
+def _matrix_from_json(
+    matrix: list[object],
+    label: str,
+) -> tuple[tuple[float, ...], ...]:
+    rows: list[tuple[float, ...]] = []
+    for row in matrix:
+        if not isinstance(row, list):
+            raise ValidationError(
+                f"mock embedding cache {label} token embedding must be a list"
+            )
+        rows.append(tuple(float(value) for value in row))
+    if rows:
+        return _validate_embedding_matrix(rows)
+    return ()

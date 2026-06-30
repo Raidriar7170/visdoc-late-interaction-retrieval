@@ -27,3 +27,22 @@ This directory contains OpenSpec-managed local configuration.
 - Final `test` split: recorded as `not_run`.
 - ColPali/ColQwen inference, external model downloads, network access, GPU
   execution, hard-negative output, benchmark claims, and training are disabled.
+
+## MVP Pipeline
+
+- `mvp.json` runs the one-command diagnostic MVP pipeline:
+  `PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json`.
+- Evaluated split: `dev`.
+- Candidate universe: `evaluated_split_pages`.
+- Ranked candidate pages: 8 dev pages.
+- Evaluated queries: 24 dev queries.
+- Final `test` split: recorded as `not_run`.
+- Enabled methods: `bm25`, deterministic local `lexical_cosine`,
+  `bm25_lexical_rrf`, and deterministic `mock_visual`.
+- Outputs: `reports/mvp/metrics.json`, `reports/mvp/rankings.csv`,
+  `reports/mvp/mock-visual-embeddings.json`, `reports/mvp/run-card.md`, and
+  `docs/human-briefs/2026-06-30-visdoc-mvp.html`.
+- The `mock_visual` path is a CPU-only deterministic scaffold with MaxSim and
+  mock cache round-trip evidence. It is not real ColPali/ColQwen inference and
+  does not require external embeddings, network access, GPU execution, model
+  downloads, hard-negative mining, final test evaluation, or training.
