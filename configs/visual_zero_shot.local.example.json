@@ -1,0 +1,26 @@
+{
+  "name": "visual-zero-shot-local-smoke",
+  "ci_required": false,
+  "corpus_path": "data/synthetic-smoke/pages.jsonl",
+  "query_path": "data/synthetic-smoke/queries.jsonl",
+  "qrels_path": "data/synthetic-smoke/queries.jsonl",
+  "evaluated_splits": [
+    "dev"
+  ],
+  "candidate_universe": "evaluated_split_pages",
+  "final_test_split": "test",
+  "backend": {
+    "name": "local_visual_model",
+    "model_path": "local-models/colpali-or-colqwen",
+    "model_id": "local-colpali-or-colqwen",
+    "device": "cpu",
+    "batch_size": 1,
+    "cache_path": ".local/visual-zero-shot/cache/embeddings.json",
+    "local_files_only": true
+  },
+  "outputs": {
+    "metrics": "reports/visual-zero-shot/metrics.json",
+    "rankings": "reports/visual-zero-shot/rankings.csv",
+    "run_card": "reports/visual-zero-shot/run-card.md"
+  }
+}
