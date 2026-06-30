@@ -47,5 +47,5 @@
 - [x] 5.1 Run the required MVP smoke, mining CLI, py_compile, pyproject parse,
   pytest, Ruff, mypy, OpenSpec strict validation, and `git diff --check`.
 - [x] 5.2 Run a Reviewer subagent over the diff and fix Must Fix items only.
-- [ ] 5.3 Commit, push `codex/add-hard-negative-mining`, create a PR, and stop
+- [x] 5.3 Commit, push `codex/add-hard-negative-mining`, create a PR, and stop
   without merge, deploy, or OpenSpec archive.
