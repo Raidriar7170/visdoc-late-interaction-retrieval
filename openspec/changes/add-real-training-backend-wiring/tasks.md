@@ -30,4 +30,4 @@
 
 - [x] 5.1 Run the required MVP, hard-negative mining, Phase 5A dry-run, Phase 5D pilot command, py_compile, pyproject parse, pytest, Ruff, mypy, OpenSpec strict validation, and `git diff --check` commands.
 - [x] 5.2 Run a Reviewer subagent over the diff and fix Must Fix items only unless replanning is required.
-- [ ] 5.3 Commit, push `codex/phase-5d-real-training-backend-wiring`, create a PR, and stop without merge, deploy, or OpenSpec archive.
+- [x] 5.3 Commit, push `codex/phase-5d-real-training-backend-wiring`, create a PR, and stop without merge, deploy, or OpenSpec archive.
