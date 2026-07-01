@@ -1,0 +1,40 @@
+{
+  "schema": "training_pilot_phase_5c_safety_check/v1",
+  "timestamp_utc": "2026-07-01T00:00:00Z",
+  "status": "blocked",
+  "training_executed": false,
+  "model_download_executed": false,
+  "network_used_for_model_resolution": false,
+  "final_test_used": false,
+  "dev_only_sanity_is_benchmark": false,
+  "benchmark_improvement_claim_added": false,
+  "pilot_loss_reported_as_model_improvement": false,
+  "adapter_checkpoint_created": false,
+  "adapter_checkpoint_committed": false,
+  "model_weights_committed": false,
+  "training_cache_committed": false,
+  "local_config_committed": false,
+  "readme_result_claim_added": false,
+  "forbidden_artifact_scan": {
+    "model_weight_paths": [],
+    "adapter_checkpoint_paths": [],
+    "training_cache_paths": [],
+    "worktree_paths": [],
+    "local_private_config_paths": []
+  },
+  "not_committed": [
+    ".local/training-pilot/phase-5c/phase-5c.local.json",
+    ".local/training-pilot/phase-5c/raw/",
+    ".local/training-pilot/phase-5c/adapters/",
+    "model weights",
+    "adapter checkpoints",
+    "training caches",
+    "training logs"
+  ],
+  "boundary_notes": [
+    "The exact private local model path was not committed.",
+    "The A100 host was recorded only by alias-level summary; no IP, process IDs, or secrets are included.",
+    "The current launcher blocked before optional ML imports and before CUDA probing.",
+    "No final-test metrics or benchmark improvement claims were produced."
+  ]
+}

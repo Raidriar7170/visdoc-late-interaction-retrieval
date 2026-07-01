@@ -1,0 +1,87 @@
+{
+  "schema": "training_pilot_phase_5c_environment_check/v1",
+  "timestamp_utc": "2026-07-01T00:00:00Z",
+  "change": "run-phase-5c-real-training-pilot",
+  "overall_status": "blocked",
+  "real_training_executed": false,
+  "exact_command_run": "VISDOC_ENABLE_REAL_TRAINING=1 PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config .local/training-pilot/phase-5c/phase-5c.local.json",
+  "command_exit_status": 2,
+  "raw_outputs_location": ".local/training-pilot/phase-5c/raw",
+  "raw_outputs_committed": false,
+  "branch": "codex/phase-5c-real-training-pilot",
+  "base_head": "0325c40bdf911ee30ea9465d9393249cc6a7a6f4",
+  "worktree_base": "origin/main",
+  "blocked_reasons": [
+    {
+      "code": "private_remote_repo_path_unresolved",
+      "message": "The prompt supplied a redacted remote repository placeholder; the default checked A100 path under /mnt/data/minghongsun was not present."
+    },
+    {
+      "code": "private_local_model_path_unresolved",
+      "message": "The prompt supplied a redacted local model placeholder; no exact private local model path was available to this session."
+    },
+    {
+      "code": "missing_local_model_path",
+      "message": "The local Phase 5C launcher blocked because the configured local_model_path placeholder does not exist."
+    },
+    {
+      "code": "cuda_not_checked_by_launcher",
+      "message": "The launcher did not probe CUDA because the missing model path blocked before optional ML imports."
+    },
+    {
+      "code": "real_training_backend_scaffold_only_if_gates_pass",
+      "message": "The current Phase 5B launcher still returns scaffold-only blocked status after all gates pass; no real adapter-producing backend is wired in this branch."
+    }
+  ],
+  "config_summary": {
+    "allow_real_training": true,
+    "allow_final_test": false,
+    "max_steps": 20,
+    "sample_limit_triples_requested": 8,
+    "effective_training_sample_count": 0,
+    "sample_limit_enforced_by_launcher": false,
+    "sample_limit_note": "Training did not start. The current launcher has no parsed sample-limit field, so a future real backend must enforce <=8 triples before pilot_run can be claimed.",
+    "device": "cuda",
+    "candidate_universe_id": "evaluated_split_pages",
+    "adapter_output_dir": ".local/training-pilot/phase-5c/adapters",
+    "adapter_output_dir_gitignored": true,
+    "local_config_path": ".local/training-pilot/phase-5c/phase-5c.local.json",
+    "local_config_committed": false
+  },
+  "local_model_path_summary": {
+    "redacted": true,
+    "committed_value": "<redacted-local-model-path>",
+    "exact_private_path_available_to_session": false,
+    "literal_placeholder_exists": false
+  },
+  "a100_preflight": {
+    "host_recorded": "ssh alias only",
+    "remote_storage_root": "/mnt/data/minghongsun",
+    "remote_repo_path_status": "missing_or_unresolved",
+    "gpu_query_command": "nvidia-smi --query-gpu=index,name,memory.total,memory.used,utilization.gpu --format=csv,noheader,nounits",
+    "gpu_count": 8,
+    "gpu_model": "NVIDIA A100-SXM4-80GB",
+    "memory_total_mib_per_gpu": 81920,
+    "selected_gpu_index": null,
+    "summary": "8x A100 80GB observed; no GPU job launched because repository and model path gates were unresolved."
+  },
+  "launcher_gate_summary": {
+    "allow_final_test_false": true,
+    "allow_real_training_true": true,
+    "training_env_enabled": true,
+    "artifact_freeze_hashes_match": true,
+    "hard_negative_files_exist": true,
+    "hard_negative_candidate_universe_matches": true,
+    "local_model_path_exists": false,
+    "adapter_output_ignored": true,
+    "max_steps_tiny": true,
+    "cuda_available": false,
+    "run_card_boundary_wording": true
+  },
+  "run_card_boundary": {
+    "pilot": true,
+    "dev_only": true,
+    "not_final_benchmark": true,
+    "benchmark_improvement_claim": false
+  }
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5C Real Training Pilot Checkpoint</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #202124;
+    }
+    main { max-width: 920px; margin: 0 auto; }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border-bottom: 1px solid #dadce0; padding: 8px; text-align: left; }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 5C Real Training Pilot Checkpoint</h1>
+  <h2>一句话结论</h2>
+  <p>Phase 5C 已尝试进入 tiny real LoRA / QLoRA pilot，但因私有
+  repo / model path 无法在本会话中解析，当前状态为
+  <span class="status">blocked</span>；没有训练、没有 adapter、没有
+  benchmark claim。</p>
+
+  <h2>当前状态</h2>
+  <p>这是 pilot / dev-only / not final benchmark 检查点。final test 未使用，
+  没有提交模型权重、adapter checkpoint、cache、日志或私有本地配置。</p>
+
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>新增 OpenSpec change
+      <code>run-phase-5c-real-training-pilot</code>。</li>
+    <li>使用 ignored local config 运行 Phase 5C pilot launcher，命令退出
+      <code>2</code>，blocked reason 为缺少可验证的本地模型路径。</li>
+    <li>新增 sanitized Phase 5C environment check、safety check、blocked
+      run-card、adapter manifest、dev-eval schema 和 progress-ledger entry。</li>
+  </ul>
+
+  <h2>关键事实</h2>
+  <table>
+    <tr><th>项目</th><th>结果</th></tr>
+    <tr><td>是否真的运行 tiny pilot</td><td>否，blocked before training</td></tr>
+    <tr><td>命令</td><td><code>VISDOC_ENABLE_REAL_TRAINING=1 PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config .local/training-pilot/phase-5c/phase-5c.local.json</code></td></tr>
+    <tr><td>max_steps</td><td><code>20</code></td></tr>
+    <tr><td>sample limit</td><td>请求为 <code>8</code> triples；当前 launcher 未解析该字段，且训练未启动</td></tr>
+    <tr><td>A100 / CUDA</td><td>远程预检看到 8 张 A100 80GB；未选择 GPU、未启动 job</td></tr>
+    <tr><td>local model path</td><td>已 redacted；确切私有路径未提供给本会话</td></tr>
+    <tr><td>final test</td><td>未使用</td></tr>
+  </table>
+
+  <h2>证据文件</h2>
+  <ul>
+    <li><code>reports/training-pilot/phase-5c-environment-check.json</code></li>
+    <li><code>reports/training-pilot/phase-5c-safety-check.json</code></li>
+    <li><code>reports/training-pilot/phase-5c-blocked-run-card.md</code></li>
+    <li><code>reports/training-pilot/phase-5c-adapter-manifest.sanitized.json</code></li>
+    <li><code>reports/training-pilot/phase-5c-dev-eval-schema.json</code></li>
+    <li><code>reports/progress-ledger.yaml</code></li>
+  </ul>
+
+  <h2>不要夸大的结论</h2>
+  <p>本阶段没有证明模型提升，没有 dev benchmark，没有 final benchmark，
+  没有 adapter effectiveness claim。blocked evidence 只证明当前门禁没有被
+  安全满足。</p>
+
+  <h2>推荐下一步</h2>
+  <p>提供 exact private A100 repo path 和 exact local model path，并在后续小
+  change 中先补齐 local-only adapter-producing backend 与 <=8 triples sample
+  limit enforcement，再重新尝试 tiny pilot。</p>
+</main>
+</body>
+</html>
