@@ -228,7 +228,6 @@ training_pilot_status:
     dev_eval_schema: reports/training-pilot/dev-eval-schema.json
     adapter_manifest: reports/training-pilot/adapter-manifest.example.json
     human_brief: docs/human-briefs/2026-07-01-training-pilot-launch-gate.html
-
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining

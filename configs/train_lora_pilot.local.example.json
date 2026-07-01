@@ -2,6 +2,7 @@
   "adapter_output_dir": ".local/training-pilot/adapters",
   "allow_final_test": false,
   "allow_real_training": false,
+  "artifact_freeze_path": "reports/training-readiness/artifact-freeze.json",
   "base_model_name_or_path": "local-colpali-or-colqwen-placeholder",
   "batch_size": 1,
   "candidate_universe_id": "evaluated_split_pages",

@@ -21,6 +21,7 @@
     "adapter_output_dir": ".local/training-pilot/adapters",
     "allow_final_test": false,
     "allow_real_training": false,
+    "artifact_freeze_path": "reports/training-readiness/artifact-freeze.json",
     "candidate_universe_id": "evaluated_split_pages",
     "device": "cuda",
     "local_model_path": "local-models/colpali-or-colqwen",
@@ -42,10 +43,25 @@
       "message": "Config did not explicitly allow real training.",
       "passed": false
     },
+    "artifact_freeze_hashes_match": {
+      "code": "artifact_freeze_mismatch",
+      "message": "Phase 5A artifact-freeze hashes match current files.",
+      "passed": true
+    },
     "cuda_available": {
       "code": "cuda_not_checked",
       "message": "CUDA was not checked because an earlier non-import gate blocked.",
       "passed": false
+    },
+    "hard_negative_candidate_universe_matches": {
+      "code": "hard_negative_candidate_universe_mismatch",
+      "message": "Hard-negative candidate_universe_id values match config.",
+      "passed": true
+    },
+    "hard_negative_files_exist": {
+      "code": "hard_negative_file_missing",
+      "message": "Train and dev hard-negative files exist.",
+      "passed": true
     },
     "local_model_path_exists": {
       "code": "missing_local_model_path",

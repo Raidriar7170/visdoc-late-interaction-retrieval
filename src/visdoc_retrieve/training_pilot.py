@@ -44,6 +44,7 @@ class TrainingPilotConfig:
     base_model_name_or_path: str
     local_model_path: Path
     model_revision: str
+    artifact_freeze_path: Path
     adapter_output_dir: Path
     train_hard_negatives_path: Path
     dev_hard_negatives_path: Path
@@ -80,18 +81,39 @@ class GateResult:
     message: str
 
 
-def load_training_pilot_config(path: Path) -> TrainingPilotConfig:
+def load_training_pilot_config(
+    path: Path,
+    *,
+    repo_root: Path | None = None,
+) -> TrainingPilotConfig:
     """Load and validate a Phase 5B pilot JSON config without ML imports."""
 
-    data = json.loads(path.read_text(encoding="utf-8"))
+    root = repo_root.resolve() if repo_root is not None else None
+    config_path = _resolve_path(root, path) if root is not None else path
+    try:
+        data = json.loads(config_path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise TrainingPilotConfigError(
+            f"training-pilot config cannot be read: {path}"
+        ) from exc
+    except json.JSONDecodeError as exc:
+        raise TrainingPilotConfigError(
+            f"training-pilot config is not valid JSON: {path}: {exc.msg}"
+        ) from exc
     if not isinstance(data, dict):
         raise TrainingPilotConfigError("training-pilot config must be an object")
 
     outputs = _required_mapping(data, "outputs")
+    artifact_freeze_path = _optional_str(
+        data,
+        "artifact_freeze_path",
+        default="reports/training-readiness/artifact-freeze.json",
+    )
     config = TrainingPilotConfig(
         base_model_name_or_path=_required_str(data, "base_model_name_or_path"),
         local_model_path=Path(_required_str(data, "local_model_path")),
         model_revision=_required_str(data, "model_revision"),
+        artifact_freeze_path=Path(artifact_freeze_path),
         adapter_output_dir=Path(_required_str(data, "adapter_output_dir")),
         train_hard_negatives_path=Path(
             _required_str(data, "train_hard_negatives_path")
@@ -129,9 +151,9 @@ def load_training_pilot_config(path: Path) -> TrainingPilotConfig:
             human_brief=Path(_required_str(outputs, "human_brief")),
             progress_ledger=Path(_required_str(outputs, "progress_ledger")),
         ),
-        config_path=path,
+        config_path=config_path,
     )
-    _validate_pilot_config(config)
+    _validate_pilot_config(config, repo_root=root)
     return config
 
 
@@ -244,7 +266,11 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _validate_pilot_config(config: TrainingPilotConfig) -> None:
+def _validate_pilot_config(
+    config: TrainingPilotConfig,
+    *,
+    repo_root: Path | None = None,
+) -> None:
     if config.allow_final_test:
         raise TrainingPilotConfigError("allow_final_test must remain false")
     if config.max_steps > MAX_PILOT_STEPS:
@@ -269,6 +295,7 @@ def _validate_pilot_config(config: TrainingPilotConfig) -> None:
             path,
             field_name=field_name,
             corpus_path=config.corpus_path,
+            repo_root=repo_root,
         )
 
 
@@ -283,11 +310,24 @@ def _evaluate_gates(
     env_enabled = environ.get("VISDOC_ENABLE_REAL_TRAINING") == "1"
     local_model_exists = local_model.exists()
     adapter_output_ignored = _git_check_ignore(repo_root, config.adapter_output_dir)
+    artifact_freeze_gate = _artifact_freeze_hash_gate(config, repo_root=repo_root)
+    hard_negative_files_gate = _hard_negative_files_exist_gate(
+        config,
+        repo_root=repo_root,
+    )
+    hard_negative_universe_gate = _hard_negative_candidate_universe_gate(
+        config,
+        repo_root=repo_root,
+        files_exist=hard_negative_files_gate.passed,
+    )
     can_probe_cuda = (
         config.allow_real_training
         and env_enabled
         and local_model_exists
         and adapter_output_ignored
+        and artifact_freeze_gate.passed
+        and hard_negative_files_gate.passed
+        and hard_negative_universe_gate.passed
         and config.max_steps <= MAX_PILOT_STEPS
     )
     cuda_passed = cuda_available() if can_probe_cuda else False
@@ -316,6 +356,9 @@ def _evaluate_gates(
             code="training_env_not_enabled",
             message="VISDOC_ENABLE_REAL_TRAINING=1 is required for a real pilot.",
         ),
+        artifact_freeze_gate,
+        hard_negative_files_gate,
+        hard_negative_universe_gate,
         GateResult(
             name="local_model_path_exists",
             passed=local_model_exists,
@@ -381,6 +424,7 @@ def _environment_check(
         "config": {
             "allow_real_training": config.allow_real_training,
             "allow_final_test": config.allow_final_test,
+            "artifact_freeze_path": str(config.artifact_freeze_path),
             "local_model_path": str(config.local_model_path),
             "adapter_output_dir": str(config.adapter_output_dir),
             "max_steps": config.max_steps,
@@ -471,6 +515,7 @@ def _adapter_manifest(
         "adapter_output_dir": str(config.adapter_output_dir),
         "base_model_name_or_path": config.base_model_name_or_path,
         "model_revision": config.model_revision,
+        "artifact_freeze_path": str(config.artifact_freeze_path),
         "hard_negative_artifact_hash": _combined_file_hash(
             repo_root,
             [config.train_hard_negatives_path, config.dev_hard_negatives_path],
@@ -843,6 +888,168 @@ def _tracked_repo_paths(repo_root: Path) -> tuple[str, ...]:
     return tuple(path for path in paths if path)
 
 
+def _artifact_freeze_hash_gate(
+    config: TrainingPilotConfig,
+    *,
+    repo_root: Path,
+) -> GateResult:
+    freeze_path = _resolve_path(repo_root, config.artifact_freeze_path)
+    if not freeze_path.is_file():
+        return GateResult(
+            name="artifact_freeze_hashes_match",
+            passed=False,
+            code="artifact_freeze_missing",
+            message=(
+                "Phase 5A artifact freeze does not exist: "
+                f"{config.artifact_freeze_path}"
+            ),
+        )
+    try:
+        data = json.loads(freeze_path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        return GateResult(
+            name="artifact_freeze_hashes_match",
+            passed=False,
+            code="artifact_freeze_invalid",
+            message=(
+                "Phase 5A artifact freeze could not be read: "
+                f"{config.artifact_freeze_path}: {exc}"
+            ),
+        )
+    except json.JSONDecodeError as exc:
+        return GateResult(
+            name="artifact_freeze_hashes_match",
+            passed=False,
+            code="artifact_freeze_invalid",
+            message=(
+                "Phase 5A artifact freeze is not valid JSON: "
+                f"{config.artifact_freeze_path}: {exc.msg}"
+            ),
+        )
+    if not isinstance(data, dict) or not isinstance(data.get("artifacts"), dict):
+        return GateResult(
+            name="artifact_freeze_hashes_match",
+            passed=False,
+            code="artifact_freeze_invalid",
+            message="Phase 5A artifact freeze must contain an artifacts object.",
+        )
+
+    mismatches: list[str] = []
+    artifacts = cast(Mapping[str, object], data["artifacts"])
+    for artifact_name, artifact_value in artifacts.items():
+        if not isinstance(artifact_value, dict):
+            mismatches.append(f"{artifact_name}: invalid artifact entry")
+            continue
+        path_value = artifact_value.get("path")
+        expected_sha = artifact_value.get("sha256")
+        if not isinstance(path_value, str) or not isinstance(expected_sha, str):
+            mismatches.append(f"{artifact_name}: missing path or sha256")
+            continue
+        artifact_path = _resolve_path(repo_root, Path(path_value))
+        if not artifact_path.is_file():
+            mismatches.append(f"{artifact_name}: missing {path_value}")
+            continue
+        actual_sha = sha256_file(artifact_path)
+        if actual_sha != expected_sha:
+            mismatches.append(
+                f"{artifact_name}: expected {expected_sha}, got {actual_sha}"
+            )
+
+    if mismatches:
+        return GateResult(
+            name="artifact_freeze_hashes_match",
+            passed=False,
+            code="artifact_freeze_mismatch",
+            message="Phase 5A artifact freeze mismatch: " + "; ".join(mismatches),
+        )
+    return GateResult(
+        name="artifact_freeze_hashes_match",
+        passed=True,
+        code="artifact_freeze_mismatch",
+        message="Phase 5A artifact-freeze hashes match current files.",
+    )
+
+
+def _hard_negative_files_exist_gate(
+    config: TrainingPilotConfig,
+    *,
+    repo_root: Path,
+) -> GateResult:
+    missing = [
+        str(path)
+        for path in (
+            config.train_hard_negatives_path,
+            config.dev_hard_negatives_path,
+        )
+        if not _resolve_path(repo_root, path).is_file()
+    ]
+    if missing:
+        return GateResult(
+            name="hard_negative_files_exist",
+            passed=False,
+            code="hard_negative_file_missing",
+            message="Missing hard-negative file(s): " + ", ".join(missing),
+        )
+    return GateResult(
+        name="hard_negative_files_exist",
+        passed=True,
+        code="hard_negative_file_missing",
+        message="Train and dev hard-negative files exist.",
+    )
+
+
+def _hard_negative_candidate_universe_gate(
+    config: TrainingPilotConfig,
+    *,
+    repo_root: Path,
+    files_exist: bool,
+) -> GateResult:
+    if not files_exist:
+        return GateResult(
+            name="hard_negative_candidate_universe_matches",
+            passed=False,
+            code="hard_negative_candidate_universe_not_checked",
+            message=(
+                "Hard-negative candidate universe was not checked because a "
+                "file is missing."
+            ),
+        )
+
+    mismatches: list[str] = []
+    for path in (config.train_hard_negatives_path, config.dev_hard_negatives_path):
+        resolved = _resolve_path(repo_root, path)
+        try:
+            records = _read_jsonl(resolved)
+        except TrainingPilotConfigError as exc:
+            return GateResult(
+                name="hard_negative_candidate_universe_matches",
+                passed=False,
+                code="hard_negative_file_invalid",
+                message=str(exc),
+            )
+        for line_number, record in enumerate(records, start=1):
+            candidate_universe = record.get("candidate_universe_id")
+            if candidate_universe != config.candidate_universe_id:
+                mismatches.append(
+                    f"{path}:{line_number} has {candidate_universe!r}, "
+                    f"expected {config.candidate_universe_id!r}"
+                )
+    if mismatches:
+        return GateResult(
+            name="hard_negative_candidate_universe_matches",
+            passed=False,
+            code="hard_negative_candidate_universe_mismatch",
+            message="Hard-negative candidate universe mismatch: "
+            + "; ".join(mismatches),
+        )
+    return GateResult(
+        name="hard_negative_candidate_universe_matches",
+        passed=True,
+        code="hard_negative_candidate_universe_mismatch",
+        message="Hard-negative candidate_universe_id values match config.",
+    )
+
+
 def _looks_like_training_cache_path(path: Path) -> bool:
     parts = path.parts
     if not parts:
@@ -879,13 +1086,18 @@ def _validate_dev_only_query_file(
     *,
     field_name: str,
     corpus_path: Path,
+    repo_root: Path | None = None,
 ) -> None:
     if _looks_like_final_test_path(path):
         raise TrainingPilotConfigError(f"{field_name} must be dev-only")
-    if not path.is_file():
+    resolved_path = _resolve_path(repo_root, path) if repo_root is not None else path
+    resolved_corpus = (
+        _resolve_path(repo_root, corpus_path) if repo_root is not None else corpus_path
+    )
+    if not resolved_path.is_file():
         raise TrainingPilotConfigError(f"{field_name} does not exist: {path}")
-    page_splits = _page_split_map(corpus_path)
-    records = _read_jsonl(path)
+    page_splits = _page_split_map(resolved_corpus)
+    records = _read_jsonl(resolved_path)
     if not records:
         raise TrainingPilotConfigError(f"{field_name} must contain dev records")
     for record in records:
@@ -940,7 +1152,12 @@ def _read_jsonl(path: Path) -> tuple[Mapping[str, object], ...]:
             stripped = line.strip()
             if not stripped:
                 continue
-            value = json.loads(stripped)
+            try:
+                value = json.loads(stripped)
+            except json.JSONDecodeError as exc:
+                raise TrainingPilotConfigError(
+                    f"{path}:{line_number} is not valid JSON: {exc.msg}"
+                ) from exc
             if not isinstance(value, dict):
                 raise TrainingPilotConfigError(
                     f"{path}:{line_number} must be a JSON object"
@@ -1017,6 +1234,13 @@ def _required_mapping(data: Mapping[str, object], key: str) -> Mapping[str, obje
 
 def _required_str(data: Mapping[str, object], key: str) -> str:
     value = data.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise TrainingPilotConfigError(f"{key} must be a non-empty string")
+    return value
+
+
+def _optional_str(data: Mapping[str, object], key: str, *, default: str) -> str:
+    value = data.get(key, default)
     if not isinstance(value, str) or not value.strip():
         raise TrainingPilotConfigError(f"{key} must be a non-empty string")
     return value

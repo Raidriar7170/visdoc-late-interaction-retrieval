@@ -130,6 +130,12 @@ def test_default_pilot_cli_blocks_and_writes_evidence_without_optional_imports(
     assert environment["overall_status"] == "blocked"
     assert environment["real_training_executed"] is False
     assert environment["blocked_reasons"][0]["code"] == "allow_real_training_false"
+    assert environment["gates"]["artifact_freeze_hashes_match"]["passed"] is True
+    assert environment["gates"]["hard_negative_files_exist"]["passed"] is True
+    assert (
+        environment["gates"]["hard_negative_candidate_universe_matches"]["passed"]
+        is True
+    )
     assert environment["gates"]["allow_final_test_false"]["passed"] is True
     assert environment["gates"]["allow_real_training_true"]["passed"] is False
     assert "blocked" in run_card
@@ -199,6 +205,207 @@ def test_cuda_is_not_probed_before_adapter_ignore_gate_passes(
 
     assert result["status"] == "blocked"
     assert result["blocked_reasons"][0]["code"] == "adapter_output_not_ignored"
+
+
+def test_artifact_freeze_hash_mismatch_blocks_before_training(
+    tmp_path: Path,
+) -> None:
+    pilot = _pilot_module()
+    freeze = json.loads(
+        Path("reports/training-readiness/artifact-freeze.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    freeze["artifacts"]["train_hard_negatives"]["sha256"] = "0" * 64
+    freeze_path = tmp_path / "artifact-freeze-mismatch.json"
+    freeze_path.write_text(
+        json.dumps(freeze, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    config_path = _write_pilot_config(tmp_path, artifact_freeze_path=freeze_path)
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={},
+        cuda_available=lambda: False,
+    )
+
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert result["status"] == "blocked"
+    assert "artifact_freeze_mismatch" in {
+        reason["code"] for reason in result["blocked_reasons"]
+    }
+    assert environment["gates"]["artifact_freeze_hashes_match"]["passed"] is False
+    assert "train_hard_negatives" in environment["gates"][
+        "artifact_freeze_hashes_match"
+    ]["message"]
+
+
+def test_missing_hard_negative_file_blocks_clearly(tmp_path: Path) -> None:
+    pilot = _pilot_module()
+    missing_train = tmp_path / "missing-train.jsonl"
+    config_path = _write_pilot_config(
+        tmp_path,
+        train_hard_negatives_path=missing_train,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={},
+        cuda_available=lambda: False,
+    )
+
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert result["status"] == "blocked"
+    assert "hard_negative_file_missing" in {
+        reason["code"] for reason in result["blocked_reasons"]
+    }
+    assert environment["gates"]["hard_negative_files_exist"]["passed"] is False
+    assert str(missing_train) in environment["gates"]["hard_negative_files_exist"][
+        "message"
+    ]
+
+
+def test_hard_negative_candidate_universe_mismatch_blocks_clearly(
+    tmp_path: Path,
+) -> None:
+    pilot = _pilot_module()
+    mismatched_train = tmp_path / "train-candidate-universe-mismatch.jsonl"
+    first_record = json.loads(
+        Path("data/derived/hard_negatives/train.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()[0]
+    )
+    first_record["candidate_universe_id"] = "all_pages"
+    mismatched_train.write_text(
+        json.dumps(first_record, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    config_path = _write_pilot_config(
+        tmp_path,
+        train_hard_negatives_path=mismatched_train,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={},
+        cuda_available=lambda: False,
+    )
+
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert result["status"] == "blocked"
+    assert "hard_negative_candidate_universe_mismatch" in {
+        reason["code"] for reason in result["blocked_reasons"]
+    }
+    assert (
+        environment["gates"]["hard_negative_candidate_universe_matches"]["passed"]
+        is False
+    )
+    assert "all_pages" in environment["gates"][
+        "hard_negative_candidate_universe_matches"
+    ]["message"]
+
+
+def test_malformed_artifact_freeze_blocks_with_evidence(tmp_path: Path) -> None:
+    pilot = _pilot_module()
+    bad_freeze = tmp_path / "bad-artifact-freeze.json"
+    bad_freeze.write_text("{not-json", encoding="utf-8")
+    config_path = _write_pilot_config(tmp_path, artifact_freeze_path=bad_freeze)
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={},
+        cuda_available=lambda: False,
+    )
+
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert result["status"] == "blocked"
+    assert "artifact_freeze_invalid" in {
+        reason["code"] for reason in result["blocked_reasons"]
+    }
+    assert environment["gates"]["artifact_freeze_hashes_match"]["passed"] is False
+    assert "not valid JSON" in environment["gates"][
+        "artifact_freeze_hashes_match"
+    ]["message"]
+
+
+def test_malformed_hard_negative_jsonl_blocks_with_evidence(
+    tmp_path: Path,
+) -> None:
+    pilot = _pilot_module()
+    bad_train = tmp_path / "bad-train.jsonl"
+    bad_train.write_text("{not-json\n", encoding="utf-8")
+    config_path = _write_pilot_config(
+        tmp_path,
+        train_hard_negatives_path=bad_train,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={},
+        cuda_available=lambda: False,
+    )
+
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert result["status"] == "blocked"
+    assert "hard_negative_file_invalid" in {
+        reason["code"] for reason in result["blocked_reasons"]
+    }
+    assert (
+        environment["gates"]["hard_negative_candidate_universe_matches"]["passed"]
+        is False
+    )
+    assert "not valid JSON" in environment["gates"][
+        "hard_negative_candidate_universe_matches"
+    ]["message"]
+
+
+def test_cli_repo_root_resolves_repo_relative_validation_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pilot = _pilot_module()
+    repo_root = Path.cwd()
+    outside_dir = tmp_path / "outside"
+    outside_dir.mkdir()
+    config_path = _write_pilot_config(tmp_path)
+
+    monkeypatch.chdir(outside_dir)
+    exit_code = pilot.main(
+        [
+            "--repo-root",
+            str(repo_root),
+            "--config",
+            str(config_path),
+        ]
+    )
+
+    assert exit_code == 2
+    environment = json.loads(
+        (tmp_path / "reports" / "environment-check.json").read_text()
+    )
+    assert environment["overall_status"] == "blocked"
+    assert environment["gates"]["artifact_freeze_hashes_match"]["passed"] is True
+    assert environment["gates"]["hard_negative_files_exist"]["passed"] is True
+    assert (
+        environment["gates"]["hard_negative_candidate_universe_matches"]["passed"]
+        is True
+    )
 
 
 def test_dev_eval_manifest_and_safety_outputs_are_honest(
@@ -364,9 +571,15 @@ def _write_pilot_config(
     adapter_output_dir: Path | str = ".local/training-pilot/adapters",
     allow_real_training: bool = False,
     allow_final_test: bool = False,
+    artifact_freeze_path: Path | str = (
+        "reports/training-readiness/artifact-freeze.json"
+    ),
     queries_path: Path | str = "data/derived/training-pilot/dev-queries.jsonl",
     qrels_path: Path | str = "data/derived/training-pilot/dev-qrels.jsonl",
     local_model_path: Path | str = "local-models/colpali-or-colqwen",
+    train_hard_negatives_path: Path | str = (
+        "data/derived/hard_negatives/train.jsonl"
+    ),
     dev_hard_negatives_path: Path | str = "data/derived/hard_negatives/dev.jsonl",
     max_steps: int = 20,
 ) -> Path:
@@ -377,6 +590,7 @@ def _write_pilot_config(
         "adapter_output_dir": str(adapter_output_dir),
         "allow_final_test": allow_final_test,
         "allow_real_training": allow_real_training,
+        "artifact_freeze_path": str(artifact_freeze_path),
         "base_model_name_or_path": "local-colpali-or-colqwen-placeholder",
         "batch_size": 1,
         "candidate_universe_id": "evaluated_split_pages",
@@ -412,7 +626,7 @@ def _write_pilot_config(
         "report_timestamp_utc": "2026-07-01T00:00:00Z",
         "save_adapter": True,
         "seed": 17,
-        "train_hard_negatives_path": "data/derived/hard_negatives/train.jsonl",
+        "train_hard_negatives_path": str(train_hard_negatives_path),
     }
     config_path = tmp_path / "train_lora_pilot.local.example.json"
     config_path.write_text(

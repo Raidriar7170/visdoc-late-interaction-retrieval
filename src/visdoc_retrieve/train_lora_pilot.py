@@ -33,9 +33,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args(argv)
 
+    repo_root = args.repo_root.resolve()
+    config_path = args.config if args.config.is_absolute() else repo_root / args.config
     try:
-        config = load_training_pilot_config(args.config)
-        result = run_training_pilot_gate(config, repo_root=args.repo_root)
+        config = load_training_pilot_config(config_path, repo_root=repo_root)
+        result = run_training_pilot_gate(config, repo_root=repo_root)
     except TrainingPilotConfigError as exc:
         print(str(exc), file=sys.stderr)
         return 2
