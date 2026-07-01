@@ -1,4 +1,4 @@
-"""CLI entry point for the Phase 5B real-training pilot launch gate."""
+"""CLI entry point for the Phase 5D real-training backend wiring gate."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ __all__ = [
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the Phase 5B local-only pilot launch gate."""
+    """Run the Phase 5D local-only pilot backend wiring gate."""
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
