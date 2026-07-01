@@ -180,6 +180,54 @@ opsx_auto_status:
     - The repo-local unattended-local-core config and validation policy are prepared for later review.
     - Runtime store initialization is intentionally not performed in this phase.
 
+training_readiness_status:
+  status: dry_run_generated
+  change: add-training-readiness-phase-5a
+  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
+  config: configs/train_lora_dry_run.json
+  candidate_universe: evaluated_split_pages
+  train_triples: 429
+  dev_triples: 429
+  dry_run: true
+  training: not_executed
+  model_download: not_executed
+  gpu_required: false
+  adapter_checkpoint: not_created
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  mock_results_are_model_performance: false
+  evidence:
+    artifact_freeze: reports/training-readiness/artifact-freeze.json
+    dataset_summary: reports/training-readiness/dataset-summary.json
+    safety_check: reports/training-readiness/safety-check.json
+    dry_run_card: reports/training-readiness/dry-run-card.md
+    human_brief: docs/human-briefs/2026-07-01-training-readiness.md
+training_pilot_status:
+  status: blocked
+  change: add-training-pilot-launch-gate
+  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json
+  config: configs/train_lora_pilot.local.example.json
+  candidate_universe: evaluated_split_pages
+  training: not_executed
+  model_download: not_executed
+  network: not_used
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  adapter_checkpoint_committed: false
+  model_weights_committed: false
+  mock_visual_result_reported_as_real: false
+  blocked_reasons:
+    - allow_real_training_false
+    - training_env_not_enabled
+    - missing_local_model_path
+    - cuda_not_checked
+  evidence:
+    environment_check: reports/training-pilot/environment-check.json
+    run_card: reports/training-pilot/blocked-run-card.md
+    safety_check: reports/training-pilot/safety-check.json
+    dev_eval_schema: reports/training-pilot/dev-eval-schema.json
+    adapter_manifest: reports/training-pilot/adapter-manifest.example.json
+    human_brief: docs/human-briefs/2026-07-01-training-pilot-launch-gate.html
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining
@@ -204,25 +252,3 @@ hard_negative_mining_status:
   training: not_started
   final_test_evaluation: not_run
   benchmark_claim: none
-training_readiness_status:
-  status: dry_run_generated
-  change: add-training-readiness-phase-5a
-  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
-  config: configs/train_lora_dry_run.json
-  candidate_universe: evaluated_split_pages
-  train_triples: 429
-  dev_triples: 429
-  dry_run: true
-  training: not_executed
-  model_download: not_executed
-  gpu_required: false
-  adapter_checkpoint: not_created
-  final_test_evaluation: not_run
-  benchmark_claim: none
-  mock_results_are_model_performance: false
-  evidence:
-    artifact_freeze: reports/training-readiness/artifact-freeze.json
-    dataset_summary: reports/training-readiness/dataset-summary.json
-    safety_check: reports/training-readiness/safety-check.json
-    dry_run_card: reports/training-readiness/dry-run-card.md
-    human_brief: docs/human-briefs/2026-07-01-training-readiness.md

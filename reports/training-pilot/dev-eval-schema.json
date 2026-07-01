@@ -1,0 +1,18 @@
+{
+  "adapter_required": true,
+  "candidate_universe_id": "evaluated_split_pages",
+  "dev_hard_negatives_path": "data/derived/hard_negatives/dev.jsonl",
+  "final_test_used": false,
+  "improvement_claim": null,
+  "metrics": {
+    "mrr": null,
+    "recall_at_1": null,
+    "recall_at_5": null
+  },
+  "notes": "No dev improvement is reported unless a gated real adapter exists; final test remains unused.",
+  "qrels_path": "data/derived/training-pilot/dev-qrels.jsonl",
+  "queries_path": "data/derived/training-pilot/dev-queries.jsonl",
+  "schema": "training_pilot_dev_eval/v1",
+  "scope": "dev-only",
+  "status": "not_run"
+}
