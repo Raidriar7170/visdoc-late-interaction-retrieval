@@ -1,0 +1,24 @@
+{
+  "schema": "training_pilot_phase_5c_dev_eval/v1",
+  "timestamp_utc": "2026-07-01T00:00:00Z",
+  "status": "not_run",
+  "scope": "dev-only",
+  "candidate_universe_id": "evaluated_split_pages",
+  "dev_hard_negatives_path": "data/derived/hard_negatives/dev.jsonl",
+  "queries_path": "data/derived/training-pilot/dev-queries.jsonl",
+  "qrels_path": "data/derived/training-pilot/dev-qrels.jsonl",
+  "adapter_required": true,
+  "adapter_available": false,
+  "final_test_used": false,
+  "metrics": {
+    "recall_at_1": null,
+    "recall_at_5": null,
+    "mrr": null
+  },
+  "improvement_claim": null,
+  "notes": [
+    "No dev metrics were computed because no gated real adapter was produced.",
+    "Dev-only sanity checks are not final benchmark evidence.",
+    "Final test remains unused."
+  ]
+}

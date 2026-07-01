@@ -228,6 +228,44 @@ training_pilot_status:
     dev_eval_schema: reports/training-pilot/dev-eval-schema.json
     adapter_manifest: reports/training-pilot/adapter-manifest.example.json
     human_brief: docs/human-briefs/2026-07-01-training-pilot-launch-gate.html
+training_pilot_phase_5c_status:
+  status: blocked
+  change: run-phase-5c-real-training-pilot
+  command: VISDOC_ENABLE_REAL_TRAINING=1 PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config .local/training-pilot/phase-5c/phase-5c.local.json
+  config: .local/training-pilot/phase-5c/phase-5c.local.json
+  local_config_committed: false
+  candidate_universe: evaluated_split_pages
+  max_steps: 20
+  sample_limit_triples_requested: 8
+  effective_training_sample_count: 0
+  training: not_executed
+  real_pilot_ran: false
+  model_download: not_executed
+  network: not_used_for_model_resolution
+  final_test_evaluation: not_run
+  dev_eval: not_run
+  benchmark_claim: none
+  adapter_checkpoint_created: false
+  adapter_checkpoint_committed: false
+  model_weights_committed: false
+  training_cache_committed: false
+  private_local_model_path_committed: false
+  remote_gpu_summary: 8x A100 80GB observed; no GPU job launched
+  local_model_path_summary: redacted placeholder unresolved
+  blocked_reasons:
+    - private_remote_repo_path_unresolved
+    - private_local_model_path_unresolved
+    - missing_local_model_path
+    - cuda_not_checked_by_launcher
+    - real_training_backend_scaffold_only_if_gates_pass
+  evidence:
+    environment_check: reports/training-pilot/phase-5c-environment-check.json
+    run_card: reports/training-pilot/phase-5c-blocked-run-card.md
+    safety_check: reports/training-pilot/phase-5c-safety-check.json
+    dev_eval_schema: reports/training-pilot/phase-5c-dev-eval-schema.json
+    adapter_manifest: reports/training-pilot/phase-5c-adapter-manifest.sanitized.json
+    human_brief: docs/human-briefs/2026-07-01-real-training-pilot.html
+
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining
