@@ -704,11 +704,6 @@ def _write_human_brief(
 def _update_progress_ledger(path: Path, summary: Mapping[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     existing = path.read_text(encoding="utf-8") if path.exists() else ""
-    preserved = _remove_top_level_yaml_section(
-        existing,
-        section="training_readiness_status",
-    )
-    prefix = preserved.rstrip() + "\n" if preserved.strip() else ""
     train = cast(Mapping[str, object], summary["train"])
     dev = cast(Mapping[str, object], summary["dev"])
     entry = "\n".join(
@@ -740,10 +735,22 @@ def _update_progress_ledger(path: Path, summary: Mapping[str, object]) -> None:
             "",
         ]
     )
-    path.write_text(prefix + entry, encoding="utf-8")
+    path.write_text(
+        _replace_top_level_yaml_section(
+            existing,
+            section="training_readiness_status",
+            replacement=entry,
+        ),
+        encoding="utf-8",
+    )
 
 
-def _remove_top_level_yaml_section(text: str, *, section: str) -> str:
+def _replace_top_level_yaml_section(
+    text: str,
+    *,
+    section: str,
+    replacement: str,
+) -> str:
     lines = text.splitlines()
     start: int | None = None
     for index, line in enumerate(lines):
@@ -751,7 +758,8 @@ def _remove_top_level_yaml_section(text: str, *, section: str) -> str:
             start = index
             break
     if start is None:
-        return text.rstrip()
+        prefix = text.rstrip() + "\n" if text.strip() else ""
+        return prefix + replacement
 
     end = start + 1
     while end < len(lines):
@@ -759,7 +767,7 @@ def _remove_top_level_yaml_section(text: str, *, section: str) -> str:
         if line and not line.startswith((" ", "-")):
             break
         end += 1
-    return "\n".join([*lines[:start], *lines[end:]]).rstrip()
+    return "\n".join([*lines[:start], replacement.rstrip(), *lines[end:]]).rstrip()
 
 
 def _write_json(path: Path, payload: Mapping[str, object]) -> None:

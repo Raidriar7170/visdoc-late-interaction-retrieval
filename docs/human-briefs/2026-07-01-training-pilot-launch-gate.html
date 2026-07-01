@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5B Training Pilot Launch Gate</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #202124;
+    }
+    main { max-width: 880px; margin: 0 auto; }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 5B Training Pilot Launch Gate</h1>
+  <h2>一句话结论</h2>
+  <p>Phase 5B 已新增真实 LoRA / QLoRA pilot 的本地启动门禁；
+  当前状态为 <span class="status">blocked</span>，默认不训练。</p>
+  <h2>当前状态</h2>
+  <p>这是 pilot / dev-only / not final benchmark 检查点。
+  final test 仍未使用，没有 benchmark improvement claim。</p>
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>新增配置 <code>configs/train_lora_pilot.local.example.json</code>。</li>
+    <li>新增 CLI <code>PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json</code>。</li>
+    <li>生成 environment check、run-card、safety check、
+    dev eval schema 和 adapter manifest example。</li>
+  </ul>
+  <h2>训练门禁</h2>
+  <p>只有同时满足 allow_real_training=true、
+  allow_final_test=false、
+  <code>VISDOC_ENABLE_REAL_TRAINING=1</code>、
+  本地模型路径存在、CUDA 可用、
+  <code>max_steps &lt;= 20</code>、
+  adapter 输出目录被 git ignore，才允许进入 guarded real pilot
+  launcher。</p>
+  <h2>为什么默认不训练</h2>
+  <ul><li><code>allow_real_training_false</code>: Config did not explicitly allow real training.</li><li><code>training_env_not_enabled</code>: VISDOC_ENABLE_REAL_TRAINING=1 is required for a real pilot.</li><li><code>missing_local_model_path</code>: local_model_path does not exist: local-models/colpali-or-colqwen</li><li><code>cuda_not_checked</code>: CUDA was not checked because an earlier non-import gate blocked.</li></ul>
+  <h2>A100 / 本地模型 pilot 运行方式</h2>
+  <p>在 A100 或本地 CUDA 环境中，先准备本地模型目录，
+  确认 adapter 输出在 ignored artifacts 目录下，再显式设置
+  <code>VISDOC_ENABLE_REAL_TRAINING=1</code> 并将配置中的
+  <code>allow_real_training</code> 改为 true。不要下载模型，
+  不要启用 final test。</p>
+  <h2>关键证据</h2>
+  <ul>
+    <li><code>reports/training-pilot/environment-check.json
+    </code></li>
+    <li><code>reports/training-pilot/blocked-run-card.md</code>
+    或 <code>reports/training-pilot/pilot-run-card.md</code></li>
+    <li><code>reports/training-pilot/safety-check.json</code></li>
+    <li><code>reports/training-pilot/dev-eval-schema.json
+    </code></li>
+    <li><code>reports/training-pilot/adapter-manifest.example.json
+    </code></li>
+  </ul>
+  <h2>不应夸大的结论</h2>
+  <p>没有提交 adapter / weights；没有把 blocked 或 dry-run 写成
+  真实训练结果；没有把 mock visual result 写成 real visual result。</p>
+  <h2>推荐下一步</h2>
+  <p>在具备本地模型和 CUDA 的 A100 环境中运行一次小预算 pilot，
+  或继续记录 blocked evidence。</p>
+</main>
+</body>
+</html>

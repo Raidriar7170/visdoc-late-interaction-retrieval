@@ -1,0 +1,82 @@
+{
+  "blocked_reasons": [
+    {
+      "code": "allow_real_training_false",
+      "message": "Config did not explicitly allow real training."
+    },
+    {
+      "code": "training_env_not_enabled",
+      "message": "VISDOC_ENABLE_REAL_TRAINING=1 is required for a real pilot."
+    },
+    {
+      "code": "missing_local_model_path",
+      "message": "local_model_path does not exist: local-models/colpali-or-colqwen"
+    },
+    {
+      "code": "cuda_not_checked",
+      "message": "CUDA was not checked because an earlier non-import gate blocked."
+    }
+  ],
+  "config": {
+    "adapter_output_dir": ".local/training-pilot/adapters",
+    "allow_final_test": false,
+    "allow_real_training": false,
+    "candidate_universe_id": "evaluated_split_pages",
+    "device": "cuda",
+    "local_model_path": "local-models/colpali-or-colqwen",
+    "max_steps": 20
+  },
+  "gates": {
+    "adapter_output_ignored": {
+      "code": "adapter_output_not_ignored",
+      "message": "adapter_output_dir must be ignored so checkpoints are not committed.",
+      "passed": true
+    },
+    "allow_final_test_false": {
+      "code": "allow_final_test_true",
+      "message": "allow_final_test must remain false for Phase 5B pilot launch.",
+      "passed": true
+    },
+    "allow_real_training_true": {
+      "code": "allow_real_training_false",
+      "message": "Config did not explicitly allow real training.",
+      "passed": false
+    },
+    "cuda_available": {
+      "code": "cuda_not_checked",
+      "message": "CUDA was not checked because an earlier non-import gate blocked.",
+      "passed": false
+    },
+    "local_model_path_exists": {
+      "code": "missing_local_model_path",
+      "message": "local_model_path does not exist: local-models/colpali-or-colqwen",
+      "passed": false
+    },
+    "max_steps_tiny": {
+      "code": "max_steps_over_budget",
+      "message": "max_steps must be <= 20.",
+      "passed": true
+    },
+    "run_card_boundary_wording": {
+      "code": "run_card_boundary_missing",
+      "message": "Run-card boundary wording must mark pilot/dev-only/not final benchmark.",
+      "passed": true
+    },
+    "training_env_enabled": {
+      "code": "training_env_not_enabled",
+      "message": "VISDOC_ENABLE_REAL_TRAINING=1 is required for a real pilot.",
+      "passed": false
+    }
+  },
+  "overall_status": "blocked",
+  "real_training_executed": false,
+  "run_card_boundary": {
+    "benchmark_improvement_claim": false,
+    "dev_only": true,
+    "not_final_benchmark": true,
+    "pilot": true
+  },
+  "schema": "training_pilot_environment_check/v1",
+  "timestamp_utc": "2026-07-01T00:00:00Z",
+  "training_result": null
+}
