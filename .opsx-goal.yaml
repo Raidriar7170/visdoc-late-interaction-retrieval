@@ -1,34 +1,46 @@
-goal_id: visdoc.mvp.practical
-created: 2026-06-30
-change: add-mvp-retrieval-pipeline
+goal_id: visdoc.phase5d.real_training_backend_wiring
+created: 2026-07-01
+change: add-real-training-backend-wiring
 status: applying
 worktree:
-  path: .worktrees/visdoc-mvp-practical
-  branch: codex/visdoc-mvp-practical
+  path: .worktrees/phase-5d-real-training-backend-wiring
+  branch: codex/phase-5d-real-training-backend-wiring
   base_ref: origin/main
 execution_policy:
   profile: practical
-  commit: forbidden
-  push: forbidden
+  commit: allowed_after_validation
+  push: allowed_after_validation
   merge: forbidden
   archive_openspec: forbidden
   deploy: forbidden
-  gpu: forbidden
+  gpu: optional_only_when_all_gates_pass
   network_required: false
 goal:
   summary: >
-    Build a minimal end-to-end diagnostic MVP pipeline for fixed synthetic
-    page-level retrieval, comparing text baselines with a deterministic visual
-    late-interaction mock scaffold and writing reproducible evidence artifacts.
-  default_command: PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+    Complete Phase 5D real-training backend wiring for the existing
+    train_lora_pilot launcher: config-gated, local-only, optional-dependency
+    guarded, and able to run a tiny real LoRA / QLoRA pilot only when all
+    safety gates pass; otherwise emit clear blocked evidence.
+  default_command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json
 acceptance:
   required_artifacts:
-    - reports/mvp/metrics.json
-    - reports/mvp/rankings.csv
-    - reports/mvp/run-card.md
-    - docs/human-briefs/2026-06-30-visdoc-mvp.html
+    - openspec/changes/add-real-training-backend-wiring/proposal.md
+    - openspec/changes/add-real-training-backend-wiring/design.md
+    - openspec/changes/add-real-training-backend-wiring/specs/real-training-backend-wiring/spec.md
+    - openspec/changes/add-real-training-backend-wiring/tasks.md
+    - src/visdoc_retrieve/lora_training_backend.py
+    - reports/training-pilot/phase-5d-environment-check.json
+    - reports/training-pilot/phase-5d-safety-check.json
+    - reports/training-pilot/phase-5d-blocked-run-card.md
+    - reports/training-pilot/phase-5d-adapter-manifest.sanitized.json
+    - reports/training-pilot/phase-5d-dev-eval-schema.json
+    - docs/human-briefs/2026-07-01-real-training-backend-wiring.html
     - reports/progress-ledger.yaml
   required_validation:
+    - PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+    - PYTHONPATH=src python -m visdoc_retrieve.mine_hard_negatives --config configs/hard_negatives.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json || test $? -eq 2
     - python -m py_compile src/visdoc_retrieve/*.py
     - pyproject tomllib parse
     - pytest -q
@@ -37,13 +49,13 @@ acceptance:
     - openspec validate --all --strict
     - git diff --check
 hard_stops:
-  - real ColPali or ColQwen execution
-  - external embedding downloads or services
-  - GPU or A100 execution
-  - hard-negative mining
-  - LoRA or QLoRA training
+  - model download or network model resolution
   - final test evaluation
-  - benchmark improvement or model superiority claims
+  - benchmark improvement or model superiority claim
+  - committed model weights, adapter checkpoints, training caches, tensorboard logs, or wandb logs
+  - committed private local model path or private local config
+  - treating pilot loss, blocked evidence, dry-run output, or dev-only sanity as model improvement
+  - chatbot, generic RAG app, browser automation, deployment, merge, or OpenSpec archive
 phase_state:
-  active_phase: phase-3-review-and-final-validation
-  goal_complete_checkpoint: true
+  active_phase: phase-5d-real-training-backend-wiring
+  goal_complete_checkpoint: false

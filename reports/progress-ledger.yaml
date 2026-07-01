@@ -266,6 +266,39 @@ training_pilot_phase_5c_status:
     adapter_manifest: reports/training-pilot/phase-5c-adapter-manifest.sanitized.json
     human_brief: docs/human-briefs/2026-07-01-real-training-pilot.html
 
+training_pilot_phase_5d_status:
+  status: blocked
+  change: add-real-training-backend-wiring
+  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json
+  config: configs/train_lora_pilot.local.example.json
+  candidate_universe: evaluated_split_pages
+  max_steps: 20
+  sample_limit: 8
+  training: not_executed
+  real_pilot_ran: false
+  model_download: not_executed
+  network: not_used
+  final_test_evaluation: not_run
+  dev_eval: not_run_or_schema_only
+  benchmark_claim: none
+  adapter_checkpoint_committed: false
+  model_weights_committed: false
+  training_cache_committed: false
+  private_local_model_path_committed: false
+  mock_visual_result_reported_as_real: false
+  pilot_loss_reported_as_model_improvement: false
+  blocked_reasons:
+    - allow_real_training_false
+    - training_env_not_enabled
+    - missing_local_model_path
+    - cuda_not_checked
+  evidence:
+    environment_check: reports/training-pilot/phase-5d-environment-check.json
+    run_card: reports/training-pilot/phase-5d-blocked-run-card.md
+    safety_check: reports/training-pilot/phase-5d-safety-check.json
+    dev_eval_schema: reports/training-pilot/phase-5d-dev-eval-schema.json
+    adapter_manifest: reports/training-pilot/phase-5d-adapter-manifest.sanitized.json
+    human_brief: docs/human-briefs/2026-07-01-real-training-backend-wiring.html
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining

@@ -1,0 +1,46 @@
+phase_id: phase-5d-real-training-backend-wiring
+change: add-real-training-backend-wiring
+status: applying
+scope:
+  - OpenSpec Phase 5D artifacts
+  - train_lora_pilot real backend wiring and gate tests
+  - Phase 5D sanitized reports, run card, human brief, and progress ledger
+allowed_paths:
+  - .opsx-goal.yaml
+  - .opsx-auto-inbox/phase-5d-real-training-backend-wiring.yaml
+  - openspec/changes/add-real-training-backend-wiring/**
+  - configs/train_lora_pilot.local.example.json
+  - src/visdoc_retrieve/train_lora_pilot.py
+  - src/visdoc_retrieve/training_pilot.py
+  - src/visdoc_retrieve/lora_training_backend.py
+  - tests/test_training_pilot_launch_gate.py
+  - reports/training-pilot/**
+  - reports/progress-ledger.yaml
+  - docs/human-briefs/2026-07-01-real-training-backend-wiring.html
+  - .gitignore
+validation_commands:
+  planned:
+    - openspec validate add-real-training-backend-wiring --strict
+    - pytest -q tests/test_training_pilot_launch_gate.py
+    - PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+    - PYTHONPATH=src python -m visdoc_retrieve.mine_hard_negatives --config configs/hard_negatives.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json || test $? -eq 2
+    - python -m py_compile src/visdoc_retrieve/*.py
+    - pyproject tomllib parse
+    - pytest -q
+    - ruff check .
+    - mypy src
+    - openspec validate --all --strict
+    - git diff --check
+evidence:
+  planned:
+    - reports/training-pilot/phase-5d-environment-check.json
+    - reports/training-pilot/phase-5d-safety-check.json
+    - reports/training-pilot/phase-5d-blocked-run-card.md
+    - reports/training-pilot/phase-5d-adapter-manifest.sanitized.json
+    - reports/training-pilot/phase-5d-dev-eval-schema.json
+    - docs/human-briefs/2026-07-01-real-training-backend-wiring.html
+phase_complete: false
+phase_blocked: false
+goal_impossible: false
