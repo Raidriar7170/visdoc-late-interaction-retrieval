@@ -204,3 +204,25 @@ hard_negative_mining_status:
   training: not_started
   final_test_evaluation: not_run
   benchmark_claim: none
+training_readiness_status:
+  status: dry_run_generated
+  change: add-training-readiness-phase-5a
+  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
+  config: configs/train_lora_dry_run.json
+  candidate_universe: evaluated_split_pages
+  train_triples: 429
+  dev_triples: 429
+  dry_run: true
+  training: not_executed
+  model_download: not_executed
+  gpu_required: false
+  adapter_checkpoint: not_created
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  mock_results_are_model_performance: false
+  evidence:
+    artifact_freeze: reports/training-readiness/artifact-freeze.json
+    dataset_summary: reports/training-readiness/dataset-summary.json
+    safety_check: reports/training-readiness/safety-check.json
+    dry_run_card: reports/training-readiness/dry-run-card.md
+    human_brief: docs/human-briefs/2026-07-01-training-readiness.md

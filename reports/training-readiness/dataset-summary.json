@@ -1,0 +1,76 @@
+{
+  "benchmark_claim": "none",
+  "candidate_universe_id": "evaluated_split_pages",
+  "dev": {
+    "negative_page_count": 8,
+    "negative_source_counts": {
+      "bm25": 72,
+      "bm25_lexical_rrf": 72,
+      "lexical_cosine": 72,
+      "mock_visual": 72,
+      "same_document": 72,
+      "tag_aware": 69
+    },
+    "positive_page_count": 8,
+    "query_count": 24,
+    "triple_count": 429
+  },
+  "dry_run": true,
+  "final_test_evaluation": "not_run",
+  "mock_batch": {
+    "batch_size": 8,
+    "loss": {
+      "empty": false,
+      "item_count": 8,
+      "loss": 0.22739999999999994,
+      "not_model_performance": true
+    },
+    "negative_scores": [
+      0.3236,
+      0.8906,
+      0.4482,
+      0.3236,
+      0.8906,
+      0.7937,
+      0.3236,
+      0.8906
+    ],
+    "positive_scores": [
+      1.4189,
+      1.4189,
+      1.4189,
+      1.4189,
+      1.4189,
+      1.4189,
+      1.4189,
+      1.4189
+    ],
+    "query_ids": [
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01",
+      "manual-a-p01-q01"
+    ]
+  },
+  "schema": "training_readiness_dataset_summary/v1",
+  "status": "dry_run_generated",
+  "train": {
+    "negative_page_count": 8,
+    "negative_source_counts": {
+      "bm25": 72,
+      "bm25_lexical_rrf": 72,
+      "lexical_cosine": 72,
+      "mock_visual": 72,
+      "same_document": 72,
+      "tag_aware": 69
+    },
+    "positive_page_count": 8,
+    "query_count": 24,
+    "triple_count": 429
+  },
+  "training_executed": false
+}

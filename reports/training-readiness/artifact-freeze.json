@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "corpus": {
+      "path": "data/synthetic-smoke/pages.jsonl",
+      "sha256": "4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1"
+    },
+    "dev_hard_negatives": {
+      "path": "data/derived/hard_negatives/dev.jsonl",
+      "sha256": "50cf98d3df00fe2ce1296d22619fe79593b91177e365b521e04c5407f6e0b339"
+    },
+    "qrels": {
+      "path": "data/synthetic-smoke/queries.jsonl",
+      "sha256": "bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11"
+    },
+    "queries": {
+      "path": "data/synthetic-smoke/queries.jsonl",
+      "sha256": "bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11"
+    },
+    "train_hard_negatives": {
+      "path": "data/derived/hard_negatives/train.jsonl",
+      "sha256": "e589ed39b48f9b88add05a9556d52765a226f699a35557f7cd92cd1862791e2f"
+    }
+  },
+  "base_model_name_or_path": "local-colpali-or-colqwen-placeholder",
+  "candidate_universe_id": "evaluated_split_pages",
+  "final_test_used": false,
+  "local_model_path": "local-models/colpali-or-colqwen",
+  "metric_definitions_ref": "openspec/specs/retrieval-evaluation-metrics/spec.md",
+  "model_revision": "phase-5a-placeholder",
+  "schema": "training_readiness_artifact_freeze/v1",
+  "split_policy": {
+    "dev": "dev hard negatives only",
+    "final_test": "excluded",
+    "train": "train hard negatives only"
+  },
+  "statement": "Phase 5A freezes inputs for a future dry-run/training handoff; final test data is not used.",
+  "timestamp_utc": "2026-07-01T00:00:00Z"
+}
