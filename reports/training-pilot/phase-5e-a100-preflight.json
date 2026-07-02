@@ -1,0 +1,89 @@
+{
+  "blocked_reasons": [
+    {
+      "code": "optional_dependency_missing",
+      "dependencies": [
+        "colpali_engine"
+      ],
+      "message": "One or more optional real-training dependencies are missing."
+    },
+    {
+      "code": "needs_user_model_path",
+      "message": "No exact local ColPali / ColQwen model path was available."
+    }
+  ],
+  "checkout": {
+    "branch": "main",
+    "clean": true,
+    "exists": true,
+    "expected_project_root": "/mnt/data/minghongsun/visdoc-late-interaction-retrieval",
+    "git_inspected": true,
+    "head_commit": "64c2b8942a9f40b80fabeb229c6ab9b0721a0cb2",
+    "origin_main_commit": "64c2b8942a9f40b80fabeb229c6ab9b0721a0cb2",
+    "path_under_allowed_root": true
+  },
+  "cuda": {
+    "available": true,
+    "busy_gpu_count": 3,
+    "device_count": 8,
+    "gpu_model_summary": "8x NVIDIA A100-SXM4-80GB",
+    "safe_idle_gpu_candidates": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "dependency_setup": {
+    "colpali_engine_install_attempt": "stopped_before_large_torch_wheel_download",
+    "isolated_env_under_allowed_root": true
+  },
+  "local_model_path_summary": {
+    "exact_path_committed": false,
+    "exists": false,
+    "path_location": "not_provided",
+    "provided": false,
+    "redacted": true
+  },
+  "remote": {
+    "access_method": "ssh_alias",
+    "allowed_storage_root": "/mnt/data/minghongsun",
+    "host_ip_committed": false,
+    "process_ids_committed": false,
+    "ssh_details_committed": false,
+    "storage_dir_exists": true,
+    "storage_dir_writable": true
+  },
+  "report_timestamp_utc": "2026-07-02T00:00:00Z",
+  "runtime": {
+    "module_available": {
+      "colpali_engine": false,
+      "peft": true,
+      "torch": true,
+      "transformers": true
+    },
+    "python": "base-conda-python"
+  },
+  "safety": {
+    "adapter_checkpoint_committed": false,
+    "adapter_checkpoint_created": false,
+    "benchmark_improvement_claim": false,
+    "final_test_used": false,
+    "host_ip_committed": false,
+    "model_download_executed": false,
+    "model_weights_committed": false,
+    "network_used_for_model_resolution": false,
+    "private_local_model_path_committed": false,
+    "process_ids_committed": false,
+    "real_training_success_claim": false,
+    "schema": "phase_5e_a100_preflight_safety/v1",
+    "ssh_details_committed": false,
+    "status": "blocked",
+    "training_cache_committed": false,
+    "training_launched": false
+  },
+  "schema": "phase_5e_a100_real_training_preflight/v1",
+  "status": "blocked",
+  "user_input_required": true
+}
