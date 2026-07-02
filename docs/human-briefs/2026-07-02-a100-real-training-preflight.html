@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5E A100 Real Training Preflight</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #202124;
+    }
+    main { max-width: 880px; margin: 0 auto; }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 5E A100 Real Training Preflight</h1>
+  <h2>一句话结论</h2>
+  <p>Phase 5E 已把 A100 checkout 和 CUDA/GPU 条件打通；
+  当前真实训练仍为 <span class="status">blocked</span>。</p>
+
+  <h2>当前状态</h2>
+  <p>这是 setup / preflight only 检查点，不是训练结果。
+  没有启动 real training，没有下载模型，没有创建 adapter，
+  没有使用 final test，也没有 benchmark gain claim。</p>
+
+  <h2>本阶段确认</h2>
+  <ul>
+    <li>远端 checkout 已位于 <code>/mnt/data/minghongsun</code> 下的允许项目目录。</li>
+    <li>远端 checkout 为 clean <code>main</code>，HEAD 为 Phase 5D merge commit。</li>
+    <li>CUDA 可用，可见 8 张 A100 80GB；GPU 3-7 看起来空闲。</li>
+    <li><code>torch</code>、<code>transformers</code>、<code>peft</code> 可导入。</li>
+  </ul>
+
+  <h2>仍然阻塞的条件</h2>
+  <ul>
+    <li><code>optional_dependency_missing</code>:
+    <code>colpali_engine</code> 当前不可导入。</li>
+    <li><code>needs_user_model_path</code>:
+    还没有 exact local ColPali / ColQwen 模型权重路径。</li>
+  </ul>
+
+  <h2>依赖安装边界</h2>
+  <p>我在允许路径下创建隔离 venv 后尝试补齐
+  <code>colpali-engine</code>，但 pip 解析会拉取另一个大版本
+  <code>torch</code> wheel。为避免扩大阶段范围和大依赖下载，
+  安装已停止，并记录为依赖阻塞。</p>
+
+  <h2>关键证据</h2>
+  <ul>
+    <li><code>reports/training-pilot/phase-5e-a100-preflight.json</code></li>
+    <li><code>reports/training-pilot/phase-5e-safety-check.json</code></li>
+    <li><code>reports/training-pilot/phase-5e-preflight-card.md</code></li>
+    <li><code>reports/progress-ledger.yaml</code></li>
+  </ul>
+
+  <h2>不应夸大的结论</h2>
+  <p>这只能说明远端基础 checkout、CUDA 和部分 Python 依赖可用。
+  不能说 real pilot 已运行，不能说训练成功，不能说指标提升。</p>
+
+  <h2>推荐下一步</h2>
+  <p>确认一个真实的本地 ColPali / ColQwen 权重路径，并选择是否允许
+  在隔离 venv 中安装兼容当前 torch 的 <code>colpali_engine</code>
+  依赖方案；然后再开一个很小的 gated real-pilot attempt。</p>
+</main>
+</body>
+</html>

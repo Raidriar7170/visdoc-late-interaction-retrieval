@@ -1,0 +1,18 @@
+{
+  "adapter_checkpoint_committed": false,
+  "adapter_checkpoint_created": false,
+  "benchmark_improvement_claim": false,
+  "final_test_used": false,
+  "host_ip_committed": false,
+  "model_download_executed": false,
+  "model_weights_committed": false,
+  "network_used_for_model_resolution": false,
+  "private_local_model_path_committed": false,
+  "process_ids_committed": false,
+  "real_training_success_claim": false,
+  "schema": "phase_5e_a100_preflight_safety/v1",
+  "ssh_details_committed": false,
+  "status": "blocked",
+  "training_cache_committed": false,
+  "training_launched": false
+}
