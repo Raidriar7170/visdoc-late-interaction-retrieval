@@ -1,4 +1,4 @@
-"""Phase 5E A100 remote setup/preflight evidence helpers."""
+"""Phase 5E/5F A100 remote setup and runtime-gate evidence helpers."""
 
 from __future__ import annotations
 
@@ -207,6 +207,155 @@ def write_phase_5e_outputs(
     return evidence
 
 
+def build_phase_5f_runtime_gate_evidence(
+    observation: Mapping[str, Any],
+    *,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Build public-safe Phase 5F runtime-gate evidence."""
+
+    evidence = build_phase_5e_preflight_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    dependency_setup = _mapping(observation.get("dependency_setup"))
+    model_path = _mapping(observation.get("model_path"))
+
+    blockers = [
+        dict(reason)
+        for reason in cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    ]
+    isolated_env_under_allowed_root = (
+        dependency_setup.get("isolated_env_under_allowed_root") is True
+    )
+    cache_dirs_under_allowed_root = (
+        dependency_setup.get("cache_dirs_under_allowed_root") is True
+    )
+    if not isolated_env_under_allowed_root:
+        _add_blocker(
+            blockers,
+            "isolated_runtime_env_outside_allowed_root",
+            "The checked runtime environment is not isolated under the allowed root.",
+        )
+    if not cache_dirs_under_allowed_root:
+        _add_blocker(
+            blockers,
+            "runtime_cache_outside_allowed_root",
+            "Runtime cache directories are not confirmed under the allowed root.",
+        )
+
+    model_provided = model_path.get("provided") is True
+    model_exists = model_path.get("exists") is True
+    shape_markers_present = (
+        model_provided
+        and model_exists
+        and model_path.get("expected_file_markers_present") is True
+    )
+    model_path_a100_readable = _model_path_a100_readable(model_path)
+    if model_provided and model_exists and not shape_markers_present:
+        _add_blocker(
+            blockers,
+            "model_shape_markers_missing",
+            "The provided local model path does not have expected model-file markers.",
+        )
+    if model_provided and model_exists and not model_path_a100_readable:
+        _add_blocker(
+            blockers,
+            "local_model_path_not_a100_readable",
+            "The provided local model path is not confirmed readable on the A100 host.",
+        )
+
+    cuda = cast(Mapping[str, object], evidence["cuda"])
+    runtime = cast(Mapping[str, object], evidence["runtime"])
+    module_available = cast(Mapping[str, object], runtime["module_available"])
+    missing_modules = [
+        name
+        for name in REQUIRED_OPTIONAL_MODULES
+        if module_available.get(name) is False
+    ]
+    local_model_path_gate = {
+        "ready": (
+            model_provided
+            and model_exists
+            and shape_markers_present
+            and model_path_a100_readable
+        ),
+        "exact_local_model_path_required": True,
+        "provided": model_provided,
+        "exists": model_exists if model_provided else False,
+        "redacted": True,
+        "exact_path_committed": False,
+        "path_location": _model_path_location(model_path),
+        "a100_readable": model_path_a100_readable,
+        "shape_markers_present": shape_markers_present,
+        "model_shape_ready": shape_markers_present,
+    }
+    runtime_gates = {
+        "dependency_importability": {
+            "ready": not missing_modules,
+            "required_optional_modules": list(REQUIRED_OPTIONAL_MODULES),
+            "missing_optional_modules": missing_modules,
+        },
+        "allowed_root_placement": {
+            "ready": isolated_env_under_allowed_root and cache_dirs_under_allowed_root,
+            "isolated_env_under_allowed_root": isolated_env_under_allowed_root,
+            "cache_dirs_under_allowed_root": cache_dirs_under_allowed_root,
+        },
+        "cuda_and_gpu": {
+            "ready": bool(cuda["available"]) and bool(cuda["safe_idle_gpu_candidates"]),
+            "cuda_available": bool(cuda["available"]),
+            "safe_idle_gpu_candidates": cuda["safe_idle_gpu_candidates"],
+        },
+        "local_model_path": local_model_path_gate,
+    }
+    status = _phase_5f_status(blockers)
+    safety = _safety_summary(status=status)
+    safety["schema"] = "phase_5f_a100_runtime_gate_safety/v1"
+
+    evidence.update(
+        {
+            "schema": "phase_5f_a100_runtime_gates/v1",
+            "status": status,
+            "dependency_setup": {
+                "isolated_env_under_allowed_root": isolated_env_under_allowed_root,
+                "cache_dirs_under_allowed_root": cache_dirs_under_allowed_root,
+                "colpali_engine_install_attempt": _optional_public_str(
+                    dependency_setup.get("colpali_engine_install_attempt")
+                ),
+            },
+            "local_model_path_summary": local_model_path_gate,
+            "runtime_gates": runtime_gates,
+            "blocked_reasons": blockers,
+            "user_input_required": any(
+                reason["code"] in {"needs_user_model_path", "missing_local_model_path"}
+                for reason in blockers
+            ),
+            "safety": safety,
+        }
+    )
+    return evidence
+
+
+def write_phase_5f_outputs(
+    observation: Mapping[str, Any],
+    *,
+    environment_check_path: Path,
+    safety_check_path: Path,
+    run_card_path: Path,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Write Phase 5F JSON and run-card outputs."""
+
+    evidence = build_phase_5f_runtime_gate_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    _write_json(environment_check_path, evidence)
+    _write_json(safety_check_path, cast(dict[str, object], evidence["safety"]))
+    _write_text(run_card_path, render_phase_5f_run_card(evidence))
+    return evidence
+
+
 def render_phase_5e_run_card(evidence: Mapping[str, object]) -> str:
     """Render a compact public-safe Markdown run card."""
 
@@ -253,6 +402,61 @@ def render_phase_5e_run_card(evidence: Mapping[str, object]) -> str:
             f"- training launched: {str(safety['training_launched']).lower()}",
             "- model download executed: "
             f"{str(safety['model_download_executed']).lower()}",
+            f"- final test used: {str(safety['final_test_used']).lower()}",
+            "- adapter checkpoint created: "
+            f"{str(safety['adapter_checkpoint_created']).lower()}",
+            "- benchmark improvement claim: "
+            f"{str(safety['benchmark_improvement_claim']).lower()}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_phase_5f_run_card(evidence: Mapping[str, object]) -> str:
+    """Render a compact public-safe Phase 5F runtime-gate run card."""
+
+    status = str(evidence["status"])
+    blockers = cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    runtime_gates = cast(Mapping[str, object], evidence["runtime_gates"])
+    safety = cast(Mapping[str, object], evidence["safety"])
+
+    lines = [
+        "# Phase 5F A100 Runtime Gate Materialization",
+        "",
+        f"Status: {status}",
+        "",
+        "Boundary: runtime-gate materialization only; real training was not launched.",
+        "",
+        "## Runtime gates",
+        "",
+    ]
+    for gate_name in (
+        "allowed_root_placement",
+        "dependency_importability",
+        "cuda_and_gpu",
+        "local_model_path",
+    ):
+        gate = cast(Mapping[str, object], runtime_gates[gate_name])
+        lines.append(f"- {gate_name}: ready={str(gate['ready']).lower()}")
+
+    lines.extend(["", "## Blocked reasons", ""])
+    if blockers:
+        for reason in blockers:
+            lines.append(f"- {reason['code']}: {reason['message']}")
+    else:
+        lines.append("- none")
+
+    lines.extend(
+        [
+            "",
+            "## Safety",
+            "",
+            f"- training launched: {str(safety['training_launched']).lower()}",
+            "- model download executed: "
+            f"{str(safety['model_download_executed']).lower()}",
+            "- network model resolution: "
+            f"{str(safety['network_used_for_model_resolution']).lower()}",
             f"- final test used: {str(safety['final_test_used']).lower()}",
             "- adapter checkpoint created: "
             f"{str(safety['adapter_checkpoint_created']).lower()}",
@@ -332,6 +536,21 @@ def _overall_status(blockers: Sequence[Mapping[str, object]]) -> str:
     return "blocked"
 
 
+def _phase_5f_status(blockers: Sequence[Mapping[str, object]]) -> str:
+    if not blockers:
+        return "runtime_ready"
+    codes = {str(reason["code"]) for reason in blockers}
+    if codes <= {"needs_user_model_path"}:
+        return "needs_user_input"
+    return "blocked"
+
+
+def _model_path_a100_readable(model_path: Mapping[str, object]) -> bool:
+    if model_path.get("provided") is not True or model_path.get("exists") is not True:
+        return False
+    return model_path.get("a100_readable") is True
+
+
 def _is_under_allowed_root(path: str) -> bool:
     try:
         parsed = PurePosixPath(path)
@@ -389,6 +608,7 @@ def _write_text(path: Path, text: str) -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--phase", choices=("5e", "5f"), default="5e")
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--environment-check", required=True, type=Path)
     parser.add_argument("--safety-check", required=True, type=Path)
@@ -399,14 +619,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     observation = json.loads(args.input.read_text(encoding="utf-8"))
     if not isinstance(observation, Mapping):
         raise SystemExit("input observation must be a JSON object")
-    evidence = write_phase_5e_outputs(
+    write_outputs = (
+        write_phase_5f_outputs if args.phase == "5f" else write_phase_5e_outputs
+    )
+    evidence = write_outputs(
         observation,
         environment_check_path=args.environment_check,
         safety_check_path=args.safety_check,
         run_card_path=args.run_card,
         report_timestamp_utc=args.timestamp_utc,
     )
-    print(f"phase 5e preflight status: {evidence['status']}")
+    print(f"phase {args.phase} preflight status: {evidence['status']}")
     return 0
 
 
