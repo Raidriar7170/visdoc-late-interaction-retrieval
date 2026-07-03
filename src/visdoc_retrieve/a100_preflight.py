@@ -356,6 +356,131 @@ def write_phase_5f_outputs(
     return evidence
 
 
+def build_phase_5g_runtime_gate_closure_evidence(
+    observation: Mapping[str, Any],
+    *,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Build public-safe Phase 5G runtime-gate closure evidence."""
+
+    evidence = build_phase_5f_runtime_gate_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    dependency_setup = _mapping(observation.get("dependency_setup"))
+    runtime_gates = cast(Mapping[str, object], evidence["runtime_gates"])
+    dependency_gate = cast(
+        Mapping[str, object], runtime_gates["dependency_importability"]
+    )
+    missing_modules = list(
+        cast(Sequence[str], dependency_gate["missing_optional_modules"])
+    )
+    setup_attempted = dependency_setup.get("setup_attempted") is True
+    setup_writes_under_allowed_root = (
+        dependency_setup.get("setup_writes_under_allowed_root") is True
+    )
+    temp_dirs_under_allowed_root = (
+        dependency_setup.get("temp_dirs_under_allowed_root") is True
+    )
+    log_dirs_under_allowed_root = (
+        dependency_setup.get("log_dirs_under_allowed_root") is True
+    )
+
+    blockers = [
+        dict(reason)
+        for reason in cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    ]
+    if not setup_writes_under_allowed_root:
+        _add_blocker(
+            blockers,
+            "runtime_setup_writes_outside_allowed_root",
+            "Runtime dependency setup writes are not confirmed under the allowed root.",
+        )
+    if not temp_dirs_under_allowed_root:
+        _add_blocker(
+            blockers,
+            "runtime_temp_dirs_outside_allowed_root",
+            "Runtime temporary directories are not confirmed under the allowed root.",
+        )
+    if not log_dirs_under_allowed_root:
+        _add_blocker(
+            blockers,
+            "runtime_log_dirs_outside_allowed_root",
+            "Runtime log directories are not confirmed under the allowed root.",
+        )
+
+    status = _phase_5f_status(blockers)
+    safety = _safety_summary(status=status)
+    safety["schema"] = "phase_5g_a100_runtime_gate_closure_safety/v1"
+    dependency_status = "closed" if not missing_modules else "blocked"
+
+    dependency_setup_summary = {
+        "isolated_env_under_allowed_root": dependency_setup.get(
+            "isolated_env_under_allowed_root"
+        )
+        is True,
+        "cache_dirs_under_allowed_root": dependency_setup.get(
+            "cache_dirs_under_allowed_root"
+        )
+        is True,
+        "setup_attempted": setup_attempted,
+        "setup_writes_under_allowed_root": setup_writes_under_allowed_root,
+        "temp_dirs_under_allowed_root": temp_dirs_under_allowed_root,
+        "log_dirs_under_allowed_root": log_dirs_under_allowed_root,
+        "colpali_engine_install_attempt": _optional_public_str(
+            dependency_setup.get("colpali_engine_install_attempt")
+        ),
+    }
+    evidence.update(
+        {
+            "schema": "phase_5g_a100_runtime_gate_closure/v1",
+            "status": status,
+            "dependency_setup": dependency_setup_summary,
+            "runtime_gate_closure": {
+                "dependency_importability": {
+                    "status": dependency_status,
+                    "setup_attempted": setup_attempted,
+                    "missing_optional_modules": missing_modules,
+                },
+                "allowed_root_setup": {
+                    "setup_writes_under_allowed_root": (
+                        setup_writes_under_allowed_root
+                    ),
+                    "temp_dirs_under_allowed_root": temp_dirs_under_allowed_root,
+                    "log_dirs_under_allowed_root": log_dirs_under_allowed_root,
+                },
+            },
+            "blocked_reasons": blockers,
+            "user_input_required": any(
+                reason["code"] in {"needs_user_model_path", "missing_local_model_path"}
+                for reason in blockers
+            ),
+            "safety": safety,
+        }
+    )
+    return evidence
+
+
+def write_phase_5g_outputs(
+    observation: Mapping[str, Any],
+    *,
+    environment_check_path: Path,
+    safety_check_path: Path,
+    run_card_path: Path,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Write Phase 5G JSON and run-card outputs."""
+
+    evidence = build_phase_5g_runtime_gate_closure_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    _write_json(environment_check_path, evidence)
+    _write_json(safety_check_path, cast(dict[str, object], evidence["safety"]))
+    _write_text(run_card_path, render_phase_5g_run_card(evidence))
+    return evidence
+
+
 def render_phase_5e_run_card(evidence: Mapping[str, object]) -> str:
     """Render a compact public-safe Markdown run card."""
 
@@ -441,6 +566,77 @@ def render_phase_5f_run_card(evidence: Mapping[str, object]) -> str:
         lines.append(f"- {gate_name}: ready={str(gate['ready']).lower()}")
 
     lines.extend(["", "## Blocked reasons", ""])
+    if blockers:
+        for reason in blockers:
+            lines.append(f"- {reason['code']}: {reason['message']}")
+    else:
+        lines.append("- none")
+
+    lines.extend(
+        [
+            "",
+            "## Safety",
+            "",
+            f"- training launched: {str(safety['training_launched']).lower()}",
+            "- model download executed: "
+            f"{str(safety['model_download_executed']).lower()}",
+            "- network model resolution: "
+            f"{str(safety['network_used_for_model_resolution']).lower()}",
+            f"- final test used: {str(safety['final_test_used']).lower()}",
+            "- adapter checkpoint created: "
+            f"{str(safety['adapter_checkpoint_created']).lower()}",
+            "- benchmark improvement claim: "
+            f"{str(safety['benchmark_improvement_claim']).lower()}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_phase_5g_run_card(evidence: Mapping[str, object]) -> str:
+    """Render a compact public-safe Phase 5G runtime-gate closure run card."""
+
+    status = str(evidence["status"])
+    blockers = cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    runtime_gates = cast(Mapping[str, object], evidence["runtime_gates"])
+    closure = cast(Mapping[str, object], evidence["runtime_gate_closure"])
+    dependency_closure = cast(
+        Mapping[str, object], closure["dependency_importability"]
+    )
+    safety = cast(Mapping[str, object], evidence["safety"])
+
+    lines = [
+        "# Phase 5G A100 Runtime Gate Closure",
+        "",
+        f"Status: {status}",
+        "",
+        "Boundary: runtime-gate closure evidence only; real training was not launched.",
+        "",
+        "## Runtime gates",
+        "",
+    ]
+    for gate_name in (
+        "allowed_root_placement",
+        "dependency_importability",
+        "cuda_and_gpu",
+        "local_model_path",
+    ):
+        gate = cast(Mapping[str, object], runtime_gates[gate_name])
+        lines.append(f"- {gate_name}: ready={str(gate['ready']).lower()}")
+
+    lines.extend(
+        [
+            "",
+            "## Closure attempt",
+            "",
+            "- dependency_importability: "
+            f"status={dependency_closure['status']}, "
+            f"setup_attempted={str(dependency_closure['setup_attempted']).lower()}",
+            "",
+            "## Blocked reasons",
+            "",
+        ]
+    )
     if blockers:
         for reason in blockers:
             lines.append(f"- {reason['code']}: {reason['message']}")
@@ -608,7 +804,7 @@ def _write_text(path: Path, text: str) -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("5e", "5f"), default="5e")
+    parser.add_argument("--phase", choices=("5e", "5f", "5g"), default="5e")
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--environment-check", required=True, type=Path)
     parser.add_argument("--safety-check", required=True, type=Path)
@@ -619,9 +815,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     observation = json.loads(args.input.read_text(encoding="utf-8"))
     if not isinstance(observation, Mapping):
         raise SystemExit("input observation must be a JSON object")
-    write_outputs = (
-        write_phase_5f_outputs if args.phase == "5f" else write_phase_5e_outputs
-    )
+    write_outputs_by_phase = {
+        "5e": write_phase_5e_outputs,
+        "5f": write_phase_5f_outputs,
+        "5g": write_phase_5g_outputs,
+    }
+    write_outputs = write_outputs_by_phase[args.phase]
     evidence = write_outputs(
         observation,
         environment_check_path=args.environment_check,

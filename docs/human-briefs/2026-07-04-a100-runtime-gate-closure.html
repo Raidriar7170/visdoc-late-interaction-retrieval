@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5G A100 Runtime Gate Closure</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #202124;
+    }
+    main { max-width: 880px; margin: 0 auto; }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 5G A100 Runtime Gate Closure</h1>
+
+  <h2>一句话结论</h2>
+  <p>Phase 5G 已闭合 A100 dependency/runtime gate；
+  当前仍为 <span class="status">blocked</span>，唯一剩余阻塞是 exact
+  A100-side model path 缺失，不是训练结果。</p>
+
+  <h2>当前状态</h2>
+  <p>这是 runtime-gate closure only。没有启动 real training，
+  没有下载模型，没有创建 adapter checkpoint，没有使用 final test，
+  也没有 benchmark improvement claim。</p>
+
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>在允许根目录下创建/复用隔离 runtime、cache、temp 和 HF cache。</li>
+    <li><code>colpali_engine</code> 已在 checked runtime 中可导入。</li>
+    <li>CUDA/GPU gate 仍 ready，可见 8 张 A100，GPU 3-7 作为空闲候选。</li>
+    <li>exact model-path gate 仍 blocked，因为目标模型目录不存在。</li>
+  </ul>
+
+  <h2>关键文件</h2>
+  <ul>
+    <li><code>src/visdoc_retrieve/a100_preflight.py</code></li>
+    <li><code>tests/test_a100_preflight.py</code></li>
+    <li><code>reports/training-pilot/phase-5g-runtime-gate-closure.json</code></li>
+    <li><code>reports/training-pilot/phase-5g-safety-check.json</code></li>
+    <li><code>reports/training-pilot/phase-5g-runtime-gate-card.md</code></li>
+    <li><code>reports/progress-ledger.yaml</code></li>
+  </ul>
+
+  <h2>验证结果</h2>
+  <p>Focused A100 preflight tests: <code>18 passed</code>。完整本地验证：
+  <code>pytest -q</code> 为 <code>105 passed</code>，
+  <code>ruff check .</code> 通过，<code>mypy src</code> 通过，
+  <code>openspec validate --all --strict</code> 为
+  <code>18 passed, 0 failed</code>，<code>git diff --check</code> 通过。</p>
+
+  <h2>剩余阻塞</h2>
+  <ul>
+    <li><code>missing_local_model_path</code>:
+    A100-side exact model directory 仍不存在。</li>
+  </ul>
+
+  <h2>不能夸大的结论</h2>
+  <p>Phase 5G 只能说明 dependency/runtime gate 已闭合，且 model path gate
+  仍未闭合。不能说 real pilot 已运行，不能说训练成功，不能说模型或检索指标提升。</p>
+
+  <h2>推荐下一步</h2>
+  <p>先把 exact A100-readable ColPali / ColQwen model directory 放置到
+  预期位置并再次运行 gate check；只有所有 gates 为 ready 后，才另开一个很小的
+  gated real-pilot attempt。</p>
+</main>
+</body>
+</html>
