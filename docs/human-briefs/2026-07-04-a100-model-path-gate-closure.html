@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5H A100 Model Path Gate Closure</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 32px;
+      line-height: 1.55;
+      color: #202124;
+    }
+    main { max-width: 880px; margin: 0 auto; }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 5H A100 Model Path Gate Closure</h1>
+
+  <h2>一句话结论</h2>
+  <p>Phase 5H 已闭合 exact A100-side model-path marker gate；
+  当前 gate 状态为 <span class="status">runtime_ready</span>，但这仍然只是
+  训练前 gate snapshot，不是训练成功。</p>
+
+  <h2>当前状态</h2>
+  <p>这是 model-path gate closure only。没有启动 real training，没有加载模型，
+  没有调用 <code>from_pretrained</code>，没有下载模型，没有创建 adapter
+  checkpoint，没有使用 final test，也没有 benchmark improvement claim。</p>
+
+  <h2>本阶段变化</h2>
+  <ul>
+    <li>A100 checkout 与 <code>origin/main</code> 对齐且 clean。</li>
+    <li>继承 Phase 5G 的 dependency/runtime/CUDA gates，全部仍为 ready。</li>
+    <li>目标模型目录以 redacted 形式记录为 allowed-root 下存在且 A100-readable。</li>
+    <li>静态 marker 检查通过：config、weight、processor/tokenizer markers 均存在。</li>
+  </ul>
+
+  <h2>关键文件</h2>
+  <ul>
+    <li><code>src/visdoc_retrieve/a100_preflight.py</code></li>
+    <li><code>tests/test_a100_preflight.py</code></li>
+    <li><code>reports/training-pilot/phase-5h-model-path-gate-closure.json</code></li>
+    <li><code>reports/training-pilot/phase-5h-safety-check.json</code></li>
+    <li><code>reports/training-pilot/phase-5h-model-path-gate-card.md</code></li>
+    <li><code>reports/progress-ledger.yaml</code></li>
+  </ul>
+
+  <h2>验证结果</h2>
+  <p>Focused A100 preflight tests: <code>24 passed</code>。完整本地验证：
+  <code>pytest -q</code> 为 <code>111 passed</code>，
+  <code>ruff check .</code> 通过，<code>mypy src</code> 通过，
+  <code>openspec validate close-a100-model-path-gate --strict</code> 通过，
+  <code>openspec validate --all --strict</code> 为
+  <code>18 passed, 0 failed</code>，<code>git diff --check</code> 通过。</p>
+
+  <h2>剩余阻塞</h2>
+  <p>Phase 5H gate evidence 中没有剩余 blocker。下一步如果要真正运行 pilot，
+  必须另开一个很小的 gated real-pilot attempt，并在 launch 前重新检查 GPU
+   occupancy 和安全边界。</p>
+
+  <h2>不能夸大的结论</h2>
+  <p>Phase 5H 只能说明 dependency/runtime/model-path gates 在本次 snapshot
+  中为 ready。不能说 real pilot 已运行，不能说训练成功，不能说 adapter
+  已生成，不能说模型或检索指标提升。</p>
+
+  <h2>推荐下一步</h2>
+  <p>PR 合并并归档后，再开单独 Phase 5I：只做一次 gated real-pilot launch
+  attempt，启动前重新确认 GPU 空闲、final-test disabled、adapter 输出目录和
+  no-benchmark-claim 边界。</p>
+</main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-"""Phase 5E/5F A100 remote setup and runtime-gate evidence helpers."""
+"""Phase 5E-5H A100 remote setup and runtime-gate evidence helpers."""
 
 from __future__ import annotations
 
@@ -481,6 +481,126 @@ def write_phase_5g_outputs(
     return evidence
 
 
+def build_phase_5h_model_path_gate_evidence(
+    observation: Mapping[str, Any],
+    *,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Build public-safe Phase 5H exact model-path gate closure evidence."""
+
+    evidence = build_phase_5g_runtime_gate_closure_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    model_path = _mapping(observation.get("model_path"))
+    runtime_gates = {
+        name: dict(cast(Mapping[str, object], gate))
+        for name, gate in cast(Mapping[str, object], evidence["runtime_gates"]).items()
+    }
+    local_model_path_gate = dict(
+        cast(Mapping[str, object], runtime_gates["local_model_path"])
+    )
+    blockers = [
+        dict(reason)
+        for reason in cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    ]
+
+    model_provided = model_path.get("provided") is True
+    model_exists = model_path.get("exists") is True
+    model_path_location = _model_path_location(model_path)
+    under_allowed_root = model_path_location == "under_allowed_root"
+    marker_verification = _phase_5h_marker_verification(model_path)
+    static_marker_verification_ready = (
+        model_provided
+        and model_exists
+        and all(marker_verification.values())
+    )
+
+    if model_provided and model_exists and not under_allowed_root:
+        _add_blocker_once(
+            blockers,
+            "local_model_path_outside_allowed_root",
+            "The provided local model path is outside the allowed A100 root.",
+        )
+    if model_provided and model_exists and not static_marker_verification_ready:
+        _add_blocker_once(
+            blockers,
+            "model_shape_markers_missing",
+            "The provided local model path does not have expected model-file markers.",
+        )
+
+    model_path_ready = (
+        bool(local_model_path_gate["ready"])
+        and under_allowed_root
+        and static_marker_verification_ready
+    )
+    local_model_path_gate.update(
+        {
+            "ready": model_path_ready,
+            "path_location": model_path_location,
+            "config_marker_present": marker_verification["config_marker_present"],
+            "weight_marker_present": marker_verification["weight_marker_present"],
+            "processor_or_tokenizer_marker_present": marker_verification[
+                "processor_or_tokenizer_marker_present"
+            ],
+            "static_marker_verification_ready": static_marker_verification_ready,
+            "shape_markers_present": static_marker_verification_ready,
+            "model_shape_ready": static_marker_verification_ready,
+        }
+    )
+    runtime_gates["local_model_path"] = local_model_path_gate
+
+    status = _phase_5f_status(blockers)
+    safety = _safety_summary(status=status)
+    safety["schema"] = "phase_5h_a100_model_path_gate_safety/v1"
+    safety["model_loading_executed"] = False
+    closure_status = "closed" if model_path_ready else "blocked"
+
+    evidence.update(
+        {
+            "schema": "phase_5h_a100_model_path_gate_closure/v1",
+            "status": status,
+            "runtime_gates": runtime_gates,
+            "local_model_path_summary": local_model_path_gate,
+            "model_path_gate_closure": {
+                "status": closure_status,
+                "verification_mode": "static_filesystem_markers_only",
+                "exact_local_model_path_required": True,
+                "model_loading_executed": False,
+                "model_download_executed": False,
+                "marker_verification": marker_verification,
+            },
+            "blocked_reasons": blockers,
+            "user_input_required": any(
+                reason["code"] in {"needs_user_model_path", "missing_local_model_path"}
+                for reason in blockers
+            ),
+            "safety": safety,
+        }
+    )
+    return evidence
+
+
+def write_phase_5h_outputs(
+    observation: Mapping[str, Any],
+    *,
+    environment_check_path: Path,
+    safety_check_path: Path,
+    run_card_path: Path,
+    report_timestamp_utc: str | None = None,
+) -> dict[str, object]:
+    """Write Phase 5H JSON and run-card outputs."""
+
+    evidence = build_phase_5h_model_path_gate_evidence(
+        observation,
+        report_timestamp_utc=report_timestamp_utc,
+    )
+    _write_json(environment_check_path, evidence)
+    _write_json(safety_check_path, cast(dict[str, object], evidence["safety"]))
+    _write_text(run_card_path, render_phase_5h_run_card(evidence))
+    return evidence
+
+
 def render_phase_5e_run_card(evidence: Mapping[str, object]) -> str:
     """Render a compact public-safe Markdown run card."""
 
@@ -664,6 +784,84 @@ def render_phase_5g_run_card(evidence: Mapping[str, object]) -> str:
     return "\n".join(lines)
 
 
+def render_phase_5h_run_card(evidence: Mapping[str, object]) -> str:
+    """Render a compact public-safe Phase 5H model-path gate run card."""
+
+    status = str(evidence["status"])
+    blockers = cast(Sequence[Mapping[str, object]], evidence["blocked_reasons"])
+    runtime_gates = cast(Mapping[str, object], evidence["runtime_gates"])
+    closure = cast(Mapping[str, object], evidence["model_path_gate_closure"])
+    marker_verification = cast(Mapping[str, object], closure["marker_verification"])
+    safety = cast(Mapping[str, object], evidence["safety"])
+
+    lines = [
+        "# Phase 5H A100 Model Path Gate Closure",
+        "",
+        f"Status: {status}",
+        "",
+        "Boundary: model-path gate closure evidence only; "
+        "real training was not launched.",
+        "",
+        "## Runtime gates",
+        "",
+    ]
+    for gate_name in (
+        "allowed_root_placement",
+        "dependency_importability",
+        "cuda_and_gpu",
+        "local_model_path",
+    ):
+        gate = cast(Mapping[str, object], runtime_gates[gate_name])
+        lines.append(f"- {gate_name}: ready={str(gate['ready']).lower()}")
+
+    lines.extend(
+        [
+            "",
+            "## Model path closure",
+            "",
+            f"- status: {closure['status']}",
+            f"- verification mode: {closure['verification_mode']}",
+            "- config marker present: "
+            f"{str(marker_verification['config_marker_present']).lower()}",
+            "- weight marker present: "
+            f"{str(marker_verification['weight_marker_present']).lower()}",
+            "- processor/tokenizer marker present: "
+            f"{str(marker_verification['processor_or_tokenizer_marker_present']).lower()}",
+            "- exact path committed: false",
+            "",
+            "## Blocked reasons",
+            "",
+        ]
+    )
+    if blockers:
+        for reason in blockers:
+            lines.append(f"- {reason['code']}: {reason['message']}")
+    else:
+        lines.append("- none")
+
+    lines.extend(
+        [
+            "",
+            "## Safety",
+            "",
+            f"- training launched: {str(safety['training_launched']).lower()}",
+            "- model loading executed: "
+            f"{str(safety['model_loading_executed']).lower()}",
+            "- model download executed: "
+            f"{str(safety['model_download_executed']).lower()}",
+            "- network model resolution: "
+            f"{str(safety['network_used_for_model_resolution']).lower()}",
+            f"- final test used: {str(safety['final_test_used']).lower()}",
+            "- adapter checkpoint created: "
+            f"{str(safety['adapter_checkpoint_created']).lower()}",
+            "- benchmark improvement claim: "
+            f"{str(safety['benchmark_improvement_claim']).lower()}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def _safety_summary(*, status: str) -> dict[str, object]:
     return {
         "schema": "phase_5e_a100_preflight_safety/v1",
@@ -747,6 +945,18 @@ def _model_path_a100_readable(model_path: Mapping[str, object]) -> bool:
     return model_path.get("a100_readable") is True
 
 
+def _phase_5h_marker_verification(
+    model_path: Mapping[str, object],
+) -> dict[str, bool]:
+    return {
+        "config_marker_present": model_path.get("config_marker_present") is True,
+        "weight_marker_present": model_path.get("weight_marker_present") is True,
+        "processor_or_tokenizer_marker_present": (
+            model_path.get("processor_or_tokenizer_marker_present") is True
+        ),
+    }
+
+
 def _is_under_allowed_root(path: str) -> bool:
     try:
         parsed = PurePosixPath(path)
@@ -758,6 +968,13 @@ def _is_under_allowed_root(path: str) -> bool:
 
 def _add_blocker(blockers: list[dict[str, object]], code: str, message: str) -> None:
     blockers.append({"code": code, "message": message})
+
+
+def _add_blocker_once(
+    blockers: list[dict[str, object]], code: str, message: str
+) -> None:
+    if not any(reason.get("code") == code for reason in blockers):
+        _add_blocker(blockers, code, message)
 
 
 def _mapping(value: object) -> Mapping[str, Any]:
@@ -804,7 +1021,7 @@ def _write_text(path: Path, text: str) -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("5e", "5f", "5g"), default="5e")
+    parser.add_argument("--phase", choices=("5e", "5f", "5g", "5h"), default="5e")
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--environment-check", required=True, type=Path)
     parser.add_argument("--safety-check", required=True, type=Path)
@@ -819,6 +1036,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "5e": write_phase_5e_outputs,
         "5f": write_phase_5f_outputs,
         "5g": write_phase_5g_outputs,
+        "5h": write_phase_5h_outputs,
     }
     write_outputs = write_outputs_by_phase[args.phase]
     evidence = write_outputs(
