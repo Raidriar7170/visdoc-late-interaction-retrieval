@@ -487,6 +487,192 @@ def test_phase_5g_runtime_ready_keeps_all_training_safety_flags_false() -> None:
     assert safety["real_training_success_claim"] is False
 
 
+def test_phase_5h_model_path_markers_close_gate_reports_runtime_ready() -> None:
+    exact_model_path = "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf"
+    evidence = a100_preflight.build_phase_5h_model_path_gate_evidence(
+        _phase_5h_observation(
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": exact_model_path,
+                "expected_file_markers_present": True,
+                "a100_readable": True,
+                "config_marker_present": True,
+                "weight_marker_present": True,
+                "processor_or_tokenizer_marker_present": True,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T12:00:00Z",
+    )
+
+    assert evidence["schema"] == "phase_5h_a100_model_path_gate_closure/v1"
+    assert evidence["status"] == "runtime_ready"
+    assert evidence["blocked_reasons"] == []
+    model_path_gate = evidence["runtime_gates"]["local_model_path"]
+    assert model_path_gate["ready"] is True
+    assert model_path_gate["path_location"] == "under_allowed_root"
+    assert model_path_gate["exact_path_committed"] is False
+    assert model_path_gate["config_marker_present"] is True
+    assert model_path_gate["weight_marker_present"] is True
+    assert model_path_gate["processor_or_tokenizer_marker_present"] is True
+    assert model_path_gate["static_marker_verification_ready"] is True
+    assert evidence["model_path_gate_closure"] == {
+        "status": "closed",
+        "verification_mode": "static_filesystem_markers_only",
+        "exact_local_model_path_required": True,
+        "model_loading_executed": False,
+        "model_download_executed": False,
+        "marker_verification": {
+            "config_marker_present": True,
+            "weight_marker_present": True,
+            "processor_or_tokenizer_marker_present": True,
+        },
+    }
+    assert exact_model_path not in json.dumps(evidence, sort_keys=True)
+
+
+def test_phase_5h_missing_exact_model_path_remains_truthful_blocker() -> None:
+    exact_model_path = "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf"
+    evidence = a100_preflight.build_phase_5h_model_path_gate_evidence(
+        _phase_5h_observation(
+            model_path={
+                "provided": True,
+                "exists": False,
+                "path": exact_model_path,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T12:00:00Z",
+    )
+
+    assert evidence["status"] == "blocked"
+    assert evidence["user_input_required"] is True
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert blocker_codes == {"missing_local_model_path"}
+    assert evidence["model_path_gate_closure"]["status"] == "blocked"
+    assert evidence["runtime_gates"]["local_model_path"]["ready"] is False
+    assert exact_model_path not in json.dumps(evidence, sort_keys=True)
+    assert evidence["safety"]["model_download_executed"] is False
+    assert evidence["safety"]["training_launched"] is False
+
+
+def test_phase_5h_incomplete_model_markers_block_without_loading_model() -> None:
+    evidence = a100_preflight.build_phase_5h_model_path_gate_evidence(
+        _phase_5h_observation(
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+                "expected_file_markers_present": False,
+                "a100_readable": True,
+                "config_marker_present": True,
+                "weight_marker_present": True,
+                "processor_or_tokenizer_marker_present": False,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T12:00:00Z",
+    )
+
+    assert evidence["status"] == "blocked"
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert blocker_codes == {"model_shape_markers_missing"}
+    model_path_gate = evidence["runtime_gates"]["local_model_path"]
+    assert model_path_gate["ready"] is False
+    assert model_path_gate["static_marker_verification_ready"] is False
+    assert model_path_gate["processor_or_tokenizer_marker_present"] is False
+    assert evidence["model_path_gate_closure"]["model_loading_executed"] is False
+    assert evidence["safety"]["real_training_success_claim"] is False
+
+
+def test_phase_5h_outside_allowed_root_path_blocks_with_markers() -> None:
+    evidence = a100_preflight.build_phase_5h_model_path_gate_evidence(
+        _phase_5h_observation(
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": "/Users/example/models/vidore-colqwen2-v1.0-hf",
+                "expected_file_markers_present": True,
+                "a100_readable": True,
+                "config_marker_present": True,
+                "weight_marker_present": True,
+                "processor_or_tokenizer_marker_present": True,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T12:00:00Z",
+    )
+
+    assert evidence["status"] == "blocked"
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert blocker_codes == {"local_model_path_outside_allowed_root"}
+    model_path_gate = evidence["runtime_gates"]["local_model_path"]
+    assert model_path_gate["ready"] is False
+    assert model_path_gate["path_location"] == "outside_allowed_root_or_private"
+    assert model_path_gate["static_marker_verification_ready"] is True
+
+
+def test_phase_5h_runtime_ready_keeps_training_safety_flags_false() -> None:
+    evidence = a100_preflight.build_phase_5h_model_path_gate_evidence(
+        _phase_5h_observation(),
+        report_timestamp_utc="2026-07-04T12:00:00Z",
+    )
+
+    assert evidence["status"] == "runtime_ready"
+    safety = evidence["safety"]
+    assert safety["schema"] == "phase_5h_a100_model_path_gate_safety/v1"
+    assert safety["training_launched"] is False
+    assert safety["model_download_executed"] is False
+    assert safety["network_used_for_model_resolution"] is False
+    assert safety["final_test_used"] is False
+    assert safety["adapter_checkpoint_created"] is False
+    assert safety["adapter_checkpoint_committed"] is False
+    assert safety["model_weights_committed"] is False
+    assert safety["training_cache_committed"] is False
+    assert safety["private_local_model_path_committed"] is False
+    assert safety["benchmark_improvement_claim"] is False
+    assert safety["real_training_success_claim"] is False
+
+
+def test_cli_writes_phase_5h_model_path_gate_outputs(tmp_path: Path) -> None:
+    exact_model_path = "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf"
+    observation_path = tmp_path / "observation.json"
+    environment_path = tmp_path / "environment.json"
+    safety_path = tmp_path / "safety.json"
+    run_card_path = tmp_path / "run-card.md"
+    observation_path.write_text(
+        json.dumps(_phase_5h_observation()),
+        encoding="utf-8",
+    )
+
+    exit_code = a100_preflight.main(
+        [
+            "--phase",
+            "5h",
+            "--input",
+            str(observation_path),
+            "--environment-check",
+            str(environment_path),
+            "--safety-check",
+            str(safety_path),
+            "--run-card",
+            str(run_card_path),
+            "--timestamp-utc",
+            "2026-07-04T12:00:00Z",
+        ]
+    )
+
+    assert exit_code == 0
+    environment_text = environment_path.read_text(encoding="utf-8")
+    environment = json.loads(environment_text)
+    safety = json.loads(safety_path.read_text(encoding="utf-8"))
+    run_card = run_card_path.read_text(encoding="utf-8")
+    assert environment["schema"] == "phase_5h_a100_model_path_gate_closure/v1"
+    assert environment["status"] == "runtime_ready"
+    assert safety["schema"] == "phase_5h_a100_model_path_gate_safety/v1"
+    assert "Boundary: model-path gate closure evidence only" in run_card
+    assert "training launched: false" in run_card
+    assert "model loading executed: false" in run_card
+    assert exact_model_path not in (environment_text + run_card)
+
+
 def test_cli_writes_phase_5g_runtime_gate_closure_outputs(tmp_path: Path) -> None:
     observation_path = tmp_path / "observation.json"
     environment_path = tmp_path / "environment.json"
@@ -726,5 +912,29 @@ def _phase_5g_observation(
             "temp_dirs_under_allowed_root": True,
             "log_dirs_under_allowed_root": True,
         }
+    )
+    return observation
+
+
+def _phase_5h_observation(
+    *,
+    checkout: dict[str, object] | None = None,
+    module_available: dict[str, bool] | None = None,
+    model_path: dict[str, object] | None = None,
+) -> dict[str, object]:
+    observation = _phase_5g_observation(
+        checkout=checkout,
+        module_available=module_available,
+        model_path=model_path
+        or {
+            "provided": True,
+            "exists": True,
+            "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+            "expected_file_markers_present": True,
+            "a100_readable": True,
+            "config_marker_present": True,
+            "weight_marker_present": True,
+            "processor_or_tokenizer_marker_present": True,
+        },
     )
     return observation

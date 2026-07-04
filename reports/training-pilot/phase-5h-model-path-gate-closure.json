@@ -1,0 +1,160 @@
+{
+  "blocked_reasons": [],
+  "checkout": {
+    "branch": "main",
+    "clean": true,
+    "exists": true,
+    "expected_project_root": "/mnt/data/minghongsun/visdoc-late-interaction-retrieval",
+    "git_inspected": true,
+    "head_commit": "7cce096d6b43156b1196ef4c3fd9b23ca383122d",
+    "origin_main_commit": "7cce096d6b43156b1196ef4c3fd9b23ca383122d",
+    "path_under_allowed_root": true
+  },
+  "cuda": {
+    "available": true,
+    "busy_gpu_count": 3,
+    "device_count": 8,
+    "gpu_model_summary": "8x NVIDIA A100-SXM4-80GB",
+    "safe_idle_gpu_candidates": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "dependency_setup": {
+    "cache_dirs_under_allowed_root": true,
+    "colpali_engine_install_attempt": "installed_no_deps_colpali_engine_0.3.12_allowed_root_venv",
+    "isolated_env_under_allowed_root": true,
+    "log_dirs_under_allowed_root": true,
+    "setup_attempted": true,
+    "setup_writes_under_allowed_root": true,
+    "temp_dirs_under_allowed_root": true
+  },
+  "local_model_path_summary": {
+    "a100_readable": true,
+    "config_marker_present": true,
+    "exact_local_model_path_required": true,
+    "exact_path_committed": false,
+    "exists": true,
+    "model_shape_ready": true,
+    "path_location": "under_allowed_root",
+    "processor_or_tokenizer_marker_present": true,
+    "provided": true,
+    "ready": true,
+    "redacted": true,
+    "shape_markers_present": true,
+    "static_marker_verification_ready": true,
+    "weight_marker_present": true
+  },
+  "model_path_gate_closure": {
+    "exact_local_model_path_required": true,
+    "marker_verification": {
+      "config_marker_present": true,
+      "processor_or_tokenizer_marker_present": true,
+      "weight_marker_present": true
+    },
+    "model_download_executed": false,
+    "model_loading_executed": false,
+    "status": "closed",
+    "verification_mode": "static_filesystem_markers_only"
+  },
+  "remote": {
+    "access_method": "ssh_alias",
+    "allowed_storage_root": "/mnt/data/minghongsun",
+    "host_ip_committed": false,
+    "process_ids_committed": false,
+    "ssh_details_committed": false,
+    "storage_dir_exists": true,
+    "storage_dir_writable": true
+  },
+  "report_timestamp_utc": "2026-07-04T08:46:36Z",
+  "runtime": {
+    "module_available": {
+      "colpali_engine": true,
+      "peft": true,
+      "torch": true,
+      "transformers": true
+    },
+    "python": "allowed_root_phase_5g_venv_python"
+  },
+  "runtime_gate_closure": {
+    "allowed_root_setup": {
+      "log_dirs_under_allowed_root": true,
+      "setup_writes_under_allowed_root": true,
+      "temp_dirs_under_allowed_root": true
+    },
+    "dependency_importability": {
+      "missing_optional_modules": [],
+      "setup_attempted": true,
+      "status": "closed"
+    }
+  },
+  "runtime_gates": {
+    "allowed_root_placement": {
+      "cache_dirs_under_allowed_root": true,
+      "isolated_env_under_allowed_root": true,
+      "ready": true
+    },
+    "cuda_and_gpu": {
+      "cuda_available": true,
+      "ready": true,
+      "safe_idle_gpu_candidates": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "dependency_importability": {
+      "missing_optional_modules": [],
+      "ready": true,
+      "required_optional_modules": [
+        "torch",
+        "transformers",
+        "peft",
+        "colpali_engine"
+      ]
+    },
+    "local_model_path": {
+      "a100_readable": true,
+      "config_marker_present": true,
+      "exact_local_model_path_required": true,
+      "exact_path_committed": false,
+      "exists": true,
+      "model_shape_ready": true,
+      "path_location": "under_allowed_root",
+      "processor_or_tokenizer_marker_present": true,
+      "provided": true,
+      "ready": true,
+      "redacted": true,
+      "shape_markers_present": true,
+      "static_marker_verification_ready": true,
+      "weight_marker_present": true
+    }
+  },
+  "safety": {
+    "adapter_checkpoint_committed": false,
+    "adapter_checkpoint_created": false,
+    "benchmark_improvement_claim": false,
+    "final_test_used": false,
+    "host_ip_committed": false,
+    "model_download_executed": false,
+    "model_loading_executed": false,
+    "model_weights_committed": false,
+    "network_used_for_model_resolution": false,
+    "private_local_model_path_committed": false,
+    "process_ids_committed": false,
+    "real_training_success_claim": false,
+    "schema": "phase_5h_a100_model_path_gate_safety/v1",
+    "ssh_details_committed": false,
+    "status": "runtime_ready",
+    "training_cache_committed": false,
+    "training_launched": false
+  },
+  "schema": "phase_5h_a100_model_path_gate_closure/v1",
+  "status": "runtime_ready",
+  "user_input_required": false
+}
