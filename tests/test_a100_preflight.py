@@ -353,6 +353,192 @@ def test_phase_5f_redacts_private_paths_ips_and_process_ids() -> None:
     assert evidence["remote"]["process_ids_committed"] is False
 
 
+def test_phase_5g_dependency_gate_closed_reports_runtime_ready() -> None:
+    evidence = a100_preflight.build_phase_5g_runtime_gate_closure_evidence(
+        _phase_5g_observation(
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+                "expected_file_markers_present": True,
+                "a100_readable": True,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T00:00:00Z",
+    )
+
+    assert evidence["schema"] == "phase_5g_a100_runtime_gate_closure/v1"
+    assert evidence["status"] == "runtime_ready"
+    assert evidence["blocked_reasons"] == []
+    assert evidence["runtime_gates"]["dependency_importability"] == {
+        "ready": True,
+        "required_optional_modules": [
+            "torch",
+            "transformers",
+            "peft",
+            "colpali_engine",
+        ],
+        "missing_optional_modules": [],
+    }
+    assert evidence["runtime_gate_closure"]["dependency_importability"] == {
+        "status": "closed",
+        "setup_attempted": True,
+        "missing_optional_modules": [],
+    }
+    assert evidence["dependency_setup"]["setup_writes_under_allowed_root"] is True
+    assert evidence["dependency_setup"]["temp_dirs_under_allowed_root"] is True
+    assert evidence["dependency_setup"]["log_dirs_under_allowed_root"] is True
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert "optional_dependency_missing" not in blocker_codes
+
+
+def test_phase_5g_dependency_gate_still_blocked_after_setup_attempt() -> None:
+    evidence = a100_preflight.build_phase_5g_runtime_gate_closure_evidence(
+        _phase_5g_observation(
+            module_available={"colpali_engine": False},
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+                "expected_file_markers_present": True,
+                "a100_readable": True,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T00:00:00Z",
+    )
+
+    assert evidence["status"] == "blocked"
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert "optional_dependency_missing" in blocker_codes
+    assert evidence["runtime_gates"]["dependency_importability"]["ready"] is False
+    assert evidence["runtime_gates"]["dependency_importability"][
+        "missing_optional_modules"
+    ] == ["colpali_engine"]
+    assert evidence["runtime_gate_closure"]["dependency_importability"] == {
+        "status": "blocked",
+        "setup_attempted": True,
+        "missing_optional_modules": ["colpali_engine"],
+    }
+    assert evidence["safety"]["training_launched"] is False
+
+
+def test_phase_5g_exact_model_path_missing_is_truthful_blocker() -> None:
+    exact_model_path = "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf"
+    evidence = a100_preflight.build_phase_5g_runtime_gate_closure_evidence(
+        _phase_5g_observation(
+            model_path={
+                "provided": True,
+                "exists": False,
+                "path": exact_model_path,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T00:00:00Z",
+    )
+
+    assert evidence["status"] == "blocked"
+    assert evidence["user_input_required"] is True
+    blocker_codes = {reason["code"] for reason in evidence["blocked_reasons"]}
+    assert "missing_local_model_path" in blocker_codes
+    assert evidence["runtime_gates"]["local_model_path"] == {
+        "ready": False,
+        "exact_local_model_path_required": True,
+        "provided": True,
+        "exists": False,
+        "redacted": True,
+        "exact_path_committed": False,
+        "path_location": "under_allowed_root",
+        "a100_readable": False,
+        "shape_markers_present": False,
+        "model_shape_ready": False,
+    }
+    evidence_text = json.dumps(evidence, sort_keys=True)
+    assert exact_model_path not in evidence_text
+    assert evidence["safety"]["training_launched"] is False
+    assert evidence["safety"]["model_download_executed"] is False
+
+
+def test_phase_5g_runtime_ready_keeps_all_training_safety_flags_false() -> None:
+    evidence = a100_preflight.build_phase_5g_runtime_gate_closure_evidence(
+        _phase_5g_observation(
+            model_path={
+                "provided": True,
+                "exists": True,
+                "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+                "expected_file_markers_present": True,
+                "a100_readable": True,
+            },
+        ),
+        report_timestamp_utc="2026-07-04T00:00:00Z",
+    )
+
+    assert evidence["status"] == "runtime_ready"
+    safety = evidence["safety"]
+    assert safety["schema"] == "phase_5g_a100_runtime_gate_closure_safety/v1"
+    assert safety["training_launched"] is False
+    assert safety["model_download_executed"] is False
+    assert safety["network_used_for_model_resolution"] is False
+    assert safety["final_test_used"] is False
+    assert safety["adapter_checkpoint_created"] is False
+    assert safety["adapter_checkpoint_committed"] is False
+    assert safety["model_weights_committed"] is False
+    assert safety["training_cache_committed"] is False
+    assert safety["private_local_model_path_committed"] is False
+    assert safety["benchmark_improvement_claim"] is False
+    assert safety["real_training_success_claim"] is False
+
+
+def test_cli_writes_phase_5g_runtime_gate_closure_outputs(tmp_path: Path) -> None:
+    observation_path = tmp_path / "observation.json"
+    environment_path = tmp_path / "environment.json"
+    safety_path = tmp_path / "safety.json"
+    run_card_path = tmp_path / "run-card.md"
+    observation_path.write_text(
+        json.dumps(
+            _phase_5g_observation(
+                module_available={"colpali_engine": False},
+                model_path={
+                    "provided": True,
+                    "exists": False,
+                    "path": "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf",
+                },
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = a100_preflight.main(
+        [
+            "--phase",
+            "5g",
+            "--input",
+            str(observation_path),
+            "--environment-check",
+            str(environment_path),
+            "--safety-check",
+            str(safety_path),
+            "--run-card",
+            str(run_card_path),
+            "--timestamp-utc",
+            "2026-07-04T00:00:00Z",
+        ]
+    )
+
+    assert exit_code == 0
+    environment_text = environment_path.read_text(encoding="utf-8")
+    environment = json.loads(environment_text)
+    safety = json.loads(safety_path.read_text(encoding="utf-8"))
+    run_card = run_card_path.read_text(encoding="utf-8")
+    assert environment["schema"] == "phase_5g_a100_runtime_gate_closure/v1"
+    assert environment["status"] == "blocked"
+    assert "/mnt/data/minghongsun/models/vidore-colqwen2-v1.0-hf" not in (
+        environment_text + run_card
+    )
+    assert environment["local_model_path_summary"]["exact_path_committed"] is False
+    assert safety["schema"] == "phase_5g_a100_runtime_gate_closure_safety/v1"
+    assert "Boundary: runtime-gate closure evidence only" in run_card
+    assert "training launched: false" in run_card
+
+
 def test_cli_writes_environment_safety_and_run_card(tmp_path: Path) -> None:
     observation_path = tmp_path / "observation.json"
     environment_path = tmp_path / "environment.json"
@@ -517,4 +703,28 @@ def _phase_5f_observation(
     assert isinstance(model_summary, dict)
     if model_summary.get("provided") is True:
         model_summary.setdefault("expected_file_markers_present", True)
+    return observation
+
+
+def _phase_5g_observation(
+    *,
+    checkout: dict[str, object] | None = None,
+    module_available: dict[str, bool] | None = None,
+    model_path: dict[str, object] | None = None,
+) -> dict[str, object]:
+    observation = _phase_5f_observation(
+        checkout=checkout,
+        module_available=module_available,
+        model_path=model_path,
+    )
+    dependency_setup = observation["dependency_setup"]
+    assert isinstance(dependency_setup, dict)
+    dependency_setup.update(
+        {
+            "setup_attempted": True,
+            "setup_writes_under_allowed_root": True,
+            "temp_dirs_under_allowed_root": True,
+            "log_dirs_under_allowed_root": True,
+        }
+    )
     return observation
