@@ -11,8 +11,8 @@
     "exists": true,
     "expected_project_root": "/mnt/data/minghongsun/visdoc-late-interaction-retrieval",
     "git_inspected": true,
-    "head_commit": "64c2b8942a9f40b80fabeb229c6ab9b0721a0cb2",
-    "origin_main_commit": "64c2b8942a9f40b80fabeb229c6ab9b0721a0cb2",
+    "head_commit": "97cb4d844db04a8da6e4469f9dc17907abc48cf5",
+    "origin_main_commit": "97cb4d844db04a8da6e4469f9dc17907abc48cf5",
     "path_under_allowed_root": true
   },
   "cuda": {
@@ -58,7 +58,7 @@
     "storage_dir_exists": true,
     "storage_dir_writable": true
   },
-  "report_timestamp_utc": "2026-07-04T00:00:00Z",
+  "report_timestamp_utc": "2026-07-04T04:20:00Z",
   "runtime": {
     "module_available": {
       "colpali_engine": true,

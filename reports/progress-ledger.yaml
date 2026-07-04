@@ -388,7 +388,8 @@ training_pilot_phase_5g_runtime_gate_closure_status:
   phase_boundary: runtime_gate_closure_only
   runtime_status: blocked
   remote_checkout: ready_under_allowed_root
-  remote_checkout_head: 64c2b8942a9f40b80fabeb229c6ab9b0721a0cb2
+  remote_checkout_head: 97cb4d844db04a8da6e4469f9dc17907abc48cf5
+  origin_main_commit: 97cb4d844db04a8da6e4469f9dc17907abc48cf5
   remote_storage_root: /mnt/data/minghongsun
   cuda_available: true
   gpu_summary: 8x A100 80GB observed; GPU 3-7 appear idle; no GPU job launched
