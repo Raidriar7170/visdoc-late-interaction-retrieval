@@ -31,6 +31,8 @@ the exact A100-side model directory using static filesystem markers only.
 ### Requirement: Phase 5H runtime-ready but not execution-ready boundary
 The A100 preflight SHALL distinguish Phase 5H runtime readiness from
 real-training execution or benchmark success.
+The `runtime_ready` outcome SHALL mean the runtime can proceed only to a
+separately gated pilot attempt, not that training succeeded.
 
 #### Scenario: All pre-training gates are closed
 - **WHEN** inherited allowed-root placement, dependency importability,
