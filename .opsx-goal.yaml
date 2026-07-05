@@ -1,10 +1,10 @@
-goal_id: visdoc.phase5d.real_training_backend_wiring
-created: 2026-07-01
-change: add-real-training-backend-wiring
+goal_id: visdoc.phase5i.gated_tiny_real_pilot
+created: 2026-07-05
+change: run-phase-5i-gated-tiny-real-pilot
 status: applying
 worktree:
-  path: .worktrees/phase-5d-real-training-backend-wiring
-  branch: codex/phase-5d-real-training-backend-wiring
+  path: .worktrees/phase-5i-gated-tiny-real-pilot
+  branch: codex/phase-5i-gated-tiny-real-pilot
   base_ref: origin/main
 execution_policy:
   profile: practical
@@ -13,28 +13,34 @@ execution_policy:
   merge: forbidden
   archive_openspec: forbidden
   deploy: forbidden
-  gpu: optional_only_when_all_gates_pass
+  gpu: allowed_only_when_all_gates_pass_and_safe_gpu_exists
   network_required: false
 goal:
   summary: >
-    Complete Phase 5D real-training backend wiring for the existing
-    train_lora_pilot launcher: config-gated, local-only, optional-dependency
-    guarded, and able to run a tiny real LoRA / QLoRA pilot only when all
-    safety gates pass; otherwise emit clear blocked evidence.
-  default_command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json
+    Complete Phase 5I gated tiny real-pilot attempt on the A100 runtime using
+    the exact local model path and existing training gate, then commit only
+    sanitized metadata, run card, safety checks, dev-only evidence, and phase
+    closeout artifacts without downloading models, using final test, or making
+    benchmark claims.
+  default_command: >
+    PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config
+    local/train_lora_pilot.phase5i.local.json
 acceptance:
   required_artifacts:
-    - openspec/changes/add-real-training-backend-wiring/proposal.md
-    - openspec/changes/add-real-training-backend-wiring/design.md
-    - openspec/changes/add-real-training-backend-wiring/specs/real-training-backend-wiring/spec.md
-    - openspec/changes/add-real-training-backend-wiring/tasks.md
-    - src/visdoc_retrieve/lora_training_backend.py
-    - reports/training-pilot/phase-5d-environment-check.json
-    - reports/training-pilot/phase-5d-safety-check.json
-    - reports/training-pilot/phase-5d-blocked-run-card.md
-    - reports/training-pilot/phase-5d-adapter-manifest.sanitized.json
-    - reports/training-pilot/phase-5d-dev-eval-schema.json
-    - docs/human-briefs/2026-07-01-real-training-backend-wiring.html
+    - openspec/changes/run-phase-5i-gated-tiny-real-pilot/proposal.md
+    - openspec/changes/run-phase-5i-gated-tiny-real-pilot/design.md
+    - openspec/changes/run-phase-5i-gated-tiny-real-pilot/specs/gated-tiny-real-pilot-attempt/spec.md
+    - openspec/changes/run-phase-5i-gated-tiny-real-pilot/tasks.md
+    - src/visdoc_retrieve/train_lora_pilot.py
+    - src/visdoc_retrieve/training_pilot.py
+    - tests/test_training_pilot_launch_gate.py
+    - reports/training-pilot/phase-5i-environment-check.json
+    - reports/training-pilot/phase-5i-safety-check.json
+    - reports/training-pilot/phase-5i-pilot-run-card.md
+    - reports/training-pilot/phase-5i-blocked-run-card.md
+    - reports/training-pilot/phase-5i-adapter-manifest.sanitized.json
+    - reports/training-pilot/phase-5i-dev-eval.json
+    - docs/human-briefs/2026-07-05-gated-tiny-real-pilot.html
     - reports/progress-ledger.yaml
   required_validation:
     - PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
@@ -54,8 +60,8 @@ hard_stops:
   - benchmark improvement or model superiority claim
   - committed model weights, adapter checkpoints, training caches, tensorboard logs, or wandb logs
   - committed private local model path or private local config
-  - treating pilot loss, blocked evidence, dry-run output, or dev-only sanity as model improvement
-  - chatbot, generic RAG app, browser automation, deployment, merge, or OpenSpec archive
+  - treating pilot loss, blocked evidence, or dev-only sanity as model improvement
+  - merge, deploy, or OpenSpec archive
 phase_state:
-  active_phase: phase-5d-real-training-backend-wiring
+  active_phase: phase-5i-gated-tiny-real-pilot
   goal_complete_checkpoint: false

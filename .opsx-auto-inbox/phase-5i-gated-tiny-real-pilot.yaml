@@ -1,0 +1,46 @@
+phase_id: phase-5i-gated-tiny-real-pilot
+change: run-phase-5i-gated-tiny-real-pilot
+status: applying
+scope:
+  - OpenSpec Phase 5I artifacts
+  - guarded pilot metadata parameterization with Phase 5D defaults preserved
+  - Phase 5I A100 gated pilot attempt and sanitized evidence only
+allowed_paths:
+  - .gitignore
+  - .opsx-goal.yaml
+  - .opsx-auto-inbox/phase-5i-gated-tiny-real-pilot.yaml
+  - openspec/changes/run-phase-5i-gated-tiny-real-pilot/**
+  - src/visdoc_retrieve/train_lora_pilot.py
+  - src/visdoc_retrieve/training_pilot.py
+  - tests/test_training_pilot_launch_gate.py
+  - reports/training-pilot/**
+  - reports/progress-ledger.yaml
+  - docs/human-briefs/2026-07-05-gated-tiny-real-pilot.html
+validation_commands:
+  planned:
+    - openspec validate run-phase-5i-gated-tiny-real-pilot --strict
+    - pytest -q tests/test_training_pilot_launch_gate.py
+    - PYTHONPATH=src python -m visdoc_retrieve.run_mvp --config configs/mvp.json
+    - PYTHONPATH=src python -m visdoc_retrieve.mine_hard_negatives --config configs/hard_negatives.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_dry_run --config configs/train_lora_dry_run.json
+    - PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config configs/train_lora_pilot.local.example.json || test $? -eq 2
+    - python -m py_compile src/visdoc_retrieve/*.py
+    - pyproject tomllib parse
+    - pytest -q
+    - ruff check .
+    - mypy src
+    - openspec validate --all --strict
+    - git diff --check
+evidence:
+  planned:
+    - reports/training-pilot/phase-5i-environment-check.json
+    - reports/training-pilot/phase-5i-safety-check.json
+    - reports/training-pilot/phase-5i-pilot-run-card.md
+    - reports/training-pilot/phase-5i-blocked-run-card.md
+    - reports/training-pilot/phase-5i-adapter-manifest.sanitized.json
+    - reports/training-pilot/phase-5i-dev-eval.json
+    - docs/human-briefs/2026-07-05-gated-tiny-real-pilot.html
+    - reports/progress-ledger.yaml
+phase_complete: false
+phase_blocked: false
+goal_impossible: false

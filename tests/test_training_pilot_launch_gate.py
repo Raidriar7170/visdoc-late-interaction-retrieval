@@ -59,6 +59,10 @@ def test_pilot_config_parses_and_rejects_unsafe_flags(tmp_path: Path) -> None:
     assert config.save_adapter is False
     assert config.local_files_only is True
     assert config.backend_dependency == "colpali_engine"
+    assert config.phase_metadata.schema_id == "phase_5d"
+    assert config.phase_metadata.phase_label == "5D"
+    assert config.phase_metadata.change_name == "add-real-training-backend-wiring"
+    assert config.phase_metadata.ledger_section == "training_pilot_phase_5d_status"
 
     unsafe_final = _write_pilot_config(tmp_path, allow_final_test=True)
     with pytest.raises(pilot.TrainingPilotConfigError, match="allow_final_test"):
@@ -595,10 +599,112 @@ def test_fake_backend_runner_can_record_pilot_run_without_final_test(
     assert dev_eval["improvement_claim"] is None
     assert safety["pilot_loss_reported_as_model_improvement"] is False
     assert ledger["training_pilot_phase_5d_status"]["evidence"]["run_card"] == (
-        "reports/training-pilot/phase-5d-pilot-run-card.md"
+        str(report_dir / "phase-5d-pilot-run-card.md")
     )
     assert "not final benchmark" in run_card
     assert "improvement" not in run_card.lower()
+
+
+def test_phase_metadata_override_updates_public_evidence_and_ledger(
+    tmp_path: Path,
+) -> None:
+    pilot = _pilot_module()
+    local_model = tmp_path / "local-model"
+    local_model.mkdir()
+    config_path = _write_pilot_config(
+        tmp_path,
+        allow_real_training=True,
+        local_model_path=local_model,
+        sample_limit=4,
+        save_adapter=True,
+        phase_metadata={
+            "schema_id": "phase_5i",
+            "phase_label": "5I",
+            "change_name": "run-phase-5i-gated-tiny-real-pilot",
+            "title": "Phase 5I Gated Tiny Real Pilot",
+            "ledger_section": "training_pilot_phase_5i_status",
+            "summary_zh": "Phase 5I 在 A100 上尝试一次 gated tiny real-pilot；",
+            "recommended_next_step_zh": "基于本次 pilot 结果决定是否进入下一阶段。",
+        },
+        outputs={
+            "adapter_manifest": str(
+                tmp_path
+                / "reports"
+                / "phase-5i-adapter-manifest.sanitized.json"
+            ),
+            "blocked_run_card": str(
+                tmp_path / "reports" / "phase-5i-blocked-run-card.md"
+            ),
+            "dev_eval_schema": str(tmp_path / "reports" / "phase-5i-dev-eval.json"),
+            "environment_check": str(
+                tmp_path / "reports" / "phase-5i-environment-check.json"
+            ),
+            "human_brief": str(tmp_path / "phase-5i-human-brief.html"),
+            "pilot_run_card": str(
+                tmp_path / "reports" / "phase-5i-pilot-run-card.md"
+            ),
+            "progress_ledger": str(tmp_path / "progress-ledger.yaml"),
+            "safety_check": str(
+                tmp_path / "reports" / "phase-5i-safety-check.json"
+            ),
+        },
+    )
+
+    def fake_backend_runner(config, *, repo_root: Path) -> dict[str, object]:
+        return {
+            "status": "pilot_run",
+            "training_executed": True,
+            "effective_training_sample_count": 4,
+            "adapter_checkpoint_created": True,
+            "adapter_checkpoint_path": str(config.adapter_output_dir),
+            "final_test_used": False,
+        }
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={"VISDOC_ENABLE_REAL_TRAINING": "1"},
+        cuda_available=lambda: True,
+        training_backend_runner=fake_backend_runner,
+    )
+
+    assert result["status"] == "pilot_run"
+    report_dir = tmp_path / "reports"
+    environment = json.loads(
+        (report_dir / "phase-5i-environment-check.json").read_text()
+    )
+    safety = json.loads((report_dir / "phase-5i-safety-check.json").read_text())
+    dev_eval = json.loads((report_dir / "phase-5i-dev-eval.json").read_text())
+    manifest = json.loads(
+        (report_dir / "phase-5i-adapter-manifest.sanitized.json").read_text()
+    )
+    run_card = (
+        report_dir / "phase-5i-pilot-run-card.md"
+    ).read_text(encoding="utf-8")
+    brief = (tmp_path / "phase-5i-human-brief.html").read_text(encoding="utf-8")
+    ledger = yaml.safe_load((tmp_path / "progress-ledger.yaml").read_text())
+
+    assert environment["schema"] == "training_pilot_phase_5i_environment_check/v1"
+    assert environment["phase"] == "5I"
+    assert environment["change"] == "run-phase-5i-gated-tiny-real-pilot"
+    assert safety["schema"] == "training_pilot_phase_5i_safety_check/v1"
+    assert dev_eval["schema"] == "training_pilot_phase_5i_dev_eval/v1"
+    assert (
+        manifest["schema"]
+        == "training_pilot_phase_5i_adapter_manifest_sanitized/v1"
+    )
+    assert "Phase 5I Gated Tiny Real Pilot" in run_card
+    assert "Phase 5I Gated Tiny Real Pilot" in brief
+    assert "phase-5i-pilot-run-card.md" in brief
+    assert ledger["training_pilot_phase_5i_status"]["status"] == "pilot_run"
+    assert (
+        ledger["training_pilot_phase_5i_status"]["change"]
+        == "run-phase-5i-gated-tiny-real-pilot"
+    )
+    assert (
+        ledger["training_pilot_phase_5i_status"]["evidence"]["run_card"]
+        == str(report_dir / "phase-5i-pilot-run-card.md")
+    )
 
 
 def test_transformers_peft_probe_blocks_without_real_training_step(
@@ -788,6 +894,7 @@ def test_safety_check_reports_tracked_forbidden_artifacts(tmp_path: Path) -> Non
 def test_real_training_artifact_paths_are_ignored() -> None:
     paths = [
         ".local/training-pilot/adapters/example",
+        "local/train_lora_pilot.phase5i.local.json",
         "local-models/colpali-or-colqwen/model.safetensors",
         ".cache/visdoc-training/cache.bin",
         "wandb/run-1/config.yaml",
@@ -872,10 +979,36 @@ def _write_pilot_config(
     max_steps: int = 20,
     sample_limit: int = 8,
     save_adapter: bool = False,
+    phase_metadata: dict[str, object] | None = None,
+    outputs: dict[str, str] | None = None,
 ) -> Path:
     tmp_path.mkdir(parents=True, exist_ok=True)
     ledger_path = tmp_path / "progress-ledger.yaml"
     shutil.copyfile(Path("reports/progress-ledger.yaml"), ledger_path)
+    config_outputs = outputs or {
+        "adapter_manifest": str(
+            tmp_path
+            / "reports"
+            / "phase-5d-adapter-manifest.sanitized.json"
+        ),
+        "blocked_run_card": str(
+            tmp_path / "reports" / "phase-5d-blocked-run-card.md"
+        ),
+        "dev_eval_schema": str(
+            tmp_path / "reports" / "phase-5d-dev-eval-schema.json"
+        ),
+        "environment_check": str(
+            tmp_path / "reports" / "phase-5d-environment-check.json"
+        ),
+        "human_brief": str(tmp_path / "human-brief.html"),
+        "pilot_run_card": str(
+            tmp_path / "reports" / "phase-5d-pilot-run-card.md"
+        ),
+        "progress_ledger": str(ledger_path),
+        "safety_check": str(
+            tmp_path / "reports" / "phase-5d-safety-check.json"
+        ),
+    }
     config = {
         "adapter_output_dir": str(adapter_output_dir),
         "allow_final_test": allow_final_test,
@@ -898,28 +1031,17 @@ def _write_pilot_config(
         "loss_type": "lora_pairwise_maxsim",
         "max_steps": max_steps,
         "model_revision": "phase-5d-local-files-only-placeholder",
-        "outputs": {
-            "adapter_manifest": str(
-                tmp_path
-                / "reports"
-                / "phase-5d-adapter-manifest.sanitized.json"
-            ),
-            "blocked_run_card": str(
-                tmp_path / "reports" / "phase-5d-blocked-run-card.md"
-            ),
-            "dev_eval_schema": str(
-                tmp_path / "reports" / "phase-5d-dev-eval-schema.json"
-            ),
-            "environment_check": str(
-                tmp_path / "reports" / "phase-5d-environment-check.json"
-            ),
-            "human_brief": str(tmp_path / "human-brief.html"),
-            "pilot_run_card": str(
-                tmp_path / "reports" / "phase-5d-pilot-run-card.md"
-            ),
-            "progress_ledger": str(ledger_path),
-            "safety_check": str(
-                tmp_path / "reports" / "phase-5d-safety-check.json"
+        "outputs": config_outputs,
+        "phase_metadata": phase_metadata or {
+            "schema_id": "phase_5d",
+            "phase_label": "5D",
+            "change_name": "add-real-training-backend-wiring",
+            "title": "Phase 5D Real Training Backend Wiring",
+            "ledger_section": "training_pilot_phase_5d_status",
+            "summary_zh": "Phase 5D 完成 train_lora_pilot 的 backend wiring 检查点；",
+            "recommended_next_step_zh": (
+                "在具备本地模型和 CUDA 的 A100 环境中运行一次小预算 pilot，"
+                "或继续记录 blocked evidence。"
             ),
         },
         "qlora": False,
