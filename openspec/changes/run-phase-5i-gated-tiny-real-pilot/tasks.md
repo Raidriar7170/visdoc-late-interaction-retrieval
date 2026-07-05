@@ -32,5 +32,5 @@
 - [x] 4.2 Confirm no model weights, adapter checkpoints, caches, `.worktrees`,
   private local model path, private local config, final-test metrics, README
   result claims, or benchmark-improvement claims are tracked.
-- [ ] 4.3 Commit, push `codex/phase-5i-gated-tiny-real-pilot`, create a PR, and
+- [x] 4.3 Commit, push `codex/phase-5i-gated-tiny-real-pilot`, create a PR, and
   stop without merge, deploy, or OpenSpec archive.
