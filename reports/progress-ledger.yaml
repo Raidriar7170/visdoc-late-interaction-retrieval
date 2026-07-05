@@ -487,6 +487,37 @@ training_pilot_phase_5h_model_path_gate_closure_status:
     safety_check: reports/training-pilot/phase-5h-safety-check.json
     human_brief: docs/human-briefs/2026-07-04-a100-model-path-gate-closure.html
 
+training_pilot_phase_5i_status:
+  status: blocked
+  change: run-phase-5i-gated-tiny-real-pilot
+  command: PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot --config local/train_lora_pilot.phase5i.local.json
+  config: local/train_lora_pilot.phase5i.local.json
+  candidate_universe: evaluated_split_pages
+  max_steps: 8
+  sample_limit: 4
+  training: not_executed
+  real_pilot_ran: false
+  model_download: not_executed
+  network: not_used
+  final_test_evaluation: not_run
+  dev_eval: not_run_or_schema_only
+  benchmark_claim: none
+  adapter_checkpoint_committed: false
+  model_weights_committed: false
+  training_cache_committed: false
+  private_local_model_path_committed: false
+  mock_visual_result_reported_as_real: false
+  pilot_loss_reported_as_model_improvement: false
+  blocked_reasons:
+    - optional_training_dependency_missing
+  evidence:
+    environment_check: reports/training-pilot/phase-5i-environment-check.json
+    run_card: reports/training-pilot/phase-5i-blocked-run-card.md
+    safety_check: reports/training-pilot/phase-5i-safety-check.json
+    dev_eval_schema: reports/training-pilot/phase-5i-dev-eval.json
+    adapter_manifest: reports/training-pilot/phase-5i-adapter-manifest.sanitized.json
+    human_brief: docs/human-briefs/2026-07-05-gated-tiny-real-pilot.html
+
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining

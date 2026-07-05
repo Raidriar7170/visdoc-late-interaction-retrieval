@@ -15,21 +15,21 @@
 
 ## 3. A100 Gated Pilot Attempt
 
-- [ ] 3.1 Refresh the A100 checkout/worktree, inspect CUDA/GPU occupancy safely,
+- [x] 3.1 Refresh the A100 checkout/worktree, inspect CUDA/GPU occupancy safely,
   and prepare an untracked `local/train_lora_pilot.phase5i.local.json` config
   with the exact local model path, tiny budget, and ignored adapter output.
-- [ ] 3.2 Run the guarded Phase 5I pilot command with
+- [x] 3.2 Run the guarded Phase 5I pilot command with
   `VISDOC_ENABLE_REAL_TRAINING=1`, then keep the truthful outcome as either a
   pilot run or blocked checkpoint.
-- [ ] 3.3 Commit only sanitized Phase 5I evidence: environment check, safety
+- [x] 3.3 Commit only sanitized Phase 5I evidence: environment check, safety
   check, run-card, adapter manifest, dev-eval JSON, Human Brief, and
   progress-ledger entry.
 
 ## 4. Validation and PR Closeout
 
-- [ ] 4.1 Run the required focused and full validation commands, including the
+- [x] 4.1 Run the required focused and full validation commands, including the
   existing blocked example pilot command and `git diff --check`.
-- [ ] 4.2 Confirm no model weights, adapter checkpoints, caches, `.worktrees`,
+- [x] 4.2 Confirm no model weights, adapter checkpoints, caches, `.worktrees`,
   private local model path, private local config, final-test metrics, README
   result claims, or benchmark-improvement claims are tracked.
 - [ ] 4.3 Commit, push `codex/phase-5i-gated-tiny-real-pilot`, create a PR, and

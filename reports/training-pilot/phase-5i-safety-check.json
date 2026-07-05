@@ -1,0 +1,34 @@
+{
+  "adapter_checkpoint_committed": false,
+  "benchmark_claim_added": false,
+  "dry_run_or_blocked_claimed_as_real_training": false,
+  "final_test_used": false,
+  "forbidden_artifact_scan": {
+    "adapter_checkpoint_paths": [],
+    "model_weight_paths": [],
+    "training_cache_paths": []
+  },
+  "mock_visual_result_reported_as_real": false,
+  "model_download_executed": false,
+  "model_weights_committed": false,
+  "network_used": false,
+  "network_used_for_model_resolution": false,
+  "phase": "5I",
+  "pilot_loss_reported_as_model_improvement": false,
+  "real_training_result": {
+    "adapter_checkpoint_created": false,
+    "adapter_checkpoint_path": null,
+    "blocked_code": "optional_training_dependency_missing",
+    "blocked_message": "Missing optional real-training dependencies: colpali_engine",
+    "effective_training_sample_count": 0,
+    "final_test_used": false,
+    "missing_dependencies": [
+      "colpali_engine"
+    ],
+    "status": "blocked",
+    "training_executed": false
+  },
+  "schema": "training_pilot_phase_5i_safety_check/v1",
+  "training_cache_committed": false,
+  "training_executed": false
+}

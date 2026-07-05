@@ -91,7 +91,7 @@ def test_unattended_local_config_uses_bounded_edit_scope() -> None:
     config = _load_json(CONFIG_ROOT / "unattended-local.json")
 
     assert config["mode"] == "unattended-local-core"
-    assert config["phase_file_globs"] == [".opsx-auto-inbox/*.json"]
+    assert config["phase_file_globs"] == [".opsx-auto-inbox/*.yaml"]
     assert config["validation_profile"] == "local-core"
     assert config["completion_validation_profile"] == "local-core"
 
@@ -102,6 +102,10 @@ def test_unattended_local_config_uses_bounded_edit_scope() -> None:
     assert all(isinstance(path, str) and path for path in allowed_paths)
     assert all(not path.startswith("/") for path in allowed_paths)
     assert all(".." not in Path(path).parts for path in allowed_paths)
+    assert ".gitignore" in allowed_paths
+    assert ".opsx-goal.yaml" in allowed_paths
+    assert ".opsx-auto-inbox/*.yaml" in allowed_paths
+    assert "openspec/changes/**" in allowed_paths
 
     forbidden_roots = {".git", ".opsx-auto", ".opsx-auto-config"}
     for path in allowed_paths:
