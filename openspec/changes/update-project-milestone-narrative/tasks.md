@@ -23,5 +23,5 @@
   `.codex/skills/openspec-sync-specs`, private local model path, private config,
   final-test metrics, README result claims, or benchmark-improvement claims are
   tracked.
-- [ ] 3.4 Commit, push, create PR, and stop without merge, deploy, training, or
+- [x] 3.4 Commit, push, create PR, and stop without merge, deploy, training, or
   OpenSpec archive.
