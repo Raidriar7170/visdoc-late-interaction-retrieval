@@ -1,0 +1,26 @@
+{
+  "change": "add-dev-only-pilot-evaluation-harness",
+  "dev_hard_negatives_path": "data/derived/hard_negatives/dev.jsonl",
+  "final_test_paths": [
+    "data/derived/hard_negatives/test.jsonl",
+    "data/derived/final-test",
+    "reports/final-test"
+  ],
+  "local_model_path": "<redacted-local-model-path>",
+  "max_steps": 1,
+  "outputs": {
+    "adapter_manifest": "reports/training-pilot/phase-5k-adapter-manifest.sanitized.json",
+    "blocked_run_card": "reports/training-pilot/phase-5k-blocked-run-card.md",
+    "comparison_schema": "reports/training-pilot/phase-5k-comparison-schema.json",
+    "dev_only_eval": "reports/training-pilot/phase-5k-dev-only-eval.json",
+    "environment_check": "reports/training-pilot/phase-5k-environment-check.json",
+    "human_brief": "docs/human-briefs/2026-07-06-dev-only-pilot-evaluation.html",
+    "progress_ledger": "reports/progress-ledger.yaml",
+    "safety_check": "reports/training-pilot/phase-5k-safety-check.json"
+  },
+  "phase": "5K",
+  "pilot_manifest_path": "reports/training-pilot/phase-5j-adapter-manifest.sanitized.json",
+  "sample_limit": 1,
+  "text_baseline_report_path": "reports/text-baselines-synthetic-smoke.json",
+  "visual_baseline_report_path": "reports/visual-baselines-synthetic-smoke.json"
+}

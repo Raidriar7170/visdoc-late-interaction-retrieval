@@ -1,0 +1,28 @@
+{
+  "benchmark_improvement_claim": false,
+  "dev_split": {
+    "candidate_universe_id": "evaluated_split_pages",
+    "hard_negative_count": 429,
+    "hard_negative_path": "data/derived/hard_negatives/dev.jsonl",
+    "split_values": [
+      "dev"
+    ]
+  },
+  "final_test_used": false,
+  "phase": "5K",
+  "pilot_loss_reported_as_model_improvement": false,
+  "schema": "training_pilot_phase_5k_dev_only_eval/v1",
+  "scope": "dev-only",
+  "status": "dev_only_eval_recorded",
+  "tiny_pilot_adapter": {
+    "adapter_checkpoint_committed": false,
+    "metrics": {
+      "mrr": null,
+      "recall_at_1": null,
+      "recall_at_5": null
+    },
+    "notes": "Adapter checkpoint is intentionally not committed; Phase 5K does not fabricate adapter metrics.",
+    "source": "phase-5j-sanitized-manifest",
+    "status": "not_available"
+  }
+}

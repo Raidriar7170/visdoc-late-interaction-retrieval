@@ -547,6 +547,26 @@ training_pilot_phase_5j_status:
     safety_check: reports/training-pilot/phase-5j-safety-check.json
     dev_eval_schema: reports/training-pilot/phase-5j-dev-eval.json
     adapter_manifest: reports/training-pilot/phase-5j-adapter-manifest.sanitized.json
+training_pilot_phase_5k_status:
+  status: dev_only_eval_recorded
+  change: add-dev-only-pilot-evaluation-harness
+  scope: dev-only
+  tiny_pilot_status: skipped
+  max_steps: 1
+  sample_limit: 1
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  adapter_checkpoint_committed: false
+  model_weights_committed: false
+  private_model_path_committed: false
+  evidence:
+    environment_check: reports/training-pilot/phase-5k-environment-check.json
+    safety_check: reports/training-pilot/phase-5k-safety-check.json
+    run_card: reports/training-pilot/phase-5k-blocked-run-card.md
+    adapter_manifest: reports/training-pilot/phase-5k-adapter-manifest.sanitized.json
+    dev_only_eval: reports/training-pilot/phase-5k-dev-only-eval.json
+    comparison_schema: reports/training-pilot/phase-5k-comparison-schema.json
+    human_brief: docs/human-briefs/2026-07-06-dev-only-pilot-evaluation.html
 
 hard_negative_mining_status:
   status: generated

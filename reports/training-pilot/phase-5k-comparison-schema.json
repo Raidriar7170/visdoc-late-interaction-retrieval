@@ -1,0 +1,44 @@
+{
+  "benchmark_improvement_claim": false,
+  "entries": {
+    "text_baseline": {
+      "benchmark_improvement_claim": false,
+      "metrics": {
+        "mrr": 0.7687499999999999,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.9166666666666666
+      },
+      "name": "text_baseline",
+      "source": "existing-dev-only-diagnostic-report",
+      "status": "dev_only_diagnostic"
+    },
+    "tiny_pilot_adapter": {
+      "adapter_checkpoint_committed": false,
+      "metrics": {
+        "mrr": null,
+        "recall_at_1": null,
+        "recall_at_5": null
+      },
+      "notes": "Adapter checkpoint is intentionally not committed; Phase 5K does not fabricate adapter metrics.",
+      "source": "phase-5j-sanitized-manifest",
+      "status": "not_available"
+    },
+    "zero_shot_visual_baseline": {
+      "benchmark_improvement_claim": false,
+      "metrics": {
+        "mrr": 0.32242063492063505,
+        "recall_at_1": 0.125,
+        "recall_at_5": 0.5416666666666666
+      },
+      "name": "zero_shot_visual_baseline",
+      "source": "existing-dev-only-diagnostic-report",
+      "status": "dev_only_diagnostic"
+    }
+  },
+  "final_test_used": false,
+  "notes": "This comparison schema is for dev-only pilot sanity. It is not a final benchmark and does not claim improvement.",
+  "phase": "5K",
+  "schema": "training_pilot_phase_5k_comparison_schema/v1",
+  "scope": "dev-only",
+  "status": "schema_recorded"
+}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 5K Dev-Only Pilot Evaluation Harness</title>
+</head>
+<body>
+<main>
+  <h1>Phase 5K Dev-Only Pilot Evaluation Harness</h1>
+  <p>Phase 5K 是 dev-only pilot evaluation harness。</p>
+  <p>这不是 final benchmark；final test 未使用。</p>
+  <p>tiny pilot 如运行也只用于 pipeline sanity，不代表模型提升。</p>
+  <p>没有 benchmark improvement claim。</p>
+  <p>没有提交 adapter/checkpoint/model/cache/private local config/
+  exact private model path。</p>
+  <p>验证：CLI matrix、py_compile、pyproject parse、pytest -q、
+  ruff check .、mypy src、openspec validate --all --strict、
+  git diff --check 均通过；pilot gate 默认 blocked exit 2。</p>
+  <p>推荐下一步：只有在冻结后，才进入 controlled longer dev training
+  或 final comparison。</p>
+</main>
+</body>
+</html>
