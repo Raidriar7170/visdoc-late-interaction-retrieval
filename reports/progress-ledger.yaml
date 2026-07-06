@@ -509,7 +509,7 @@ training_pilot_phase_5i_status:
   mock_visual_result_reported_as_real: false
   pilot_loss_reported_as_model_improvement: false
   blocked_reasons:
-    - optional_training_dependency_missing
+    - backend_training_step_unavailable
   evidence:
     environment_check: reports/training-pilot/phase-5i-environment-check.json
     run_card: reports/training-pilot/phase-5i-blocked-run-card.md
@@ -517,7 +517,6 @@ training_pilot_phase_5i_status:
     dev_eval_schema: reports/training-pilot/phase-5i-dev-eval.json
     adapter_manifest: reports/training-pilot/phase-5i-adapter-manifest.sanitized.json
     human_brief: docs/human-briefs/2026-07-05-gated-tiny-real-pilot.html
-
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining

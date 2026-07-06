@@ -5,11 +5,11 @@
   "artifact_freeze_path": "reports/training-readiness/artifact-freeze.json",
   "base_model_name_or_path": "local-colpali-or-colqwen-placeholder",
   "benchmark_improvement_claim": false,
-  "created_at": "2026-07-05T05:47:55Z",
+  "created_at": "2026-07-06T02:33:42Z",
   "device": "cuda",
-  "effective_training_sample_count": 0,
+  "effective_training_sample_count": 4,
   "final_test_used": false,
-  "git_commit": "0dd1a88466f453285bfa1d518c7eff26087e0512",
+  "git_commit": "033f025f3bd5bc701b03bb1ea5dfcf47840f3980",
   "hard_negative_artifact_hash": "731da01523c13d75b4dd00e1e8ed052448a247288014be4e8f22ba5d04456586",
   "local_model_path": "<redacted-local-model-path>",
   "max_steps": 8,
@@ -22,18 +22,15 @@
   "real_training_result": {
     "adapter_checkpoint_created": false,
     "adapter_checkpoint_path": null,
-    "blocked_code": "optional_training_dependency_missing",
-    "blocked_message": "Missing optional real-training dependencies: colpali_engine",
-    "effective_training_sample_count": 0,
+    "blocked_code": "backend_training_step_unavailable",
+    "blocked_message": "Optional dependencies are importable, but no reviewed backend runner performed a tiny optimizer-backed training step.",
+    "effective_training_sample_count": 4,
     "final_test_used": false,
-    "missing_dependencies": [
-      "colpali_engine"
-    ],
     "status": "blocked",
     "training_executed": false
   },
   "sample_limit": 4,
   "schema": "training_pilot_phase_5i_adapter_manifest_sanitized/v1",
   "seed": 17,
-  "train_config_hash": "3308447f13271d71b7b38b2d3833410db40d5f2dc715047fbde1a1e4789b1c09"
+  "train_config_hash": "0d8105136efa007bc2321ce2df61b1ec35a510ba84e2a6e64a324071160b1611"
 }

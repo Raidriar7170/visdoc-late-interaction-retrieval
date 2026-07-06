@@ -45,7 +45,7 @@
   adapter 输出目录被 git ignore，才允许进入 guarded real pilot
   launcher。</p>
   <h2>当前阻塞原因</h2>
-  <ul><li><code>optional_training_dependency_missing</code>: Missing optional real-training dependencies: colpali_engine</li></ul>
+  <ul><li><code>backend_training_step_unavailable</code>: Optional dependencies are importable, but no reviewed backend runner performed a tiny optimizer-backed training step.</li></ul>
   <h2>A100 / 本地模型 pilot 运行方式</h2>
   <p>在 A100 或本地 CUDA 环境中，先准备本地模型目录，
   确认 adapter 输出在 ignored artifacts 目录下，再显式设置
@@ -64,7 +64,7 @@
   <p>没有提交 adapter / weights；没有把 blocked 或 dry-run 写成
   真实训练结果；没有把 pilot loss 或 dev-only sanity 写成模型提升。</p>
   <h2>推荐下一步</h2>
-  <p>根据本次 pilot 结果决定是否进入下一阶段。</p>
+  <p>基于本次 pilot 结果决定是否进入下一阶段。</p>
 </main>
 </body>
 </html>

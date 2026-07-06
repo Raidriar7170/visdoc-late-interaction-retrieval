@@ -18,13 +18,10 @@
   "real_training_result": {
     "adapter_checkpoint_created": false,
     "adapter_checkpoint_path": null,
-    "blocked_code": "optional_training_dependency_missing",
-    "blocked_message": "Missing optional real-training dependencies: colpali_engine",
-    "effective_training_sample_count": 0,
+    "blocked_code": "backend_training_step_unavailable",
+    "blocked_message": "Optional dependencies are importable, but no reviewed backend runner performed a tiny optimizer-backed training step.",
+    "effective_training_sample_count": 4,
     "final_test_used": false,
-    "missing_dependencies": [
-      "colpali_engine"
-    ],
     "status": "blocked",
     "training_executed": false
   },
