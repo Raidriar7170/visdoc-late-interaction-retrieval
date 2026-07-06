@@ -1,4 +1,4 @@
-"""Phase 5D local-only real-training pilot backend wiring helpers."""
+"""Guarded local real-training pilot helpers."""
 
 from __future__ import annotations
 
@@ -14,19 +14,44 @@ from typing import cast
 
 MAX_PILOT_STEPS = 20
 MAX_PILOT_SAMPLE_LIMIT = 8
-PILOT_COMMAND = (
-    "PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot "
-    "--config configs/train_lora_pilot.local.example.json"
-)
+PILOT_COMMAND_PREFIX = "PYTHONPATH=src python -m visdoc_retrieve.train_lora_pilot"
+DEFAULT_PILOT_CONFIG_PATH = "configs/train_lora_pilot.local.example.json"
 
 
 class TrainingPilotConfigError(ValueError):
-    """Raised when a Phase 5D pilot config violates launch-gate boundaries."""
+    """Raised when a pilot config violates launch-gate boundaries."""
+
+
+@dataclass(frozen=True, slots=True)
+class TrainingPilotPhaseMetadata:
+    """Public-safe phase metadata for reports and progress ledger output."""
+
+    schema_id: str
+    phase_label: str
+    change_name: str
+    title: str
+    ledger_section: str
+    summary_zh: str
+    recommended_next_step_zh: str
+
+
+DEFAULT_PHASE_METADATA = TrainingPilotPhaseMetadata(
+    schema_id="phase_5d",
+    phase_label="5D",
+    change_name="add-real-training-backend-wiring",
+    title="Phase 5D Real Training Backend Wiring",
+    ledger_section="training_pilot_phase_5d_status",
+    summary_zh="Phase 5D 完成 train_lora_pilot 的 backend wiring 检查点；",
+    recommended_next_step_zh=(
+        "在具备本地模型和 CUDA 的 A100 环境中运行一次小预算 pilot，"
+        "或继续记录 blocked evidence。"
+    ),
+)
 
 
 @dataclass(frozen=True, slots=True)
 class TrainingPilotOutputs:
-    """Report output paths for the Phase 5D pilot backend wiring gate."""
+    """Report output paths for a guarded pilot gate."""
 
     environment_check: Path
     blocked_run_card: Path
@@ -40,7 +65,7 @@ class TrainingPilotOutputs:
 
 @dataclass(frozen=True, slots=True)
 class TrainingPilotConfig:
-    """Parsed Phase 5D pilot backend-wiring config."""
+    """Parsed guarded pilot config."""
 
     base_model_name_or_path: str
     local_model_path: Path
@@ -71,6 +96,7 @@ class TrainingPilotConfig:
     allow_final_test: bool
     save_adapter: bool
     report_timestamp_utc: str
+    phase_metadata: TrainingPilotPhaseMetadata
     outputs: TrainingPilotOutputs
     config_path: Path | None
 
@@ -90,7 +116,7 @@ def load_training_pilot_config(
     *,
     repo_root: Path | None = None,
 ) -> TrainingPilotConfig:
-    """Load and validate a Phase 5D pilot JSON config without ML imports."""
+    """Load and validate a guarded pilot JSON config without ML imports."""
 
     root = repo_root.resolve() if repo_root is not None else None
     config_path = _resolve_path(root, path) if root is not None else path
@@ -108,6 +134,9 @@ def load_training_pilot_config(
         raise TrainingPilotConfigError("training-pilot config must be an object")
 
     outputs = _required_mapping(data, "outputs")
+    phase_metadata = _phase_metadata_from_data(
+        _optional_mapping(data, "phase_metadata")
+    )
     artifact_freeze_path = _optional_str(
         data,
         "artifact_freeze_path",
@@ -152,6 +181,7 @@ def load_training_pilot_config(
         allow_final_test=_required_bool(data, "allow_final_test"),
         save_adapter=_required_bool(data, "save_adapter"),
         report_timestamp_utc=_required_str(data, "report_timestamp_utc"),
+        phase_metadata=phase_metadata,
         outputs=TrainingPilotOutputs(
             environment_check=Path(_required_str(outputs, "environment_check")),
             blocked_run_card=Path(_required_str(outputs, "blocked_run_card")),
@@ -176,7 +206,7 @@ def run_training_pilot_gate(
     cuda_available: Callable[[], bool] | None = None,
     training_backend_runner: Callable[..., dict[str, object]] | None = None,
 ) -> dict[str, object]:
-    """Run Phase 5D launch gates and write blocked or pilot evidence."""
+    """Run the guarded pilot gates and write blocked or pilot evidence."""
 
     env = environ if environ is not None else os.environ
     cuda_probe = cuda_available if cuda_available is not None else _cuda_available
@@ -248,21 +278,26 @@ def run_training_pilot_gate(
         _write_blocked_run_card(
             outputs.blocked_run_card,
             config=config,
+            repo_root=repo_root,
             environment=environment,
         )
     else:
         _write_pilot_run_card(
             outputs.pilot_run_card,
             config=config,
+            repo_root=repo_root,
             environment=environment,
         )
     _write_human_brief(
         outputs.human_brief,
         config=config,
+        repo_root=repo_root,
         environment=environment,
     )
     _update_progress_ledger(
         outputs.progress_ledger,
+        config=config,
+        repo_root=repo_root,
         status=status,
         environment=environment,
     )
@@ -375,7 +410,7 @@ def _evaluate_gates(
             name="allow_final_test_false",
             passed=not config.allow_final_test,
             code="allow_final_test_true",
-            message="allow_final_test must remain false for Phase 5D pilot launch.",
+            message="allow_final_test must remain false for the gated pilot.",
         ),
         GateResult(
             name="allow_real_training_true",
@@ -456,11 +491,12 @@ def _environment_check(
     status: str,
     training_result: Mapping[str, object] | None,
 ) -> dict[str, object]:
+    phase = config.phase_metadata
     return {
-        "schema": "training_pilot_phase_5d_environment_check/v1",
+        "schema": _phase_schema(config, "environment_check"),
         "timestamp_utc": config.report_timestamp_utc,
-        "phase": "5D",
-        "change": "add-real-training-backend-wiring",
+        "phase": phase.phase_label,
+        "change": phase.change_name,
         "overall_status": status,
         "real_training_executed": status == "pilot_run",
         "blocked_reasons": list(blocked_reasons),
@@ -506,6 +542,7 @@ def _safety_check(
     status: str,
     training_result: Mapping[str, object] | None,
 ) -> dict[str, object]:
+    phase = config.phase_metadata
     forbidden_scan = _forbidden_artifact_scan(config, repo_root=repo_root)
     model_weight_paths = cast(
         Sequence[str],
@@ -520,8 +557,8 @@ def _safety_check(
         forbidden_scan["training_cache_paths"],
     )
     return {
-        "schema": "training_pilot_phase_5d_safety_check/v1",
-        "phase": "5D",
+        "schema": _phase_schema(config, "safety_check"),
+        "phase": phase.phase_label,
         "training_executed": status == "pilot_run",
         "model_download_executed": False,
         "network_used": False,
@@ -546,7 +583,7 @@ def _dev_eval_schema(config: TrainingPilotConfig, *, status: str) -> dict[str, o
         "mrr": None,
     }
     return {
-        "schema": "training_pilot_phase_5d_dev_eval/v1",
+        "schema": _phase_schema(config, "dev_eval"),
         "status": "not_run" if status == "blocked" else "pending_real_adapter_eval",
         "scope": "dev-only",
         "candidate_universe_id": config.candidate_universe_id,
@@ -571,6 +608,7 @@ def _adapter_manifest(
     status: str,
     training_result: Mapping[str, object] | None,
 ) -> dict[str, object]:
+    phase = config.phase_metadata
     result = training_result or {}
     sample_count = _int_result_value(result, "effective_training_sample_count")
     adapter_checkpoint_created = bool(
@@ -578,8 +616,8 @@ def _adapter_manifest(
     )
     adapter_checkpoint_path = result.get("adapter_checkpoint_path")
     return {
-        "schema": "training_pilot_phase_5d_adapter_manifest_sanitized/v1",
-        "phase": "5D",
+        "schema": _phase_schema(config, "adapter_manifest_sanitized"),
+        "phase": phase.phase_label,
         "adapter_output_dir": str(config.adapter_output_dir),
         "base_model_name_or_path": config.base_model_name_or_path,
         "local_model_path": "<redacted-local-model-path>",
@@ -630,7 +668,7 @@ def _unsafe_backend_result(
     if sample_count <= 0 or sample_count > config.sample_limit:
         return _unsafe_reason("backend sample count exceeded the configured cap")
     if sample_count > MAX_PILOT_SAMPLE_LIMIT:
-        return _unsafe_reason("backend sample count exceeded Phase 5D cap")
+        return _unsafe_reason("backend sample count exceeded the phase cap")
     if result.get("benchmark_improvement_claim") is True:
         return _unsafe_reason("backend reported a benchmark claim")
     if result.get("pilot_loss_reported_as_model_improvement") is True:
@@ -743,7 +781,7 @@ def _run_guarded_real_training_pilot(
     *,
     repo_root: Path,
 ) -> dict[str, object]:
-    """Run the Phase 5D guarded local-only backend wiring path.
+    """Run the guarded local-only real-training path.
 
     This path is intentionally unreachable from default validation. The backend
     module has no top-level optional ML imports; torch/transformers/peft and the
@@ -774,6 +812,7 @@ def _write_blocked_run_card(
     path: Path,
     *,
     config: TrainingPilotConfig,
+    repo_root: Path,
     environment: Mapping[str, object],
 ) -> None:
     reasons = cast(Sequence[Mapping[str, object]], environment["blocked_reasons"])
@@ -782,12 +821,12 @@ def _write_blocked_run_card(
         for reason in reasons
     ]
     lines = [
-        "# Phase 5D Real Training Backend Wiring",
+        f"# {config.phase_metadata.title}",
         "",
         "Status: blocked",
         "",
         f"Timestamp: {config.report_timestamp_utc}",
-        f"Command: {PILOT_COMMAND}",
+        f"Command: {_pilot_command(config, repo_root=repo_root)}",
         f"Candidate universe: {config.candidate_universe_id}",
         f"Max steps: {config.max_steps}",
         f"Sample limit: {config.sample_limit}",
@@ -808,18 +847,19 @@ def _write_pilot_run_card(
     path: Path,
     *,
     config: TrainingPilotConfig,
+    repo_root: Path,
     environment: Mapping[str, object],
 ) -> None:
     _write_text(
         path,
         "\n".join(
             [
-                "# Phase 5D Real Training Backend Wiring",
+                f"# {config.phase_metadata.title}",
                 "",
                 "Status: pilot_run",
                 "",
                 f"Timestamp: {config.report_timestamp_utc}",
-                f"Command: {PILOT_COMMAND}",
+                f"Command: {_pilot_command(config, repo_root=repo_root)}",
                 f"Max steps: {config.max_steps}",
                 f"Sample limit: {config.sample_limit}",
                 "Boundary: pilot, dev-only, not final benchmark.",
@@ -835,21 +875,45 @@ def _write_human_brief(
     path: Path,
     *,
     config: TrainingPilotConfig,
+    repo_root: Path,
     environment: Mapping[str, object],
 ) -> None:
     reasons = cast(Sequence[Mapping[str, object]], environment["blocked_reasons"])
-    reason_items = "".join(
-        f"<li><code>{reason['code']}</code>: {reason['message']}</li>"
-        for reason in reasons
-    )
     status = str(environment["overall_status"])
+    if reasons:
+        gate_status_html = (
+            "  <h2>当前阻塞原因</h2>\n"
+            "  <ul>"
+            + "".join(
+                f"<li><code>{reason['code']}</code>: {reason['message']}</li>"
+                for reason in reasons
+            )
+            + "</ul>"
+        )
+    else:
+        gate_status_html = (
+            "  <h2>当前阻塞原因</h2>\n"
+            "  <p>本次运行没有阻塞理由；所有训练门禁已通过。</p>"
+        )
+    command = _pilot_command(config, repo_root=repo_root)
+    output_paths = [
+        str(config.outputs.environment_check),
+        str(
+            config.outputs.blocked_run_card
+            if status == "blocked"
+            else config.outputs.pilot_run_card
+        ),
+        str(config.outputs.safety_check),
+        str(config.outputs.dev_eval_schema),
+        str(config.outputs.adapter_manifest),
+    ]
     html = "\n".join(
         [
             "<!doctype html>",
             '<html lang="zh-CN">',
             "<head>",
             '  <meta charset="utf-8">',
-            "  <title>Phase 5D Real Training Backend Wiring</title>",
+            f"  <title>{config.phase_metadata.title}</title>",
             "  <style>",
             "    body {",
             '      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",',
@@ -869,21 +933,21 @@ def _write_human_brief(
             "</head>",
             "<body>",
             "<main>",
-            "  <h1>Phase 5D Real Training Backend Wiring</h1>",
+            f"  <h1>{config.phase_metadata.title}</h1>",
             "  <h2>一句话结论</h2>",
-            "  <p>Phase 5D 完成 train_lora_pilot 的 backend wiring 检查点；",
+            f"  <p>{config.phase_metadata.summary_zh}",
             f'  当前状态为 <span class="status">{status}</span>。</p>',
             "  <h2>当前状态</h2>",
             "  <p>这是 pilot / dev-only / not final benchmark 检查点。",
             "  final test 仍未使用，没有 benchmark gain claim。</p>",
             "  <h2>本阶段变化</h2>",
             "  <ul>",
-            "    <li>新增配置 "
-            "<code>configs/train_lora_pilot.local.example.json</code>。</li>",
-            f"    <li>新增 CLI <code>{PILOT_COMMAND}</code>。</li>",
-            "    <li>接入 import-safe 的本地 LoRA / QLoRA backend wiring。</li>",
-            "    <li>生成 Phase 5D environment check、run-card、safety check、",
-            "    dev eval schema 和 sanitized adapter manifest。</li>",
+            f"    <li>运行 gated pilot 命令 <code>{command}</code>。</li>",
+            "    <li>只在所有门禁通过时进入 import-safe 的本地 LoRA / "
+            "QLoRA guarded backend。</li>",
+            f"    <li>生成 Phase {config.phase_metadata.phase_label} "
+            "environment check、run-card、safety check、dev eval 和 "
+            "sanitized adapter manifest。</li>",
             "  </ul>",
             "  <h2>训练门禁</h2>",
             "  <p>只有同时满足 allow_real_training=true、",
@@ -894,8 +958,7 @@ def _write_human_brief(
             f"  <code>sample_limit &lt;= {MAX_PILOT_SAMPLE_LIMIT}</code>、",
             "  adapter 输出目录被 git ignore，才允许进入 guarded real pilot",
             "  launcher。</p>",
-            "  <h2>为什么默认不训练</h2>",
-            f"  <ul>{reason_items}</ul>",
+            gate_status_html,
             "  <h2>A100 / 本地模型 pilot 运行方式</h2>",
             "  <p>在 A100 或本地 CUDA 环境中，先准备本地模型目录，",
             "  确认 adapter 输出在 ignored artifacts 目录下，再显式设置",
@@ -904,25 +967,16 @@ def _write_human_brief(
             "  不要启用 final test。</p>",
             "  <h2>关键证据</h2>",
             "  <ul>",
-            "    <li><code>reports/training-pilot/phase-5d-environment-check.json",
-            "    </code></li>",
-            "    <li><code>reports/training-pilot/phase-5d-blocked-run-card.md",
-            "    </code> 或 <code>reports/training-pilot/",
-            "    phase-5d-pilot-run-card.md</code></li>",
-            "    <li><code>reports/training-pilot/phase-5d-safety-check.json",
-            "    </code></li>",
-            "    <li><code>reports/training-pilot/phase-5d-dev-eval-schema.json",
-            "    </code></li>",
-            "    <li><code>reports/training-pilot/",
-            "    phase-5d-adapter-manifest.sanitized.json",
-            "    </code></li>",
+            *[
+                f"    <li><code>{output_path}</code></li>"
+                for output_path in output_paths
+            ],
             "  </ul>",
             "  <h2>不应夸大的结论</h2>",
             "  <p>没有提交 adapter / weights；没有把 blocked 或 dry-run 写成",
             "  真实训练结果；没有把 pilot loss 或 dev-only sanity 写成模型提升。</p>",
             "  <h2>推荐下一步</h2>",
-            "  <p>在具备本地模型和 CUDA 的 A100 环境中运行一次小预算 pilot，",
-            "  或继续记录 blocked evidence。</p>",
+            f"  <p>{config.phase_metadata.recommended_next_step_zh}</p>",
             "</main>",
             "</body>",
             "</html>",
@@ -934,6 +988,8 @@ def _write_human_brief(
 def _update_progress_ledger(
     path: Path,
     *,
+    config: TrainingPilotConfig,
+    repo_root: Path,
     status: str,
     environment: Mapping[str, object],
 ) -> None:
@@ -943,21 +999,22 @@ def _update_progress_ledger(
     reason_lines = [f"    - {code}" for code in reason_codes]
     if not reason_lines:
         reason_lines = ["    - none"]
-    run_card_path = (
-        "reports/training-pilot/phase-5d-blocked-run-card.md"
+    run_card_path = str(
+        config.outputs.blocked_run_card
         if status == "blocked"
-        else "reports/training-pilot/phase-5d-pilot-run-card.md"
+        else config.outputs.pilot_run_card
     )
+    config_path = _display_repo_path(repo_root, config.config_path)
     entry = "\n".join(
         [
-            "training_pilot_phase_5d_status:",
+            f"{config.phase_metadata.ledger_section}:",
             f"  status: {status}",
-            "  change: add-real-training-backend-wiring",
-            f"  command: {PILOT_COMMAND}",
-            "  config: configs/train_lora_pilot.local.example.json",
-            "  candidate_universe: evaluated_split_pages",
-            "  max_steps: 20",
-            f"  sample_limit: {MAX_PILOT_SAMPLE_LIMIT}",
+            f"  change: {config.phase_metadata.change_name}",
+            f"  command: {_pilot_command(config, repo_root=repo_root)}",
+            f"  config: {config_path}",
+            f"  candidate_universe: {config.candidate_universe_id}",
+            f"  max_steps: {config.max_steps}",
+            f"  sample_limit: {config.sample_limit}",
             (
                 "  training: not_executed"
                 if status == "blocked"
@@ -978,15 +1035,12 @@ def _update_progress_ledger(
             "  blocked_reasons:",
             *reason_lines,
             "  evidence:",
-            "    environment_check: "
-            "reports/training-pilot/phase-5d-environment-check.json",
+            f"    environment_check: {config.outputs.environment_check}",
             f"    run_card: {run_card_path}",
-            "    safety_check: reports/training-pilot/phase-5d-safety-check.json",
-            "    dev_eval_schema: reports/training-pilot/phase-5d-dev-eval-schema.json",
-            "    adapter_manifest: "
-            "reports/training-pilot/phase-5d-adapter-manifest.sanitized.json",
-            "    human_brief: "
-            "docs/human-briefs/2026-07-01-real-training-backend-wiring.html",
+            f"    safety_check: {config.outputs.safety_check}",
+            f"    dev_eval_schema: {config.outputs.dev_eval_schema}",
+            f"    adapter_manifest: {config.outputs.adapter_manifest}",
+            f"    human_brief: {config.outputs.human_brief}",
             "",
         ]
     )
@@ -994,10 +1048,33 @@ def _update_progress_ledger(
         path,
         _replace_top_level_yaml_section(
             existing,
-            section="training_pilot_phase_5d_status",
+            section=config.phase_metadata.ledger_section,
             replacement=entry,
         ),
     )
+
+
+def _phase_schema(config: TrainingPilotConfig, artifact_name: str) -> str:
+    return f"training_pilot_{config.phase_metadata.schema_id}_{artifact_name}/v1"
+
+
+def _pilot_command(
+    config: TrainingPilotConfig,
+    *,
+    repo_root: Path,
+) -> str:
+    config_path = _display_repo_path(repo_root, config.config_path)
+    return f"{PILOT_COMMAND_PREFIX} --config {config_path}"
+
+
+def _display_repo_path(repo_root: Path, path: Path | None) -> str:
+    if path is None:
+        return DEFAULT_PILOT_CONFIG_PATH
+    resolved = path.resolve(strict=False)
+    try:
+        return str(resolved.relative_to(repo_root.resolve(strict=False)))
+    except ValueError:
+        return str(path)
 
 
 def _combined_file_hash(repo_root: Path, paths: Sequence[Path]) -> str:
@@ -1429,6 +1506,18 @@ def _required_mapping(data: Mapping[str, object], key: str) -> Mapping[str, obje
     return value
 
 
+def _optional_mapping(
+    data: Mapping[str, object],
+    key: str,
+) -> Mapping[str, object] | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise TrainingPilotConfigError(f"{key} must be an object")
+    return value
+
+
 def _required_str(data: Mapping[str, object], key: str) -> str:
     value = data.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -1441,6 +1530,41 @@ def _optional_str(data: Mapping[str, object], key: str, *, default: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise TrainingPilotConfigError(f"{key} must be a non-empty string")
     return value
+
+
+def _phase_metadata_from_data(
+    data: Mapping[str, object] | None,
+) -> TrainingPilotPhaseMetadata:
+    defaults = DEFAULT_PHASE_METADATA
+    if data is None:
+        return defaults
+    metadata = TrainingPilotPhaseMetadata(
+        schema_id=_optional_str(data, "schema_id", default=defaults.schema_id),
+        phase_label=_optional_str(data, "phase_label", default=defaults.phase_label),
+        change_name=_optional_str(data, "change_name", default=defaults.change_name),
+        title=_optional_str(data, "title", default=defaults.title),
+        ledger_section=_optional_str(
+            data,
+            "ledger_section",
+            default=defaults.ledger_section,
+        ),
+        summary_zh=_optional_str(data, "summary_zh", default=defaults.summary_zh),
+        recommended_next_step_zh=_optional_str(
+            data,
+            "recommended_next_step_zh",
+            default=defaults.recommended_next_step_zh,
+        ),
+    )
+    for field_name, value in {
+        "schema_id": metadata.schema_id,
+        "ledger_section": metadata.ledger_section,
+    }.items():
+        if not all(char.isalnum() or char == "_" for char in value):
+            raise TrainingPilotConfigError(
+                "phase_metadata."
+                f"{field_name} must use only letters, numbers, or underscores"
+            )
+    return metadata
 
 
 def _required_bool(data: Mapping[str, object], key: str) -> bool:

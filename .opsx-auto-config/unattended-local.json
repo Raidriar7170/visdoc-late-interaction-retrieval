@@ -1,18 +1,21 @@
 {
   "mode": "unattended-local-core",
   "allowed_paths": [
+    ".gitignore",
+    ".opsx-goal.yaml",
+    ".opsx-auto-inbox/*.yaml",
     "README.md",
     "configs/**",
     "data/README.md",
     "docs/**",
-    "openspec/changes/add-text-retrieval-baselines/**",
+    "openspec/changes/**",
     "reports/**",
     "scripts/validate-local-core.sh",
     "src/visdoc_retrieve/**",
     "tests/**"
   ],
   "phase_file_globs": [
-    ".opsx-auto-inbox/*.json"
+    ".opsx-auto-inbox/*.yaml"
   ],
   "validation_profile": "local-core",
   "completion_validation_profile": "local-core",
