@@ -568,6 +568,27 @@ training_pilot_phase_5k_status:
     comparison_schema: reports/training-pilot/phase-5k-comparison-schema.json
     human_brief: docs/human-briefs/2026-07-06-dev-only-pilot-evaluation.html
 
+project_milestone_phase_6a_status:
+  status: narrative_and_evidence_index_recorded
+  change: update-project-milestone-narrative
+  scope: documentation_only
+  final_test_evaluation: not_run
+  benchmark_claim: none
+  training: not_executed
+  a100_or_gpu_used: false
+  model_download: not_executed
+  model_weights_committed: false
+  adapter_checkpoint_committed: false
+  training_cache_committed: false
+  private_model_path_committed: false
+  hidden_bidi_unicode_controls: scan_passed
+  evidence:
+    readme: README.md
+    evidence_index: docs/evidence-index.md
+    milestone_brief: docs/human-briefs/2026-07-06-visdoc-project-milestone.md
+    phase_5k_spec: openspec/specs/dev-only-pilot-evaluation-harness/spec.md
+    phase_5k_archive: openspec/changes/archive/2026-07-06-add-dev-only-pilot-evaluation-harness
+
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining
