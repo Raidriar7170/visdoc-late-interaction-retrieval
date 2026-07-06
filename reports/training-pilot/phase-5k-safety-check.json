@@ -1,0 +1,16 @@
+{
+  "adapter_checkpoints_committed": false,
+  "benchmark_claim_added": false,
+  "cache_artifacts_committed": false,
+  "final_test_files_read": false,
+  "final_test_metrics_added": false,
+  "model_weights_committed": false,
+  "phase": "5K",
+  "pilot_loss_reported_as_model_improvement": false,
+  "private_local_config_committed": false,
+  "private_local_model_path_committed": false,
+  "read_splits": [
+    "dev"
+  ],
+  "schema": "training_pilot_phase_5k_safety_check/v1"
+}

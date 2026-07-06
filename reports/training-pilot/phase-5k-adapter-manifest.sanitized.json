@@ -1,0 +1,15 @@
+{
+  "adapter_checkpoint_committed": false,
+  "adapter_checkpoint_created_in_prior_phase": true,
+  "adapter_status": {
+    "path": "<redacted-local-adapter-path>",
+    "reason": "adapter checkpoint is ignored/local and not committed",
+    "status": "not_available"
+  },
+  "benchmark_improvement_claim": false,
+  "final_test_used": false,
+  "phase": "5K",
+  "schema": "training_pilot_phase_5k_adapter_manifest_sanitized/v1",
+  "source_manifest": "reports/training-pilot/phase-5j-adapter-manifest.sanitized.json",
+  "source_pilot_status": "pilot_run"
+}

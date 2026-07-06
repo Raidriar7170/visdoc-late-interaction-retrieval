@@ -1,0 +1,21 @@
+{
+  "benchmark_improvement_claim": false,
+  "change": "add-dev-only-pilot-evaluation-harness",
+  "dev_hard_negatives_path": "data/derived/hard_negatives/dev.jsonl",
+  "final_test_used": false,
+  "local_model_path_summary": {
+    "committed_value": "<redacted-local-model-path>",
+    "exact_path_committed": false,
+    "redacted": true
+  },
+  "max_steps": 1,
+  "model_download_executed": false,
+  "network_used": false,
+  "overall_status": "dev_only_eval_recorded",
+  "phase": "5K",
+  "sample_limit": 1,
+  "schema": "training_pilot_phase_5k_environment_check/v1",
+  "source_manifest": "reports/training-pilot/phase-5j-adapter-manifest.sanitized.json",
+  "tiny_pilot_skip_reason": "A100 runtime was not used in this local harness checkpoint.",
+  "tiny_pilot_status": "skipped"
+}
