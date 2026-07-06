@@ -774,6 +774,142 @@ def test_transformers_peft_probe_blocks_without_real_training_step(
     assert environment["training_result"]["adapter_checkpoint_created"] is False
 
 
+def test_colpali_engine_without_hook_uses_reviewed_tiny_runner(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pilot = _pilot_module()
+    local_model = tmp_path / "local-colqwen2"
+    local_model.mkdir()
+    calls = _install_fake_colpali_runner_modules(monkeypatch)
+    config_path = _write_pilot_config(
+        tmp_path,
+        allow_real_training=True,
+        local_model_path=local_model,
+        sample_limit=4,
+        max_steps=8,
+        save_adapter=True,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={"VISDOC_ENABLE_REAL_TRAINING": "1"},
+        cuda_available=lambda: True,
+    )
+
+    assert result["status"] == "pilot_run"
+    assert calls["model_path"] == str(local_model)
+    assert calls["processor_path"] == str(local_model)
+    assert calls["local_files_only"] is True
+    assert calls["lora_config"]["r"] == 8
+    assert calls["lora_config"]["lora_alpha"] == 16
+    assert calls["lora_config"]["lora_dropout"] == pytest.approx(0.05)
+    assert calls["processed_query_count"] == 4
+    assert calls["forward"] == 1
+    assert calls["backward"] == 1
+    assert calls["optimizer_step"] == 1
+    assert calls["adapter_saved"] is True
+
+    manifest = json.loads(
+        (
+            tmp_path
+            / "reports"
+            / "phase-5d-adapter-manifest.sanitized.json"
+        ).read_text()
+    )
+    assert manifest["pilot_status"] == "pilot_run"
+    assert manifest["effective_training_sample_count"] == 4
+    assert manifest["adapter_checkpoint_created"] is True
+    assert manifest["adapter_checkpoint_path"] == ".local/training-pilot/adapters"
+    assert manifest["final_test_used"] is False
+    assert manifest["benchmark_improvement_claim"] is False
+
+
+def test_colpali_runner_prefers_transformers_colqwen2_when_available(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pilot = _pilot_module()
+    local_model = tmp_path / "local-colqwen2"
+    local_model.mkdir()
+    calls = _install_fake_colpali_runner_modules(
+        monkeypatch,
+        transformers_colqwen2_available=True,
+    )
+    config_path = _write_pilot_config(
+        tmp_path,
+        allow_real_training=True,
+        local_model_path=local_model,
+        sample_limit=1,
+        max_steps=1,
+        save_adapter=True,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={"VISDOC_ENABLE_REAL_TRAINING": "1"},
+        cuda_available=lambda: True,
+    )
+
+    assert result["status"] == "pilot_run"
+    assert calls["transformers_colqwen2_used"] is True
+    assert calls["transformers_processor_used"] is True
+    assert calls["model_path"] == str(local_model)
+    assert calls["processed_query_count"] == 1
+    assert calls["optimizer_step"] == 1
+
+
+@pytest.mark.parametrize(
+    ("fail_at", "blocked_code"),
+    [
+        ("model_load", "colpali_model_load_failed"),
+        ("processor", "colpali_processor_failed"),
+        ("lora", "colpali_lora_wrap_failed"),
+        ("optimizer", "colpali_optimizer_step_failed"),
+        ("adapter_save", "colpali_adapter_save_failed"),
+    ],
+)
+def test_colpali_reviewed_runner_failures_block_precisely(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    fail_at: str,
+    blocked_code: str,
+) -> None:
+    pilot = _pilot_module()
+    local_model = tmp_path / "local-colqwen2"
+    local_model.mkdir()
+    _install_fake_colpali_runner_modules(monkeypatch, fail_at=fail_at)
+    config_path = _write_pilot_config(
+        tmp_path,
+        allow_real_training=True,
+        local_model_path=local_model,
+        sample_limit=2,
+        max_steps=8,
+        save_adapter=True,
+    )
+
+    result = pilot.run_training_pilot_gate(
+        pilot.load_training_pilot_config(config_path),
+        repo_root=Path.cwd(),
+        environ={"VISDOC_ENABLE_REAL_TRAINING": "1"},
+        cuda_available=lambda: True,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["blocked_reasons"][0]["code"] == blocked_code
+    environment = json.loads(
+        (tmp_path / "reports" / "phase-5d-environment-check.json").read_text()
+    )
+    training_result = environment["training_result"]
+    assert training_result["blocked_code"] == blocked_code
+    assert training_result["training_executed"] is False
+    assert training_result["adapter_checkpoint_created"] is False
+    assert training_result["adapter_checkpoint_path"] is None
+    assert training_result["final_test_used"] is False
+
+
 def test_unsafe_backend_result_is_downgraded_to_blocked(
     tmp_path: Path,
 ) -> None:
@@ -956,6 +1092,172 @@ def _pilot_module() -> ModuleType:
         if exc.name == "visdoc_retrieve.train_lora_pilot":
             pytest.fail(f"missing training-pilot module: {exc}")
         raise
+
+
+def _install_fake_colpali_runner_modules(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    transformers_colqwen2_available: bool = False,
+    fail_at: str | None = None,
+) -> dict[str, object]:
+    calls: dict[str, object] = {
+        "adapter_saved": False,
+        "backward": 0,
+        "forward": 0,
+        "optimizer_step": 0,
+        "processed_query_count": 0,
+    }
+    fake_colpali = ModuleType("colpali_engine")
+    fake_torch = ModuleType("torch")
+    fake_transformers = ModuleType("transformers")
+    fake_peft = ModuleType("peft")
+
+    class FakeTensor:
+        def float(self) -> FakeTensor:
+            return self
+
+        def mean(self) -> FakeTensor:
+            return self
+
+        def backward(self) -> None:
+            calls["backward"] = int(calls["backward"]) + 1
+
+    class FakeBatch(dict):
+        def to(self, device: str) -> FakeBatch:
+            calls["batch_device"] = device
+            return self
+
+    class FakeParameter:
+        requires_grad = True
+
+    class FakeModel:
+        def __init__(self) -> None:
+            self.trainable = [FakeParameter()]
+
+        @classmethod
+        def from_pretrained(
+            cls,
+            path: str,
+            *,
+            local_files_only: bool,
+            **_: object,
+        ) -> FakeModel:
+            if fail_at == "model_load":
+                raise RuntimeError("model load failed")
+            calls["model_path"] = path
+            calls["local_files_only"] = local_files_only
+            return cls()
+
+        def train(self) -> None:
+            calls["train_mode"] = True
+
+        def to(self, device: str) -> FakeModel:
+            calls["model_device"] = device
+            return self
+
+        def parameters(self) -> list[FakeParameter]:
+            return self.trainable
+
+        def __call__(self, **batch: object) -> FakeTensor:
+            calls["forward"] = int(calls["forward"]) + 1
+            calls["forward_batch"] = batch
+            return FakeTensor()
+
+        def save_pretrained(self, path: str) -> None:
+            if fail_at == "adapter_save":
+                raise RuntimeError("adapter save failed")
+            Path(path).mkdir(parents=True, exist_ok=True)
+            calls["adapter_saved"] = True
+
+    class FakeTransformersModel(FakeModel):
+        @staticmethod
+        def from_pretrained(
+            path: str,
+            *,
+            local_files_only: bool,
+            **_: object,
+        ) -> FakeModel:
+            if fail_at == "model_load":
+                raise RuntimeError("transformers colqwen2 load failed")
+            calls["transformers_colqwen2_used"] = True
+            calls["model_path"] = path
+            calls["local_files_only"] = local_files_only
+            return FakeModel()
+
+    class FakeProcessor:
+        @classmethod
+        def from_pretrained(
+            cls,
+            path: str,
+            *,
+            local_files_only: bool,
+            **_: object,
+        ) -> FakeProcessor:
+            calls["processor_path"] = path
+            calls["processor_local_files_only"] = local_files_only
+            return cls()
+
+        def process_queries(self, *, texts: list[str]) -> FakeBatch:
+            if fail_at == "processor":
+                raise RuntimeError("processor failed")
+            calls["processed_query_count"] = len(texts)
+            return FakeBatch(input_ids=texts)
+
+    class FakeTransformersProcessor(FakeProcessor):
+        @classmethod
+        def from_pretrained(
+            cls,
+            path: str,
+            *,
+            local_files_only: bool,
+            **_: object,
+        ) -> FakeTransformersProcessor:
+            calls["transformers_processor_used"] = True
+            calls["processor_path"] = path
+            calls["processor_local_files_only"] = local_files_only
+            return cls()
+
+        def process_queries(self, *, text: list[str]) -> FakeBatch:
+            calls["processor_used_text_arg"] = True
+            return super().process_queries(texts=text)
+
+    class FakeLoraConfig:
+        def __init__(self, **kwargs: object) -> None:
+            calls["lora_config"] = kwargs
+
+    class FakeAdamW:
+        def __init__(self, params: object, *, lr: float) -> None:
+            calls["optimizer_params"] = list(params)
+            calls["optimizer_lr"] = lr
+
+        def zero_grad(self) -> None:
+            calls["zero_grad"] = int(calls.get("zero_grad", 0)) + 1
+
+        def step(self) -> None:
+            if fail_at == "optimizer":
+                raise RuntimeError("optimizer failed")
+            calls["optimizer_step"] = int(calls["optimizer_step"]) + 1
+
+    def fake_get_peft_model(model: FakeModel, _: FakeLoraConfig) -> FakeModel:
+        if fail_at == "lora":
+            raise RuntimeError("lora failed")
+        calls["lora_wrapped"] = True
+        return model
+
+    fake_colpali.ColQwen2 = FakeModel
+    fake_colpali.ColQwen2Processor = FakeProcessor
+    if transformers_colqwen2_available:
+        fake_transformers.ColQwen2ForRetrieval = FakeTransformersModel
+        fake_transformers.ColQwen2Processor = FakeTransformersProcessor
+    fake_peft.LoraConfig = FakeLoraConfig
+    fake_peft.get_peft_model = fake_get_peft_model
+    fake_torch.optim = ModuleType("torch.optim")
+    fake_torch.optim.AdamW = FakeAdamW
+    monkeypatch.setitem(sys.modules, "colpali_engine", fake_colpali)
+    monkeypatch.setitem(sys.modules, "torch", fake_torch)
+    monkeypatch.setitem(sys.modules, "transformers", fake_transformers)
+    monkeypatch.setitem(sys.modules, "peft", fake_peft)
+    return calls
 
 
 def _write_pilot_config(
