@@ -23,5 +23,5 @@
   `.codex/skills/openspec-sync-specs`, private local model path, private local
   config, final-test metrics, README result claims, or benchmark-improvement
   claims are tracked.
-- [ ] 3.3 Commit, push `codex/phase-5k-dev-only-pilot-evaluation-harness`,
+- [x] 3.3 Commit, push `codex/phase-5k-dev-only-pilot-evaluation-harness`,
   create a PR, and stop without merge, deploy, or OpenSpec archive.
