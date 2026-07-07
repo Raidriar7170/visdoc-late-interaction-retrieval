@@ -8,34 +8,40 @@ with visual late-interaction retrieval,
 then evaluate hard-negative mining
 and future LoRA adaptation under a frozen benchmark contract.
 
-**Current status:** Phase 3A diagnostic baselines remain available,
-with a Phase 2.5 text/candidate-universe clarification applied
-to the synthetic smoke development split,
-and an active diagnostic MVP pipeline change in this worktree:
-Phase 2 text-only baselines, explicit candidate-universe metadata,
-a deterministic local visual-smoke report,
-and a one-command MVP evidence bundle.
-No final benchmark results exist yet,
-and this repository does not claim retrieval improvement,
-model superiority, or frozen-test performance.
+**Current status:** Phase 5K has been merged and archived as a
+dev-only pilot evaluation harness checkpoint. The repository now contains
+a diagnostic MVP retrieval pipeline, deterministic text baselines with
+explicit candidate-universe metadata, a mock visual late-interaction /
+MaxSim scaffold, an optional visual backend scaffold, hard-negative mining,
+training readiness and safety gates, A100 runtime/model-path gate evidence,
+a reviewed tiny A100 LoRA runner proof, and a dev-only pilot evaluation
+harness.
 
-This repository currently contains the project skeleton,
-local validation configuration,
-Phase 1 page/query manifest validation,
-and a small generated synthetic technical page corpus
-under `data/synthetic-smoke/`.
-It also contains deterministic BM25, local lexical cosine,
-a config-gated local-stub neural text baseline,
-BM25+lexical RRF, and BM25+neural RRF text diagnostics
-plus a diagnostic report runner.
-It also contains a deterministic local visual-smoke runner
-over existing page image artifacts.
-The MVP command composes a bounded subset of those surfaces with a
-deterministic mock visual late-interaction scaffold and MaxSim scoring.
-It does not contain ColPali/ColQwen inference,
-external embedding caches, training scripts,
-adapters, checkpoints,
-final benchmark reports, or final result tables.
+The completed evidence remains bounded. The final benchmark has not been run,
+the final test split has not been used for evaluation, and this repository
+does not claim benchmark improvement, model superiority, frozen-test
+performance, or production training readiness. The `max_steps=1` /
+`sample_limit=1` tiny runner proof is pipeline evidence, not model
+performance. The dev-only evaluation harness is schema and sanity evidence,
+not a final benchmark. No model weights, adapter checkpoints, training caches,
+private local configs, or exact private model paths are committed.
+
+This repository currently contains the project skeleton, local validation
+configuration, Phase 1 page/query manifest validation, and a small generated
+synthetic technical page corpus under `data/synthetic-smoke/`. It also
+contains deterministic BM25, local lexical cosine, a config-gated local-stub
+neural text baseline, BM25+lexical RRF, and BM25+neural RRF text diagnostics
+plus a diagnostic report runner. The MVP command composes a bounded subset of
+those surfaces with a deterministic mock visual late-interaction scaffold and
+MaxSim scoring. Later phases add optional local-only visual backend wiring,
+hard-negative mining, training-readiness dry-runs, gated pilot launch safety,
+and A100 evidence gates without turning those surfaces into final benchmark
+claims.
+
+For a path-by-path map of the current evidence, see
+[`docs/evidence-index.md`](docs/evidence-index.md). For a recruiter-facing
+milestone summary, see
+[`docs/human-briefs/2026-07-06-visdoc-project-milestone.md`](docs/human-briefs/2026-07-06-visdoc-project-milestone.md).
 
 ## Project Boundary
 
