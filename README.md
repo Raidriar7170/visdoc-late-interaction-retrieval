@@ -8,14 +8,15 @@ with visual late-interaction retrieval,
 then evaluate hard-negative mining
 and future LoRA adaptation under a frozen benchmark contract.
 
-**Current status:** Phase 5K has been merged and archived as a
-dev-only pilot evaluation harness checkpoint. The repository now contains
-a diagnostic MVP retrieval pipeline, deterministic text baselines with
-explicit candidate-universe metadata, a mock visual late-interaction /
-MaxSim scaffold, an optional visual backend scaffold, hard-negative mining,
-training readiness and safety gates, A100 runtime/model-path gate evidence,
-a reviewed tiny A100 LoRA runner proof, and a dev-only pilot evaluation
-harness.
+**Current status:** Phase 6B has frozen the final-comparison protocol after
+the Phase 5K dev-only pilot evaluation harness and Phase 6A milestone
+narrative were merged and archived. The repository now contains a diagnostic
+MVP retrieval pipeline, deterministic text baselines with explicit
+candidate-universe metadata, a mock visual late-interaction / MaxSim scaffold,
+an optional visual backend scaffold, hard-negative mining, training readiness
+and safety gates, A100 runtime/model-path gate evidence, a reviewed tiny A100
+LoRA runner proof, a dev-only pilot evaluation harness, and a protocol for
+future final comparison.
 
 The completed evidence remains bounded. The final benchmark has not been run,
 the final test split has not been used for evaluation, and this repository
@@ -24,7 +25,10 @@ performance, or production training readiness. The `max_steps=1` /
 `sample_limit=1` tiny runner proof is pipeline evidence, not model
 performance. The dev-only evaluation harness is schema and sanity evidence,
 not a final benchmark. No model weights, adapter checkpoints, training caches,
-private local configs, or exact private model paths are committed.
+private local configs, or exact private model paths are committed. The Phase
+6B final-comparison protocol freezes future final-test access gates,
+comparison-table schema, and public claim checklist; it is not a final
+comparison run.
 
 This repository currently contains the project skeleton, local validation
 configuration, Phase 1 page/query manifest validation, and a small generated
@@ -42,6 +46,8 @@ For a path-by-path map of the current evidence, see
 [`docs/evidence-index.md`](docs/evidence-index.md). For a recruiter-facing
 milestone summary, see
 [`docs/human-briefs/2026-07-06-visdoc-project-milestone.md`](docs/human-briefs/2026-07-06-visdoc-project-milestone.md).
+For the frozen final-comparison protocol, see
+[`docs/final-comparison-protocol.md`](docs/final-comparison-protocol.md).
 
 ## Project Boundary
 

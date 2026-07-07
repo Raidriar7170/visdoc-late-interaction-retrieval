@@ -1,0 +1,65 @@
+{
+  "allowed_row_status": [
+    "diagnostic",
+    "schema_only",
+    "not_run",
+    "not_available",
+    "blocked",
+    "dev_only",
+    "final_benchmark"
+  ],
+  "benchmark_claim_default": "blocked",
+  "final_test_default": "not_run",
+  "notes": [
+    "Rows without authorized evidence must not contain fabricated metric values.",
+    "Dev-only and tiny-runner rows are not final benchmark rows.",
+    "A final_benchmark row requires a later authorized OpenSpec change."
+  ],
+  "required_row_fields": [
+    "method_id",
+    "method_family",
+    "split_scope",
+    "candidate_universe",
+    "artifact_source",
+    "adapter_status",
+    "status",
+    "metrics",
+    "final_test_used",
+    "benchmark_claim",
+    "evidence_path",
+    "notes"
+  ],
+  "row_templates": {
+    "dev_only_harness": {
+      "adapter_status": "not_available_or_local_only",
+      "benchmark_claim": "none",
+      "candidate_universe": "evaluated_split_pages",
+      "final_test_used": false,
+      "method_family": "pilot_eval_harness",
+      "metrics": null,
+      "split_scope": "dev",
+      "status": "dev_only"
+    },
+    "final_benchmark": {
+      "adapter_status": "must_be_declared",
+      "benchmark_claim": "requires_claim_checklist_pass",
+      "candidate_universe": "must_be_frozen",
+      "final_test_used": "requires_later_authorized_change",
+      "method_family": "final_comparison",
+      "metrics": "requires_authorized_final_test_metrics",
+      "split_scope": "final_test",
+      "status": "blocked"
+    },
+    "tiny_runner_proof": {
+      "adapter_status": "pipeline_proof_only",
+      "benchmark_claim": "none",
+      "candidate_universe": "evaluated_split_pages",
+      "final_test_used": false,
+      "method_family": "tiny_lora_runner",
+      "metrics": null,
+      "split_scope": "train_or_dev_sanity",
+      "status": "schema_only"
+    }
+  },
+  "schema": "final_comparison_schema/v1"
+}
