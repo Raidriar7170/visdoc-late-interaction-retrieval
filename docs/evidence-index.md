@@ -1,7 +1,7 @@
 # VisDoc Evidence Index
 
 This index maps the current public evidence for VisDoc-Retrieve after the
-Phase 5K dev-only pilot evaluation harness was merged and archived.
+Phase 6B final-comparison protocol freeze.
 
 ## Claim Boundaries
 
@@ -16,6 +16,8 @@ Phase 5K dev-only pilot evaluation harness was merged and archived.
   model performance.
 - Phase 5K dev-only evaluation harness: dev-only sanity/schema evidence, not
   final test or final benchmark.
+- Phase 6B final-comparison protocol: protocol/schema/checklist evidence, not
+  final-test execution or final benchmark.
 
 ## Milestone Evidence
 
@@ -147,6 +149,18 @@ Evidence: `reports/training-pilot/phase-5k-environment-check.json`,
 `docs/human-briefs/2026-07-06-dev-only-pilot-evaluation.html`,
 `openspec/specs/dev-only-pilot-evaluation-harness/spec.md`,
 `openspec/changes/archive/2026-07-06-add-dev-only-pilot-evaluation-harness/`.
+
+### Phase 6B Final-Comparison Protocol Freeze
+
+Status: final-comparison protocol, comparison schema, and public claim
+checklist are frozen without final-test use or benchmark claims.
+
+Evidence: `docs/final-comparison-protocol.md`,
+`reports/final-comparison-protocol/phase-6b-protocol-freeze.json`,
+`reports/final-comparison-protocol/phase-6b-comparison-schema.json`,
+`reports/final-comparison-protocol/phase-6b-claim-checklist.json`,
+`docs/human-briefs/2026-07-07-final-comparison-protocol-freeze.html`,
+`openspec/changes/freeze-final-comparison-protocol/`.
 
 ## Validation Surface
 

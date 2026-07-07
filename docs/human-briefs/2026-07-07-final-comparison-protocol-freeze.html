@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Phase 6B Final Comparison Protocol Freeze</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 40px; line-height: 1.6; color: #1f2933; }
+    main { max-width: 980px; margin: 0 auto; }
+    h1, h2 { line-height: 1.25; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 6px; background: #e7f0ff; color: #174ea6; font-weight: 600; }
+    code { background: #f3f4f6; padding: 1px 4px; border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; vertical-align: top; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phase 6B Final Comparison Protocol Freeze</h1>
+  <p><strong>一句话结论：</strong>Phase 6B 冻结了 final-comparison protocol，
+  明确 final test、benchmark claim、dev-only sanity 和 tiny runner proof 的边界；
+  本阶段不训练、不跑 final test、不声明模型提升。</p>
+
+  <h2>当前状态</h2>
+  <p><span class="status">protocol freeze recorded</span></p>
+  <p>这是文档 / evidence / schema 阶段。它只规定未来如何安全进入 final
+  comparison，不执行 final comparison。</p>
+
+  <h2>本阶段新增</h2>
+  <ul>
+    <li><code>docs/final-comparison-protocol.md</code>：冻结 final-test access gates、comparison schema 和 claim checklist。</li>
+    <li><code>reports/final-comparison-protocol/phase-6b-protocol-freeze.json</code>：机器可读协议状态。</li>
+    <li><code>reports/final-comparison-protocol/phase-6b-comparison-schema.json</code>：最终比较表 schema。</li>
+    <li><code>reports/final-comparison-protocol/phase-6b-claim-checklist.json</code>：公开 claim 审查清单。</li>
+  </ul>
+
+  <h2>边界</h2>
+  <table>
+    <tr><th>项目</th><th>状态</th></tr>
+    <tr><td>final test</td><td>未读取，未评测</td></tr>
+    <tr><td>final benchmark</td><td>未运行</td></tr>
+    <tr><td>benchmark improvement claim</td><td>无，默认 blocked</td></tr>
+    <tr><td>A100 / GPU / SSH</td><td>未使用</td></tr>
+    <tr><td>模型权重 / adapter checkpoint / cache</td><td>未提交</td></tr>
+  </table>
+
+  <h2>为什么现在先冻结协议</h2>
+  <p>项目已有 dev-only harness 和 tiny runner proof。它们能证明链路和 schema，
+  但不能证明最终性能。先冻结 protocol 可以防止后续 longer dev training 或
+  final comparison 时把 dev-only evidence 误写成 benchmark claim。</p>
+
+  <h2>推荐下一步</h2>
+  <p>下一步可以开一个受控 longer-dev-training proposal，或者开一个专门的
+  final-comparison execution proposal。后者必须显式申请 final-test access，
+  并引用本阶段冻结的 protocol。</p>
+</main>
+</body>
+</html>
