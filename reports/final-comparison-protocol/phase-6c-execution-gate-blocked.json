@@ -1,0 +1,47 @@
+{
+  "active_openspec_changes": [
+    "add-real-training-backend-wiring",
+    "run-phase-5c-real-training-pilot",
+    "add-training-pilot-launch-gate",
+    "add-training-readiness-phase-5a",
+    "add-hard-negative-mining",
+    "add-visual-zero-shot-backend",
+    "add-mvp-retrieval-pipeline"
+  ],
+  "active_openspec_change_count": 7,
+  "benchmark_improvement_claim": false,
+  "blocked_reasons": [
+    "active_openspec_changes_present"
+  ],
+  "change": "phase-6c-final-comparison-execution-gate-dry-run",
+  "comparison_execution": "not_started",
+  "dev_or_dry_run_comparison": "not_executed",
+  "evidence_paths": {
+    "claim_checklist": "reports/final-comparison-protocol/phase-6b-claim-checklist.json",
+    "comparison_schema": "reports/final-comparison-protocol/phase-6b-comparison-schema.json",
+    "human_brief": "docs/human-briefs/2026-07-07-phase-6c-execution-gate-blocked.md",
+    "protocol": "docs/final-comparison-protocol.md",
+    "protocol_freeze": "reports/final-comparison-protocol/phase-6b-protocol-freeze.json"
+  },
+  "final_benchmark_status": "not_run",
+  "final_run_readiness": "blocked",
+  "final_test_evaluation": "not_run",
+  "final_test_guard": {
+    "benchmark_claim_allowed": false,
+    "claim_status": "blocked",
+    "final_test_default": "not_run",
+    "final_test_evaluation": "not_run",
+    "protocol_version": "phase-6b-final-comparison-protocol/v1",
+    "status": "passed"
+  },
+  "model_download": "not_executed",
+  "open_prs_relevant_to_gate": [],
+  "phase": "6C",
+  "phase_6b_archive_status": "merged",
+  "protocol_artifacts_present": true,
+  "protocol_version": "phase-6b-final-comparison-protocol/v1",
+  "schema": "final_comparison_execution_gate_blocked/v1",
+  "status": "blocked",
+  "training": "not_executed",
+  "updated": "2026-07-07"
+}
