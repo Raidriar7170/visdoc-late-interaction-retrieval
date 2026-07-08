@@ -1,0 +1,174 @@
+{
+  "a100_or_gpu_used": false,
+  "active_openspec_state": {
+    "active_changes": [
+      "add-final-comparison-execution-gate-dry-run"
+    ],
+    "allowed_change": "add-final-comparison-execution-gate-dry-run",
+    "mode": "phase_6c_change_only",
+    "status": "pass",
+    "unexpected_active_changes": []
+  },
+  "artifact_checks": [
+    {
+      "artifact_id": "protocol_status",
+      "category": "protocol_status",
+      "path": "reports/final-comparison-protocol/phase-6b-protocol-freeze.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "comparison_schema",
+      "category": "comparison_schema",
+      "path": "reports/final-comparison-protocol/phase-6b-comparison-schema.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "claim_checklist",
+      "category": "claim_checklist",
+      "path": "reports/final-comparison-protocol/phase-6b-claim-checklist.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "candidate_universe",
+      "category": "candidate_universe",
+      "path": "reports/mvp/metrics.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "split_policy",
+      "category": "split_policy",
+      "path": "reports/training-readiness/artifact-freeze.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "metrics_definitions",
+      "category": "metrics_definitions",
+      "path": "openspec/specs/retrieval-evaluation-metrics/spec.md",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "mvp_evidence",
+      "category": "mvp_evidence",
+      "path": "reports/mvp/run-card.md",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "hard_negative_evidence",
+      "category": "hard_negative_evidence",
+      "path": "reports/hard-negatives/mining-summary.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "training_readiness_evidence",
+      "category": "training_readiness_evidence",
+      "path": "reports/training-readiness/dataset-summary.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "tiny_runner_or_training_gate_evidence",
+      "category": "training_pilot_evidence",
+      "path": "reports/training-pilot/phase-5j-pilot-run-card.md",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "dev_only_harness_evidence",
+      "category": "dev_only_harness_evidence",
+      "path": "reports/training-pilot/phase-5k-dev-only-eval.json",
+      "required": true,
+      "status": "present"
+    },
+    {
+      "artifact_id": "dev_only_comparison_schema",
+      "category": "dev_only_harness_evidence",
+      "path": "reports/training-pilot/phase-5k-comparison-schema.json",
+      "required": true,
+      "status": "present"
+    }
+  ],
+  "benchmark_improvement_claim": false,
+  "blocked_reasons": [],
+  "change": "add-final-comparison-execution-gate-dry-run",
+  "comparison_mode": "dry_run_only",
+  "evidence_paths": {
+    "claim_checklist": "reports/final-comparison-protocol/phase-6c-claim-checklist.json",
+    "dry_run": "reports/final-comparison-protocol/phase-6c-execution-gate-dry-run.json",
+    "human_brief": "docs/human-briefs/2026-07-08-final-comparison-dry-run-gate.md",
+    "readiness_report": "reports/final-comparison-protocol/phase-6c-readiness-report.md"
+  },
+  "final_comparison_execution": "not_executed",
+  "final_run_readiness": "ready_for_phase_6d",
+  "final_test_guard": {
+    "final_test_evaluation": "not_run",
+    "final_test_forbidden_paths": [
+      "data/final-test/qrels.jsonl",
+      "data/final-test/labels.jsonl",
+      "reports/final-comparison/final-test-metrics.json"
+    ],
+    "final_test_metrics_added": false,
+    "final_test_read": false,
+    "status": "locked"
+  },
+  "frozen_readiness_checks": {
+    "candidate_universe_frozen": true,
+    "claim_checklist_exists": true,
+    "comparison_schema_exists": true,
+    "dev_only_harness_evidence_exists": true,
+    "final_test_guard_locked": true,
+    "hard_negative_evidence_exists": true,
+    "metrics_definitions_frozen": true,
+    "mvp_evidence_exists": true,
+    "no_tuning_after_final_documented": true,
+    "phase_6b_claim_checklist_blocks": true,
+    "protocol_status_exists": true,
+    "required_artifacts_present": true,
+    "split_policy_frozen": true,
+    "training_pilot_evidence_exists": true,
+    "training_readiness_evidence_exists": true
+  },
+  "model_download": "not_executed",
+  "next_phase": "Phase 6D one-time frozen final comparison",
+  "output_path_safety": {
+    "status": "pass",
+    "unsafe_paths": []
+  },
+  "phase": "6C",
+  "planned_runs": [
+    {
+      "benchmark_claim": "blocked_until_phase_6d_review",
+      "candidate_universe": "evaluated_split_pages",
+      "expected_artifact_paths": {
+        "claim_checklist": "reports/final-comparison/phase-6d-claim-checklist.json",
+        "final_comparison_report": "reports/final-comparison/phase-6d-final-comparison.json"
+      },
+      "metrics": null,
+      "phase": "6D",
+      "protocol_version": "phase-6b-final-comparison-protocol/v1",
+      "requires_new_openspec_change": true,
+      "run_id": "phase-6d-one-time-final-comparison",
+      "split_scope": "final_test",
+      "status": "planned_not_executed"
+    }
+  ],
+  "protocol_doc_check": {
+    "final_test_access_gate_documented": true,
+    "no_benchmark_claim_boundary": true,
+    "protocol_version_referenced": true,
+    "status": "present"
+  },
+  "protocol_version": "phase-6b-final-comparison-protocol/v1",
+  "schema": "final_comparison_execution_gate_dry_run/v1",
+  "ssh_used": false,
+  "status": "ready_for_phase_6d",
+  "training": "not_executed",
+  "tuning": "not_executed"
+}

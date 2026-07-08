@@ -614,6 +614,31 @@ final_comparison_phase_6b_status:
     claim_checklist: reports/final-comparison-protocol/phase-6b-claim-checklist.json
     human_brief: docs/human-briefs/2026-07-07-final-comparison-protocol-freeze.html
     openspec_change: openspec/changes/freeze-final-comparison-protocol
+final_comparison_phase_6c_status:
+  status: ready_for_phase_6d
+  change: add-final-comparison-execution-gate-dry-run
+  scope: execution_gate_dry_run_only
+  protocol_version: phase-6b-final-comparison-protocol/v1
+  final_test_evaluation: not_run
+  final_comparison_execution: not_executed
+  benchmark_claim: none
+  training: not_executed
+  tuning: not_executed
+  a100_or_gpu_used: false
+  ssh_used: false
+  model_download: not_executed
+  model_weights_committed: false
+  adapter_checkpoint_committed: false
+  training_cache_committed: false
+  private_config_committed: false
+  private_model_path_committed: false
+  blocked_reasons:
+    - none
+  evidence:
+    dry_run: reports/final-comparison-protocol/phase-6c-execution-gate-dry-run.json
+    readiness_report: reports/final-comparison-protocol/phase-6c-readiness-report.md
+    claim_checklist: reports/final-comparison-protocol/phase-6c-claim-checklist.json
+    human_brief: docs/human-briefs/2026-07-08-final-comparison-dry-run-gate.md
 
 hard_negative_mining_status:
   status: generated
