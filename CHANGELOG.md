@@ -1,9 +1,6 @@
 # Changelog
 
-## v0.1.0 - Draft
-
-Status: release-preparation draft. The `v0.1.0` tag has not been created and no
-GitHub Release has been published.
+## v0.1.0 - 2026-07-08
 
 ### Added
 
