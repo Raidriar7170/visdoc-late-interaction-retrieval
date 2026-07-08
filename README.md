@@ -8,27 +8,25 @@ with visual late-interaction retrieval,
 then evaluate hard-negative mining
 and future LoRA adaptation under a frozen benchmark contract.
 
-**Current status:** Phase 6B has frozen the final-comparison protocol after
-the Phase 5K dev-only pilot evaluation harness and Phase 6A milestone
-narrative were merged and archived. The repository now contains a diagnostic
-MVP retrieval pipeline, deterministic text baselines with explicit
-candidate-universe metadata, a mock visual late-interaction / MaxSim scaffold,
-an optional visual backend scaffold, hard-negative mining, training readiness
-and safety gates, A100 runtime/model-path gate evidence, a reviewed tiny A100
-LoRA runner proof, a dev-only pilot evaluation harness, and a protocol for
-future final comparison.
+**Current status:** Phase 6D has completed the one-time frozen final comparison
+under `phase-6b-final-comparison-protocol/v1`, and the no-retune pledge is now
+active. The final test split has been read for that authorized run, and no
+tuning, retrieval-pipeline change, metric-definition change, candidate-universe
+change, final-label change, or result-driven rerun is allowed after it.
 
-The completed evidence remains bounded. The final benchmark has not been run,
-the final test split has not been used for evaluation, and this repository
-does not claim benchmark improvement, model superiority, frozen-test
-performance, or production training readiness. The `max_steps=1` /
-`sample_limit=1` tiny runner proof is pipeline evidence, not model
-performance. The dev-only evaluation harness is schema and sanity evidence,
-not a final benchmark. No model weights, adapter checkpoints, training caches,
-private local configs, or exact private model paths are committed. The Phase
-6B final-comparison protocol freezes future final-test access gates,
-comparison-table schema, and public claim checklist; it is not a final
-comparison run.
+The final claim checklist records `no_clear_improvement_claim`. The repository
+can demonstrate a reproducible retrieval/evaluation pipeline and a disciplined
+final-comparison process, but it does not claim benchmark improvement, model
+superiority, or production training readiness. The final run executed
+deterministic `bm25`, `lexical_cosine`, `bm25_lexical_rrf`, and `mock_visual`
+systems. `tiny_lora_adapter` and `zero_shot_visual_backend` were reported as
+`not_available`; their metrics were not fabricated.
+
+The `mock_visual` row remains a deterministic CPU-only MaxSim scaffold, not
+real visual-model performance. The `max_steps=1` / `sample_limit=1` tiny A100
+LoRA runner proof remains pipeline evidence, not benchmark performance or
+formal training gain. No model weights, adapter checkpoints, training caches,
+private local configs, or exact private model paths are committed.
 
 This repository currently contains the project skeleton, local validation
 configuration, Phase 1 page/query manifest validation, and a small generated
@@ -44,10 +42,18 @@ claims.
 
 For a path-by-path map of the current evidence, see
 [`docs/evidence-index.md`](docs/evidence-index.md). For a recruiter-facing
-milestone summary, see
-[`docs/human-briefs/2026-07-06-visdoc-project-milestone.md`](docs/human-briefs/2026-07-06-visdoc-project-milestone.md).
+project card, see [`docs/project-card.md`](docs/project-card.md). For resume
+phrasing, see [`docs/resume-bullets.md`](docs/resume-bullets.md). For interview
+preparation, see
+[`docs/interview-talking-points.md`](docs/interview-talking-points.md).
+For the Phase 7A Human Brief, see
+[`docs/human-briefs/2026-07-08-add-final-presentation-package.html`](docs/human-briefs/2026-07-08-add-final-presentation-package.html).
 For the frozen final-comparison protocol, see
 [`docs/final-comparison-protocol.md`](docs/final-comparison-protocol.md).
+For the final comparison report and claim boundary, see
+[`reports/final-comparison/final-comparison-report.md`](reports/final-comparison/final-comparison-report.md)
+and
+[`reports/final-comparison/final-claim-checklist.json`](reports/final-comparison/final-claim-checklist.json).
 
 ## Project Boundary
 

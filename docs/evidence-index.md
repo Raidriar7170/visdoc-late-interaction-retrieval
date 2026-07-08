@@ -1,13 +1,16 @@
 # VisDoc Evidence Index
 
 This index maps the current public evidence for VisDoc-Retrieve after the
-Phase 6B final-comparison protocol freeze.
+Phase 6D one-time frozen final comparison and Phase 7A final presentation
+package.
 
 ## Claim Boundaries
 
-- Final benchmark: not run.
-- Final test evaluation: not used.
-- Benchmark improvement claim: none.
+- Final benchmark: one-time frozen final comparison completed in Phase 6D.
+- Final test evaluation: read once under `phase-6b-final-comparison-protocol/v1`.
+- No-retune pledge: active after Phase 6D.
+- Benchmark improvement claim: not supported; claim status is
+  `no_clear_improvement_claim`.
 - Model weights committed: no.
 - Adapter checkpoints committed: no.
 - Training caches committed: no.
@@ -16,8 +19,10 @@ Phase 6B final-comparison protocol freeze.
   model performance.
 - Phase 5K dev-only evaluation harness: dev-only sanity/schema evidence, not
   final test or final benchmark.
-- Phase 6B final-comparison protocol: protocol/schema/checklist evidence, not
-  final-test execution or final benchmark.
+- `mock_visual`: deterministic MaxSim scaffold only, not real visual-model
+  performance.
+- `tiny_lora_adapter` and `zero_shot_visual_backend`: final status is
+  `not_available`; metrics were not fabricated.
 
 ## Milestone Evidence
 
@@ -56,7 +61,7 @@ MVP backend.
 
 Evidence: `reports/visual-baselines-synthetic-smoke.json`,
 `docs/human-briefs/2026-06-30-visual-zero-shot-backend.html`,
-`openspec/changes/add-visual-zero-shot-backend/`.
+`openspec/changes/archive/2026-07-07-add-visual-zero-shot-backend/`.
 
 ### Hard-Negative Mining
 
@@ -160,7 +165,52 @@ Evidence: `docs/final-comparison-protocol.md`,
 `reports/final-comparison-protocol/phase-6b-comparison-schema.json`,
 `reports/final-comparison-protocol/phase-6b-claim-checklist.json`,
 `docs/human-briefs/2026-07-07-final-comparison-protocol-freeze.html`,
-`openspec/changes/freeze-final-comparison-protocol/`.
+`openspec/changes/archive/2026-07-07-freeze-final-comparison-protocol/`.
+
+### Phase 6C Final-Comparison Execution Gate Dry Run
+
+Status: final-comparison execution gate and dry-run readiness evidence recorded;
+final test was not read and final comparison was not executed in this phase.
+
+Evidence: `reports/final-comparison-protocol/phase-6c-execution-gate-dry-run.json`,
+`reports/final-comparison-protocol/phase-6c-readiness-report.md`,
+`reports/final-comparison-protocol/phase-6c-claim-checklist.json`,
+`docs/human-briefs/2026-07-08-final-comparison-dry-run-gate.md`,
+`openspec/changes/archive/2026-07-08-add-final-comparison-execution-gate-dry-run/`.
+
+### Phase 6D One-Time Frozen Final Comparison
+
+Status: final comparison completed exactly once under the frozen protocol.
+Final test was read once. No training, tuning, A100/GPU/SSH, model download,
+retrieval behavior change, metric-definition change, candidate-universe change,
+or result-driven rerun occurred.
+
+Systems run: `bm25`, `lexical_cosine`, `bm25_lexical_rrf`, and `mock_visual`.
+
+Systems not available: `tiny_lora_adapter` and `zero_shot_visual_backend`.
+
+Claim boundary: `reports/final-comparison/final-claim-checklist.json` records
+`benchmark_claim_allowed=false` and `claim_status=no_clear_improvement_claim`.
+
+Evidence: `reports/final-comparison/final-comparison-run-manifest.json`,
+`reports/final-comparison/final-metrics.json`,
+`reports/final-comparison/final-rankings.csv`,
+`reports/final-comparison/final-comparison-report.md`,
+`reports/final-comparison/final-claim-checklist.json`,
+`reports/final-comparison/no-retune-pledge.md`,
+`docs/human-briefs/2026-07-08-final-comparison-report.md`,
+`openspec/changes/archive/2026-07-08-run-one-time-frozen-final-comparison/`.
+
+### Phase 7A Final Presentation Package
+
+Status: final presentation package prepared for review. This phase does not
+rerun final comparison, read or modify final labels/qrels, train, tune, modify
+final metrics, modify final rankings, or make an unsupported improvement claim.
+
+Evidence: `README.md`, `docs/project-card.md`, `docs/resume-bullets.md`,
+`docs/interview-talking-points.md`, `docs/evidence-index.md`,
+`docs/human-briefs/2026-07-08-add-final-presentation-package.html`,
+`openspec/changes/add-final-presentation-package/`.
 
 ## Validation Surface
 
