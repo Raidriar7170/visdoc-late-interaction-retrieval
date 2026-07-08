@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: One-time frozen final comparison execution
 The system SHALL execute the Phase 6D final comparison exactly once under the
