@@ -640,6 +640,29 @@ final_comparison_phase_6c_status:
     claim_checklist: reports/final-comparison-protocol/phase-6c-claim-checklist.json
     human_brief: docs/human-briefs/2026-07-08-final-comparison-dry-run-gate.md
 
+final_comparison_phase_6d_status:
+  status: final_comparison_complete
+  change: run-one-time-frozen-final-comparison
+  scope: one_time_frozen_final_benchmark
+  protocol_version: phase-6b-final-comparison-protocol/v1
+  command: PYTHONPATH=src python -m visdoc_retrieve.run_final_comparison --config configs/final_comparison.json
+  final_test_evaluation: run_once
+  final_comparison_execution: complete
+  benchmark_claim: no_clear_improvement_claim
+  training: not_executed
+  tuning_after_final: forbidden
+  a100_or_gpu_used: false
+  ssh_used: false
+  model_download: not_executed
+  evidence:
+    manifest: reports/final-comparison/final-comparison-run-manifest.json
+    metrics: reports/final-comparison/final-metrics.json
+    rankings: reports/final-comparison/final-rankings.csv
+    report: reports/final-comparison/final-comparison-report.md
+    claim_checklist: reports/final-comparison/final-claim-checklist.json
+    no_retune_pledge: reports/final-comparison/no-retune-pledge.md
+    human_brief: docs/human-briefs/2026-07-08-final-comparison-report.md
+
 hard_negative_mining_status:
   status: generated
   change: add-hard-negative-mining

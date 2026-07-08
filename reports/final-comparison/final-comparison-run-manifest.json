@@ -1,0 +1,75 @@
+{
+  "a100_or_gpu_used": false,
+  "adapter_checkpoints_committed": false,
+  "cache_artifacts_committed": false,
+  "candidate_universe": {
+    "candidate_page_count": 8,
+    "candidate_split_counts": {
+      "test": 8
+    },
+    "evaluated_query_count": 24,
+    "evaluated_splits": [
+      "test"
+    ],
+    "name": "evaluated_split_pages",
+    "sha256": "b0a5200c9829530d1b27dd03f038f29fb8a72fcbef0948db73bd7c780a3cb0c4"
+  },
+  "command": "PYTHONPATH=src python -m visdoc_retrieve.run_final_comparison --config configs/final_comparison.json",
+  "config_hashes": {
+    "config_path": "configs/final_comparison.json",
+    "config_sha256": "e5b91d1fd97165365195d723dc68f3edcc37002feb7ffeada1859e6910d62a64",
+    "normalized_config_sha256": "677e31de3aabe27e2997209dd638c3fd17e5dd1f4427b3673ce6ba6dfc816f16"
+  },
+  "final_test": {
+    "candidate_page_count": 8,
+    "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+    "pages_manifest_sha256": "4885f4062d07c381fe863cd4abc30da27def4925d5533496f97d6749b106a2d1",
+    "queries_manifest": "data/synthetic-smoke/queries.jsonl",
+    "queries_manifest_sha256": "bc0bb663954de60471564aa0e0384dfcb3c93eb03305cd58df9b8510f7dafa11",
+    "query_count": 24,
+    "read": true,
+    "sha256": "d78792e199078ee614c6ff768c5ffa394c72f6a5c1249741ad0459b882d00782",
+    "split": "test"
+  },
+  "git_commit": "3f5f022eb29897339f1782db880037fa50b09174",
+  "metric_definitions": {
+    "metrics": [
+      "recall_at_1",
+      "recall_at_5",
+      "mrr",
+      "ndcg_at_10"
+    ],
+    "path": "openspec/specs/retrieval-evaluation-metrics/spec.md",
+    "sha256": "d589ddfc41bbaa9d8185df8ffd2514096794ee49fa7294571e883dc38eb98b5c"
+  },
+  "model_download": "not_executed",
+  "model_weights_committed": false,
+  "no_retune_pledge": {
+    "accepted": true,
+    "path": "reports/final-comparison/no-retune-pledge.md",
+    "pledge": "No tuning, retrieval-pipeline changes, candidate-universe changes, metric-definition changes, or final-label changes after this run."
+  },
+  "phase": "6D",
+  "private_config_or_path_committed": false,
+  "protocol": {
+    "path": "docs/final-comparison-protocol.md",
+    "sha256": "79c3a3f8800f96f48aa1ddbca54b0f5a221c771fecf1f23c9edbcffe216ecb31",
+    "spec_path": "openspec/specs/final-comparison-protocol/spec.md",
+    "spec_sha256": "78201d2cb8083900c20984b83b87c2f4b684c1fd40aaf784a30a386175e9b9d2",
+    "version": "phase-6b-final-comparison-protocol/v1"
+  },
+  "run_id": "phase-6d-2026-07-08T072959+0000",
+  "run_timestamp": "2026-07-08T07:29:59+00:00",
+  "schema": "final_comparison_run_manifest/v1",
+  "split_policy": {
+    "artifact_freeze_path": "reports/training-readiness/artifact-freeze.json",
+    "dev_split": "dev",
+    "final_split": "test",
+    "policy": "read final split once; no tuning after final",
+    "sha256": "10a270c54b7fa8cc5ef7d56f3cb9a916d63c6a644e03bb48d83047f6e8e40428",
+    "training_split": "train"
+  },
+  "ssh_used": false,
+  "training": "not_executed",
+  "tuning_after_final": "forbidden"
+}
