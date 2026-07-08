@@ -210,7 +210,20 @@ final metrics, modify final rankings, or make an unsupported improvement claim.
 Evidence: `README.md`, `docs/project-card.md`, `docs/resume-bullets.md`,
 `docs/interview-talking-points.md`, `docs/evidence-index.md`,
 `docs/human-briefs/2026-07-08-add-final-presentation-package.html`,
-`openspec/changes/add-final-presentation-package/`.
+`openspec/changes/archive/2026-07-08-add-final-presentation-package/`.
+
+### Phase 7B v0.1 Release Preparation
+
+Status: release-preparation package prepared for review. This phase does not
+create a tag, publish a GitHub Release, deploy, rerun final comparison, read
+final labels/qrels, train, tune, modify final metrics, modify final rankings,
+or add an unsupported improvement claim.
+
+Evidence: `CHANGELOG.md`, `docs/release/v0.1.0-release-notes.md`,
+`docs/release/v0.1.0-tag-checklist.md`,
+`reports/release/v0.1.0-release-readiness.json`,
+`docs/human-briefs/2026-07-08-prepare-v0-1-final-release.html`,
+`openspec/changes/prepare-v0-1-final-release/`.
 
 ## Validation Surface
 

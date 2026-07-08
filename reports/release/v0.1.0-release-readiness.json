@@ -1,0 +1,57 @@
+{
+  "schema": "visdoc_release_readiness/v1",
+  "phase": "7B",
+  "status": "release_preparation",
+  "release": {
+    "version": "v0.1.0",
+    "tag_created": false,
+    "github_release_published": false,
+    "planned_tag_target": "post_merge_main_head",
+    "base_main_head_at_prep_start": "0d38d1089178677bcdac000de259607fea09bbcd"
+  },
+  "open_prs_at_prep_start": 0,
+  "active_openspec_changes_at_prep_start": 0,
+  "final_comparison": {
+    "rerun": false,
+    "final_test_read_in_this_phase": false,
+    "phase_6d_final_test_already_read_once": true,
+    "no_retune_pledge_active": true,
+    "claim_status": "no_clear_improvement_claim",
+    "benchmark_improvement_claim_supported": false,
+    "mock_visual_is_real_visual_model_performance": false,
+    "tiny_lora_adapter_status": "not_available",
+    "zero_shot_visual_backend_status": "not_available"
+  },
+  "hygiene": {
+    "training": "not_executed",
+    "tuning": "not_executed",
+    "a100_or_gpu_used": false,
+    "ssh_used": false,
+    "model_download": "not_executed",
+    "deploy": "not_executed",
+    "model_weights_committed": false,
+    "adapter_checkpoints_committed": false,
+    "cache_artifacts_committed": false,
+    "private_config_or_path_committed": false
+  },
+  "evidence": {
+    "release_notes": "docs/release/v0.1.0-release-notes.md",
+    "tag_checklist": "docs/release/v0.1.0-tag-checklist.md",
+    "changelog": "CHANGELOG.md",
+    "final_report": "reports/final-comparison/final-comparison-report.md",
+    "final_manifest": "reports/final-comparison/final-comparison-run-manifest.json",
+    "final_metrics": "reports/final-comparison/final-metrics.json",
+    "final_claim_checklist": "reports/final-comparison/final-claim-checklist.json",
+    "no_retune_pledge": "reports/final-comparison/no-retune-pledge.md"
+  },
+  "validation": {
+    "unicode_control_scan": "passed",
+    "py_compile": "passed",
+    "pyproject_parse": "passed",
+    "pytest_safe": "135 passed with tests/test_final_comparison_run.py intentionally excluded",
+    "ruff": "passed",
+    "mypy": "passed",
+    "openspec": "22 passed, 0 failed",
+    "git_diff_check": "passed"
+  }
+}
