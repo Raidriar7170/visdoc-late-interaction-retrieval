@@ -1,0 +1,427 @@
+{
+  "candidate_universe": {
+    "candidate_page_count": 8,
+    "candidate_split_counts": {
+      "test": 8
+    },
+    "evaluated_query_count": 24,
+    "evaluated_splits": [
+      "test"
+    ],
+    "name": "evaluated_split_pages"
+  },
+  "final_test_read": true,
+  "phase": "6D",
+  "protocol_version": "phase-6b-final-comparison-protocol/v1",
+  "result_interpretation": {
+    "claim_status": "no_clear_improvement_claim",
+    "improvement_claim_supported": false,
+    "summary": "Final comparison ran on deterministic baselines and mock visual scaffold only; no clear benchmark improvement claim is supported."
+  },
+  "schema": "final_comparison_metrics/v1",
+  "split_scope": "final_test",
+  "systems": {
+    "bm25": {
+      "adapter_status": "not_applicable",
+      "artifact_source": "checked_in_deterministic_runner",
+      "benchmark_claim": "none",
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.39375,
+            "ndcg_at_10": 0.5332485605234158,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.46875,
+            "ndcg_at_10": 0.5942677971076449,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": "reports/final-comparison/final-metrics.json",
+      "final_test_used": true,
+      "method_family": "text_lexical",
+      "method_id": "bm25",
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7687499999999999,
+        "ndcg_at_10": 0.8238302057361316,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.9166666666666666
+      },
+      "notes": [
+        "Executed once under Phase 6D frozen protocol.",
+        "No training, tuning, GPU, model download, or adapter checkpoint used."
+      ],
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7687499999999999,
+          "ndcg_at_10": 0.8238302057361316,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.9166666666666666
+        },
+        "support": 24
+      },
+      "split_scope": "final_test",
+      "status": "final_benchmark"
+    },
+    "bm25_lexical_rrf": {
+      "adapter_status": "not_applicable",
+      "artifact_source": "checked_in_deterministic_runner",
+      "benchmark_claim": "none",
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.4107142857142857,
+            "ndcg_at_10": 0.5473851301103388,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.5
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.46875,
+            "ndcg_at_10": 0.5942677971076449,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": "reports/final-comparison/final-metrics.json",
+      "final_test_used": true,
+      "method_family": "hybrid_rrf",
+      "method_id": "bm25_lexical_rrf",
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7715773809523809,
+        "ndcg_at_10": 0.8261863006672855,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.875
+      },
+      "notes": [
+        "Executed once under Phase 6D frozen protocol.",
+        "No training, tuning, GPU, model download, or adapter checkpoint used."
+      ],
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7715773809523809,
+          "ndcg_at_10": 0.8261863006672855,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.875
+        },
+        "support": 24
+      },
+      "split_scope": "final_test",
+      "status": "final_benchmark"
+    },
+    "lexical_cosine": {
+      "adapter_status": "not_applicable",
+      "artifact_source": "checked_in_deterministic_runner",
+      "benchmark_claim": "none",
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.6666666666666666,
+            "ndcg_at_10": 0.7539531690476383,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.425,
+            "ndcg_at_10": 0.560764998585641,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.4732142857142857,
+            "ndcg_at_10": 0.598734911244546,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.25,
+            "recall_at_5": 0.75
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 1.0,
+            "recall_at_5": 1.0
+          },
+          "support": 8
+        }
+      },
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": "reports/final-comparison/final-metrics.json",
+      "final_test_used": true,
+      "method_family": "text_lexical",
+      "method_id": "lexical_cosine",
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.7747023809523809,
+        "ndcg_at_10": 0.8291607977693193,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.6666666666666666,
+        "recall_at_5": 0.9166666666666666
+      },
+      "notes": [
+        "Executed once under Phase 6D frozen protocol.",
+        "No training, tuning, GPU, model download, or adapter checkpoint used."
+      ],
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.7747023809523809,
+          "ndcg_at_10": 0.8291607977693193,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.6666666666666666,
+          "recall_at_5": 0.9166666666666666
+        },
+        "support": 24
+      },
+      "split_scope": "final_test",
+      "status": "final_benchmark"
+    },
+    "mock_visual": {
+      "adapter_status": "not_applicable",
+      "artifact_source": "checked_in_deterministic_runner",
+      "benchmark_claim": "none",
+      "by_query_type": {
+        "figure": {
+          "metrics": {
+            "evaluated_queries": 3,
+            "mrr": 0.5833333333333334,
+            "ndcg_at_10": 0.6872021038816168,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.3333333333333333,
+            "recall_at_5": 1.0
+          },
+          "support": 3
+        },
+        "layout": {
+          "metrics": {
+            "evaluated_queries": 5,
+            "mrr": 0.40714285714285714,
+            "ndcg_at_10": 0.5456545956623036,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.2,
+            "recall_at_5": 0.6
+          },
+          "support": 5
+        },
+        "ocr_failure": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.23363095238095238,
+            "ndcg_at_10": 0.40898378769963545,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.0,
+            "recall_at_5": 0.25
+          },
+          "support": 4
+        },
+        "table": {
+          "metrics": {
+            "evaluated_queries": 4,
+            "mrr": 0.1919642857142857,
+            "ndcg_at_10": 0.37625134930677107,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.0,
+            "recall_at_5": 0.25
+          },
+          "support": 4
+        },
+        "text": {
+          "metrics": {
+            "evaluated_queries": 8,
+            "mrr": 0.32440476190476186,
+            "ndcg_at_10": 0.4820258983885028,
+            "ranked_pages_per_query": 8,
+            "recall_at_1": 0.125,
+            "recall_at_5": 0.5
+          },
+          "support": 8
+        }
+      },
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": "reports/final-comparison/final-metrics.json",
+      "final_test_used": true,
+      "method_family": "visual_mock_scaffold",
+      "method_id": "mock_visual",
+      "metrics": {
+        "evaluated_queries": 24,
+        "mrr": 0.3368055555555555,
+        "ndcg_at_10": 0.4911261260454174,
+        "ranked_pages_per_query": 8,
+        "recall_at_1": 0.125,
+        "recall_at_5": 0.5
+      },
+      "notes": [
+        "Executed once under Phase 6D frozen protocol.",
+        "No training, tuning, GPU, model download, or adapter checkpoint used."
+      ],
+      "overall": {
+        "metrics": {
+          "evaluated_queries": 24,
+          "mrr": 0.3368055555555555,
+          "ndcg_at_10": 0.4911261260454174,
+          "ranked_pages_per_query": 8,
+          "recall_at_1": 0.125,
+          "recall_at_5": 0.5
+        },
+        "support": 24
+      },
+      "split_scope": "final_test",
+      "status": "final_benchmark"
+    },
+    "tiny_lora_adapter": {
+      "adapter_status": "not_available",
+      "artifact_source": "not_available",
+      "benchmark_claim": "none",
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": null,
+      "final_test_used": false,
+      "method_family": "optional_or_unavailable",
+      "method_id": "tiny_lora_adapter",
+      "metrics": null,
+      "notes": [
+        "No frozen artifact was available under the Phase 6D protocol.",
+        "Metrics were not fabricated."
+      ],
+      "split_scope": "final_test",
+      "status": "not_available"
+    },
+    "zero_shot_visual_backend": {
+      "adapter_status": "not_available",
+      "artifact_source": "not_available",
+      "benchmark_claim": "none",
+      "candidate_universe": "evaluated_split_pages",
+      "evidence_path": null,
+      "final_test_used": false,
+      "method_family": "optional_or_unavailable",
+      "method_id": "zero_shot_visual_backend",
+      "metrics": null,
+      "notes": [
+        "No frozen artifact was available under the Phase 6D protocol.",
+        "Metrics were not fabricated."
+      ],
+      "split_scope": "final_test",
+      "status": "not_available"
+    }
+  }
+}

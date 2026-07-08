@@ -1,0 +1,42 @@
+{
+  "candidate_universe": "evaluated_split_pages",
+  "final_split": "test",
+  "name": "phase-6d-one-time-frozen-final-comparison",
+  "outputs": {
+    "claim_checklist": "reports/final-comparison/final-claim-checklist.json",
+    "human_brief": "docs/human-briefs/2026-07-08-final-comparison-report.md",
+    "manifest": "reports/final-comparison/final-comparison-run-manifest.json",
+    "metrics": "reports/final-comparison/final-metrics.json",
+    "no_retune_pledge": "reports/final-comparison/no-retune-pledge.md",
+    "progress_ledger": "reports/progress-ledger.yaml",
+    "rankings": "reports/final-comparison/final-rankings.csv",
+    "report": "reports/final-comparison/final-comparison-report.md"
+  },
+  "pages_manifest": "data/synthetic-smoke/pages.jsonl",
+  "protocol_doc": "docs/final-comparison-protocol.md",
+  "protocol_spec": "openspec/specs/final-comparison-protocol/spec.md",
+  "queries_manifest": "data/synthetic-smoke/queries.jsonl",
+  "readiness_evidence": "reports/final-comparison-protocol/phase-6c-execution-gate-dry-run.json",
+  "systems": {
+    "bm25": {
+      "enabled": true
+    },
+    "bm25_lexical_rrf": {
+      "enabled": true
+    },
+    "lexical_cosine": {
+      "enabled": true
+    },
+    "mock_visual": {
+      "enabled": true
+    },
+    "tiny_lora_adapter": {
+      "artifact_required": true,
+      "enabled": false
+    },
+    "zero_shot_visual_backend": {
+      "artifact_required": true,
+      "enabled": false
+    }
+  }
+}
