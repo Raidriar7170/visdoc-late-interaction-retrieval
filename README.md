@@ -54,6 +54,12 @@ For the final comparison report and claim boundary, see
 [`reports/final-comparison/final-comparison-report.md`](reports/final-comparison/final-comparison-report.md)
 and
 [`reports/final-comparison/final-claim-checklist.json`](reports/final-comparison/final-claim-checklist.json).
+For `v0.1.0` release-preparation materials, see
+[`CHANGELOG.md`](CHANGELOG.md),
+[`docs/release/v0.1.0-release-notes.md`](docs/release/v0.1.0-release-notes.md),
+[`docs/release/v0.1.0-tag-checklist.md`](docs/release/v0.1.0-tag-checklist.md),
+and
+[`reports/release/v0.1.0-release-readiness.json`](reports/release/v0.1.0-release-readiness.json).
 
 ## Project Boundary
 
