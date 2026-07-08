@@ -1,9 +1,9 @@
-current_phase: 6B
-status: PHASE_6B_FINAL_COMPARISON_PROTOCOL_FREEZE
-change: freeze-final-comparison-protocol
+current_phase: 7A
+status: PHASE_7A_FINAL_PRESENTATION_PACKAGE
+change: add-final-presentation-package
 openspec_status: active
 archive: not_archived
-updated: 2026-07-07
+updated: 2026-07-08
 data_status:
   synthetic_smoke: materialized
   families: 3
@@ -662,6 +662,37 @@ final_comparison_phase_6d_status:
     claim_checklist: reports/final-comparison/final-claim-checklist.json
     no_retune_pledge: reports/final-comparison/no-retune-pledge.md
     human_brief: docs/human-briefs/2026-07-08-final-comparison-report.md
+
+final_presentation_phase_7a_status:
+  status: presentation_package_prepared
+  change: add-final-presentation-package
+  scope: documentation_and_evidence_packaging_only
+  final_comparison_rerun: false
+  final_test_labels_or_qrels_read: false
+  final_metrics_changed: false
+  final_rankings_changed: false
+  final_manifest_changed: false
+  benchmark_claim: no_clear_improvement_claim
+  training: not_executed
+  tuning: not_executed
+  a100_or_gpu_used: false
+  ssh_used: false
+  model_download: not_executed
+  model_weights_committed: false
+  adapter_checkpoint_committed: false
+  training_cache_committed: false
+  private_config_committed: false
+  private_model_path_committed: false
+  mock_visual_presented_as_real_model_performance: false
+  tiny_runner_presented_as_training_gain: false
+  evidence:
+    readme: README.md
+    evidence_index: docs/evidence-index.md
+    project_card: docs/project-card.md
+    resume_bullets: docs/resume-bullets.md
+    interview_talking_points: docs/interview-talking-points.md
+    human_brief: docs/human-briefs/2026-07-08-add-final-presentation-package.html
+    openspec_change: openspec/changes/add-final-presentation-package
 
 hard_negative_mining_status:
   status: generated
